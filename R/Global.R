@@ -22,7 +22,7 @@ library(colorspace)
 library(igraph)
 library(TraMineR)
 
-# this is another  change
+# this is another real change
 
 source("ThreadNet_Core.R")
 source("ThreadNet_Misc.R")
