@@ -11,9 +11,17 @@
 # a set of variables that describes a set of one or more visits.
 
 # This is just a test
-ACHR_batch_V1 <- function(inFileName){
+De <- function(inFileName){
 
-#source("ThreadNetFunctions.R")
+  library(ngram)
+  library(stringr)
+  library(stringdist)
+  library(tidyr)
+
+  source("ThreadNet_Core.R")
+  source("ThreadNet_Misc.R")
+  source("ThreadNet_Graphics.R")
+  source("ThreadNet_Metrics.R")
 
 # first read in the csv
 rawOcc = read.csv(inFileName)
@@ -41,8 +49,10 @@ for (b in bucket_list){
   # select the threads that go in this bucket
   #  df = threadedOcc[,threadedOcc$threadNum ==b]
 
+
+
   # compute each of the IVs and DVs and add them to the table
- ACHR <- rbind(ACHR, list(a="a", x="x", z="z"))
+ ACHR <- rbind(ACHR, list(bucket=b, x="x", z="z"))
 
 }
 # return the table
