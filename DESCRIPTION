@@ -1,0 +1,10 @@
+Package: ThreadNet
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Brian T. Pentland, Michigan State University
+Maintainer: The package maintainer <pentlan2@msu.edu>
+Description: ThreadNet is a tool for exploratory sequential data analysis.  It converts threads into networks and provides some simple visualizations. 
+License: GNU General Public License (GPL-3.0)
+Encoding: UTF-8
+LazyData: true
