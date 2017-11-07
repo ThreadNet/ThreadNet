@@ -1,9 +1,9 @@
 ##########################################################################################################
 # THREADNET:  Metrics
 
-# (c) 2017 Michigan State University. This software may be used according to the terms provided in the 
+# (c) 2017 Michigan State University. This software may be used according to the terms provided in the
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
-# Absolutely no warranty! 
+# Absolutely no warranty!
 ##########################################################################################################
 # Functions for metrics:  entropy, complexity, routine-ness, etc.
 
@@ -13,18 +13,18 @@ estimate_network_complexity <- function(net){ return(estimate_task_complexity_in
 
 # this version takes vertices and edges
 estimate_task_complexity_index <- function(v,e){
-  
-  #INPUT ARGS: 
+
+  #INPUT ARGS:
   # in MatLab version, arguments were v (vertices) and e (edges)
-  # v = number of vertices  
+  # v = number of vertices
   # tested for range of 10 < v < 100
   # e = number of edges
-  
-  # 
+
+  #
   # OUTPUT ARG:
-  # cidx correlates with Log10(simple paths) with r>= 0.8  
-  
-  # from ORM paper analysis, constant is 0.12. 
+  # cidx correlates with Log10(simple paths) with r>= 0.8
+
+  # from ORM paper analysis, constant is 0.12.
   # For boundary condition of 2 nodes and 1 edge, complexity index=0, constant = 0.08
   return(  0.08 + 0.08*e - 0.08*v )
 }
@@ -32,38 +32,38 @@ estimate_task_complexity_index <- function(v,e){
 # compute Rt for a set of observations in a column from a data frame
 # Rt = the fraction (0 < Rt < 1) of the data that conforms to the patterns
 # freq = same set of ngrams used for simpson's D, typically the largest portion of the distribution
-# total N = sum of occurrences -- should include ALL, not just the ones that 
+# total N = sum of occurrences -- should include ALL, not just the ones that
 #    were included in the ngrams
 #  n = ngram length
 compute_Rt <- function(freq, n, totalN){
-  
+
   # count # of occurrences that match the observed ngrams
   # just multiply count * length
   N = sum(freq)*n
-  
+
   # return the fraction of the total
   return(N/totalN)
 }
 
 routineness_metrics <- function(freq,n,totalN){
-  
+
   # how many kind of ngrams to include
   g = length(freq)
-  
+
   npatterns = matrix(1:g, nrow=g,ncol=1 )
   entropy = matrix(data=0, nrow=g,ncol=1)
   simpsonD= matrix(data=0, nrow=g,ncol=1)
   Rp= matrix(data=0, nrow=g,ncol=1)
   Rt= matrix(data=0, nrow=g,ncol=1)
-  
-  
+
+
   for (i in 1:length(freq)){
     entropy[i] = compute_entropy(freq[1:i])
     simpsonD[i] = compute_simpsonD(freq[1:i])
     Rp[i] = 1-simpsonD[i]
     Rt[i] = compute_Rt(freq[1:i], n, totalN)
   }
-  
+
   rm = data.frame(npatterns,entropy,simpsonD,Rp, Rt)
   return(rm)
 }
@@ -72,7 +72,7 @@ routineness_metrics <- function(freq,n,totalN){
 # use built-in functions for in=memory compression
 # normalized by length, so it's a compression ratio
 # near zero = highly repetitive.  Near 1 = nearly random
-compression_index <- function(df,CF){ return(length(memCompress(as.raw(df[[CF]]),type="gzip"))/length(df[[CF]])) }
+compression_index <- function(df,CF){ return(length(memCompress(as.raw(df[[CF]]),type="gzip"))/length(as.raw(df[[CF]]))) }
 
 
 #compute entropy for a set of observations in a column from a data frame
