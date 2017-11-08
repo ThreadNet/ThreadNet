@@ -11,24 +11,30 @@
 # a set of variables that describes a set of one or more visits.
 
 # This is just a test
-De <- function(inFileName){
+ACHR_batch_V1 <- function(inFileName){
 
-  library(ngram)
-  library(stringr)
-  library(stringdist)
-  library(tidyr)
-
-  source("ThreadNet_Core.R")
-  source("ThreadNet_Misc.R")
-  source("ThreadNet_Graphics.R")
-  source("ThreadNet_Metrics.R")
+  # library(ngram)
+  # library(stringr)
+  # library(stringdist)
+  # library(tidyr)
+  #
+  # source("ThreadNet_Core.R")
+  # source("ThreadNet_Misc.R")
+  # source("ThreadNet_Graphics.R")
+  # source("ThreadNet_Metrics.R")
 
 # first read in the csv
 rawOcc = read.csv(inFileName)
 
-# clean up the ocurrences, add week and month columns
+
 # HARD-CODED COLUMNS!!
-occ = cleanOcc(rawOcc, c("role","workstn","action"))
+TN = "threadID"
+CFs =  c("role","workstn","action")
+
+
+
+# clean up the ocurrences, add week and month columns
+occ = cleanOcc(rawOcc,CFs)
 
 # make threads -- NEED TO CHANGE THESE COLUMN NAMES
 threadedOcc <- ThreadOccByPOV(occ,"threadID",c("role","workstn","action"))
@@ -47,16 +53,36 @@ ACHR <- NULL
 for (b in bucket_list){
 
   # select the threads that go in this bucket
-  #  df = threadedOcc[,threadedOcc$threadNum ==b]
+    df = threadedOcc[threadedOcc[[TN]] ==b,]
 
+    # length of the thread (number of rows)
+    tl = nrow(df)
+
+  # compute stuff on each context factor
+    IV <- NULL
+  for (cf in CFs){
+
+    # get the compression
+    IV_name = paste0(cf,"_compression")
+    IV = c(IV,IV_name,  compression_index(df,cf))
+
+    # get the entropy
+    IV_name = paste0(cf,"_entropy")
+    IV = c(IV,IV_name,  compute_entropy(table(df[[cf]])[table(df[[cf]])>0]))
+
+    # get the network complexity
+
+
+
+  }
 
 
   # compute each of the IVs and DVs and add them to the table
- ACHR <- rbind(ACHR, list(bucket=b, x="x", z="z"))
+ ACHR <- rbind(ACHR, list(bucket=b, threadLen=tl, x="x", z="z", IV = IV))
 
 }
 # return the table
-ACHR
+as.data.frame(ACHR)
 }
 
 
