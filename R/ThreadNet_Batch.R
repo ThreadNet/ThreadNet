@@ -13,31 +13,22 @@
 # This is just a test
 ACHR_batch_V1 <- function(inFileName){
 
-  # library(ngram)
-  # library(stringr)
-  # library(stringdist)
-  # library(tidyr)
-  #
-  # source("ThreadNet_Core.R")
-  # source("ThreadNet_Misc.R")
-  # source("ThreadNet_Graphics.R")
-  # source("ThreadNet_Metrics.R")
 
 # first read in the csv
-rawOcc = read.csv(inFileName)
+rawOcc = fread(inFileName)
 
 
-# HARD-CODED COLUMNS!!
+# HARD-CODED COLUMNS!! Should probably pass in as a parameters
 TN = "threadID"
 CFs =  c("role","workstn","action")
-
+DV= newColName(CFs)
 
 
 # clean up the ocurrences, add week and month columns
 occ = cleanOcc(rawOcc,CFs)
 
-# make threads -- NEED TO CHANGE THESE COLUMN NAMES
-threadedOcc <- ThreadOccByPOV(occ,"threadID",c("role","workstn","action"))
+# make threads - this will also make a new column that combines the CFs
+threadedOcc <- ThreadOccByPOV(occ,TN,CFs)
 
 # may want to make threads with and without different CFs to define events, as well
 
@@ -46,50 +37,86 @@ threadedOcc <- ThreadOccByPOV(occ,"threadID",c("role","workstn","action"))
 criteria <-"threadID"
 bucket_list <- make_buckets(threadedOcc, criteria)
 
-# print(bucket_list)
+# get the size (number of buckets)
+N = length(bucket_list)
 
-# loop through the buckets. Result will be data frame with one row per bucket
-ACHR <- NULL
-for (b in bucket_list){
+# pre-allocate the data.table.  Tables are supposed to be faster.
+ACHR = data.table(bucket=integer(N),
+                  NEvents = integer(N),
+                  NDiagnoses = integer(N),
+                  NProcedures = integer(N),
+                  visitStartTime = numeric(N),  # might need special data type for time
+                  VisitDuration=numeric(N),  # might need special data type for time
+                  NetComplexity=double(N),
+                  CompressRatio = double(N),
+                  Clinic = character(N),
+                  PrimaryDiagnosis = character(N),
+                  PayerType = character(N),
+                  Provider = character(N)  # might not be available
+                  )
 
-  # select the threads that go in this bucket
-    df = threadedOcc[threadedOcc[[TN]] ==b,]
+# Now add columns for the IVs.  There will be three for each IV
 
-    # length of the thread (number of rows)
-    tl = nrow(df)
+# Add the IV columns
+for (cf in CFs){
 
-  # compute stuff on each context factor
-    IV <- NULL
-  for (cf in CFs){
-
-    # get the compression
-    IV_name = paste0(cf,"_compression")
-    IV = c(IV,IV_name,  compression_index(df,cf))
-
-    # get the entropy
-    IV_name = paste0(cf,"_entropy")
-    IV = c(IV,IV_name,  compute_entropy(table(df[[cf]])[table(df[[cf]])>0]))
-
-    # get the network complexity
-
-
-
-  }
-
-
-  # compute each of the IVs and DVs and add them to the table
- ACHR <- rbind(ACHR, list(bucket=b, threadLen=tl, x="x", z="z", IV = IV))
+  ACHR[, paste0(cf,"_count"):= double(N)]
+  ACHR[, paste0(cf,"_compression"):= double(N)]
+  ACHR[, paste0(cf,"_entropy"):= double(N)]
 
 }
+
+# loop through the buckets. Result will be data frame with one row per bucket
+for (i in 1:N){
+
+  b = i #  as.integer(bucket_list[i])
+
+  # select the threads that go in this bucket
+    df = threadedOcc[threadedOcc[[TN]] ==bucket_list[i],]
+
+    # bucket number
+    ACHR[b,bucket := b]
+
+    # length of the thread (number of rows)
+    ACHR[b,NEvents := nrow(df)]
+
+    # only do the computations if there are more than two occurrences
+    if (nrow(df) > 2) {
+
+    # compressibility of DV
+    ACHR[b,CompressRatio := compression_index(df,DV)]
+
+    # NetComplexity of DV
+    # First get the network
+    n = threads_to_network(df,TN, DV)
+    ACHR[b,NetComplexity := estimate_network_complexity( n )]
+
+  # compute stuff on each context factor
+  for (cf in CFs){
+
+    # Count the unique elements in each cf
+    ACHR[b, paste0(cf,"_count") :=  length(unique(df[[cf]])) ]
+
+    # get the compression
+    ACHR[b, paste0(cf,"_compression") := compression_index(df,cf) ]
+
+    # get the entropy
+    ACHR[b, paste0(cf,"_entropy") := compute_entropy(table(df[[cf]])[table(df[[cf]])>0]) ]
+
+  }
+} # kf nrows > 2
+
+} # loop thru buckets
+
 # return the table
-as.data.frame(ACHR)
+return(ACHR)
 }
 
 
 # Each bucket is a list of thread numbers that can be used to subset the list of occurrences
 make_buckets <- function(o, criteria){
 
-  return((unique(o[[criteria]])))
+  return( levels(o[[criteria]]) )
 
 }
 

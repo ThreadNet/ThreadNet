@@ -25,10 +25,10 @@ library(TraMineR)
 
 # this is another change
 
-source("ThreadNet_Core.R")
-source("ThreadNet_Misc.R")
-source("ThreadNet_Graphics.R")
-source("ThreadNet_Metrics.R")
+# source("ThreadNet_Core.R")
+# source("ThreadNet_Misc.R")
+# source("ThreadNet_Graphics.R")
+# source("ThreadNet_Metrics.R")
 
 # Global variables, config settings, etc. can be defined here
 

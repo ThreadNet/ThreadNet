@@ -72,7 +72,9 @@ routineness_metrics <- function(freq,n,totalN){
 # use built-in functions for in=memory compression
 # normalized by length, so it's a compression ratio
 # near zero = highly repetitive.  Near 1 = nearly random
-compression_index <- function(df,CF){ return(length(memCompress(as.raw(df[[CF]]),type="gzip"))/length(as.raw(df[[CF]]))) }
+compression_index <- function(df,CF){ return(
+    length(memCompress(paste0(as.character(df[[CF]])),type="gzip")) /
+    length(paste0(as.character(df[[CF]]))) ) }
 
 
 #compute entropy for a set of observations in a column from a data frame
