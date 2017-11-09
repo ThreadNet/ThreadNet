@@ -313,7 +313,7 @@ server <- shinyServer(function(input, output, session) {
                             get_Zoom_COMP()) )
 
 
-
+  ########################  MOVING WINDOW TAB ##############################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
     sliderInput("MovingWindowSizeID","Window Size", 1,10,1,step=1,ticks=FALSE )
@@ -323,7 +323,9 @@ server <- shinyServer(function(input, output, session) {
   })
 
   # just leave it blank for now...
- output$MovingWindow_Plot <- renderPlotly( plotly_empty() )
+ output$MovingWindow_Plot <- renderVisNetwork({
+   w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
+   eventNetwork( w, "threadNum", get_Zoom_TM()) })
 
 
   ############################  Admin, params, etc  ##############################

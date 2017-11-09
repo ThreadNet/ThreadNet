@@ -97,7 +97,7 @@ ui <- fluidPage(
               tabPanel("Moving Window",
                        uiOutput("Moving_Window_Tab_Controls_1"),
                        uiOutput("Moving_Window_Tab_Controls_2"),
-                       plotlyOutput("MovingWindow_Plot")
+                       visNetworkOutput("MovingWindow_Plot")
               ),
               tabPanel("Admin",
 
