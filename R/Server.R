@@ -65,6 +65,7 @@ server <- shinyServer(function(input, output, session) {
 
   # This slider controls the zoom level for zooming in-out
   get_Zoom_TM <<- reactive({ return(paste0("E_",input$ThreadMapZoomID))})
+  get_Zoom_COMP <<- reactive({ return(paste0("E_",input$ComparisonZoomID))})
 
 
 
