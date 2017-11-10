@@ -109,8 +109,9 @@ ui <- fluidPage(
                         tags$h4("Code advisors:"),
                               tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills"),
                         tags$h4("Collaborators:"),
-                             tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"))
-
+                             tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
+                        tags$h4("Related Publications:"),
+                        tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ))
              )
   )
 
