@@ -167,7 +167,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
 ##############################################################################################################
-OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMapName,CF_compare,timescale){
+OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMapName,EVENT_CF, compare_CF, timescale){
 
   # Inputs: o = table of occurrences
   #         m = method parameter = c('Variable chunks','Uniform chunks')
@@ -218,11 +218,9 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
     seqNum = integer(nChunks))
 
   # add columns for each of the context factors used for comparison
-  for (cf in CF_compare){
+  for (cf in compare_CF){
     e[cf] = character(nChunks)
   }
-
-
 
   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
@@ -259,7 +257,7 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
 
 
     # fill in data for each of the context factors
-    for (cf in CF_compare){
+    for (cf in compare_CF){
       e[chunkNo,cf] = o[start_idx,cf]
     }
 
@@ -276,7 +274,7 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
   }
 
   # convert them to factors
-  for (cf in CF_compare){
+  for (cf in compare_CF){
     e[cf] = as.factor(e[,cf])
   }
 
@@ -293,11 +291,21 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
   for (i in 1:nChunks){
     for (j in 1:i){
 
-      chunk1 = as.integer(unlist(o[e$eventStart[i]:e$eventStop[i],get_EVENT_CF()]))
-      chunk2 = as.integer(unlist(o[e$eventStart[j]:e$eventStop[j],get_EVENT_CF()]))
+      chunk1 = unique(as.integer(unlist(o[e$eventStart[i]:e$eventStop[i],newColName(EVENT_CF)])))
+      chunk2 = unique(as.integer(unlist(o[e$eventStart[j]:e$eventStop[j],newColName(EVENT_CF)])))
+
+      print(EVENT_CF)
+      print(newColName(EVENT_CF))
+      print("chunk1")
+      print(chunk1)
+
+      print("chunk2")
+      print(chunk2)
 
       dm[i,j] <- seq_dist(chunk1, chunk2, method='osa')
 
+      print("dm[i,j]")
+      print(dm[i,j])
     }
   }
 

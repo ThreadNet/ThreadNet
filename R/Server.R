@@ -36,6 +36,7 @@ server <- shinyServer(function(input, output, session) {
                         input$Threshold_slider,
                         input$CHUNK_CF_ID,
                         input$EventMapName,
+                        get_EVENT_CF(),
                         get_COMPARISON_CF(),
                         get_timeScale()) )})
 
