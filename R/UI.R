@@ -65,7 +65,9 @@ ui <- fluidPage(
                        uiOutput("Event_Tab_Controls_1"),
                        uiOutput("Event_Tab_Controls_2"),
                        uiOutput("Event_Tab_Controls_3"),
+                       plotOutput("Event_Tab_Output_3"),
                        tableOutput("Event_Tab_Output_2")
+
               ),
               tabPanel("Zooming in-out",
                        tags$h3("Move slider to adjust granularity of event categories."),
@@ -99,18 +101,17 @@ ui <- fluidPage(
                        uiOutput("Moving_Window_Tab_Controls_2"),
                        visNetworkOutput("MovingWindow_Plot")
               ),
-              tabPanel("Admin",
 
-                         tabsetPanel(type = "tabs",
-                                     tabPanel("Current Parameter Settings",
-                                              tableOutput("currentParameterSettings")),
-                                     tabPanel("Acknowledgements",
-                                              tags$h4("People, references, etc.")),
-                                              # verbatimTextOutput(outputId, placeholder = FALSE)),
+              tabPanel("Parameter Settings",
+                        tableOutput("currentParameterSettings")
+                       ),
+               tabPanel("Acknowledgements",
+                        tags$h4("Code advisors:"),
+                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills"),
+                        tags$h4("Collaborators:"),
+                             tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"))
 
-                                     tabPanel("Other",
-                                              tags$h4("Other...")))
-              )
              )
   )
+
 

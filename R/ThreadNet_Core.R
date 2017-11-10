@@ -294,32 +294,29 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
       chunk1 = unique(as.integer(unlist(o[e$eventStart[i]:e$eventStop[i],newColName(EVENT_CF)])))
       chunk2 = unique(as.integer(unlist(o[e$eventStart[j]:e$eventStop[j],newColName(EVENT_CF)])))
 
-      print(EVENT_CF)
-      print(newColName(EVENT_CF))
-      print("chunk1")
-      print(chunk1)
-
-      print("chunk2")
-      print(chunk2)
+      # print(newColName(EVENT_CF))
+      # print("chunk1")
+      # print(chunk1)
+      # print("chunk2")
+      # print(chunk2)
 
       dm[i,j] <- seq_dist(chunk1, chunk2, method='osa')
 
-      print("dm[i,j]")
-      print(dm[i,j])
+      # print("dm[i,j]")
+      # print(dm[i,j])
     }
   }
 
   ### Cluster the chunks
-  fit <- hclust(as.dist(dm), method="ward.D2")
+  clust <- hclust(as.dist(dm), method="ward.D2")
 
-
-
-  ## plot(fit) # display dendogram
+  ## Create a new column for each cluster solution -- would be faster with data.table
   for (cluster_level in 1:nChunks){
 
     clevelName = paste0("E_",cluster_level)
-    e[clevelName] = cutree(fit, k=cluster_level)
+    e[clevelName] = cutree(clust, k=cluster_level)
 
   }
-  return(e)
+#  return(e)
+  return(list(threads = e, cluster = clust))
 }

@@ -28,7 +28,7 @@ server <- shinyServer(function(input, output, session) {
 
 
   ######  From here on down, we are working with events, not occurrences   #######
-  threadedEvents <- reactive({
+  threadedEventCluster <- reactive({
     input$EventButton
     isolate(OccToEvents(threadedOcc(),
                         input$Event_method_ID,
@@ -39,6 +39,10 @@ server <- shinyServer(function(input, output, session) {
                         get_EVENT_CF(),
                         get_COMPARISON_CF(),
                         get_timeScale()) )})
+
+  threadedEvents <- reactive({e=threadedEventCluster()[["threads"]]})
+  threadedCluster <- reactive({e=threadedEventCluster()[["cluster"]]})
+
 
 
   ##################################################
@@ -205,7 +209,9 @@ server <- shinyServer(function(input, output, session) {
 
   output$Event_Tab_Output_1  = renderText( "Add a nested tabset with table, threadmap, and ngrams... " )
 
-  output$Event_Tab_Output_2  = renderTable({ threadedEvents() })
+  output$Event_Tab_Output_2  = renderTable({ head( threadedEvents()) })
+  output$Event_Tab_Output_3  = renderPlot({ plot(threadedCluster()) })
+
 
 
   ##################### 5.THREAD  tab ################################
