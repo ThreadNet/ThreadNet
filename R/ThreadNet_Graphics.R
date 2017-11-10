@@ -1,7 +1,7 @@
 ##########################################################################################################
 # THREADNET Graphics functions
 
-# (c) 2017 Michigan State University. This software may be used according to the terms provided in the
+# This software may be used according to the terms provided in the
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
 # Absolutely no warranty!
 ##########################################################################################################

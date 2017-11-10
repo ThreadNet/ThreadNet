@@ -1,7 +1,7 @@
 ##########################################################################################################
 # THREADNET:  SHINY SERVER
 
-# (c) 2017 Michigan State University. This software may be used according to the terms provided in the
+# This software may be used according to the terms provided in the
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
 # Absolutely no warranty!
 ##########################################################################################################
@@ -31,6 +31,7 @@ server <- shinyServer(function(input, output, session) {
   threadedEventCluster <- reactive({
     input$EventButton
     isolate(OccToEvents(threadedOcc(),
+                        input$MappingID,
                         input$Event_method_ID,
                         input$uniform_chunk_slider,
                         input$Threshold_slider,
@@ -40,8 +41,8 @@ server <- shinyServer(function(input, output, session) {
                         get_COMPARISON_CF(),
                         get_timeScale()) )})
 
-  threadedEvents <- reactive({e=threadedEventCluster()[["threads"]]})
-  threadedCluster <- reactive({e=threadedEventCluster()[["cluster"]]})
+  threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
+  threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
 
 
@@ -69,8 +70,8 @@ server <- shinyServer(function(input, output, session) {
   get_timeScale <<- reactive({ return(input$timeScaleID) })
 
   # This slider controls the zoom level for zooming in-out
-  get_Zoom_TM <<- reactive({ return(paste0("E_",input$ThreadMapZoomID))})
-  get_Zoom_COMP <<- reactive({ return(paste0("E_",input$ComparisonZoomID))})
+  get_Zoom_TM <<- reactive({ return( ifelse (input$MappingID =="One-to-One", "E_1", paste0("E_",input$ThreadMapZoomID))) })
+  get_Zoom_COMP <<- reactive({ return( ifelse (input$MappingID =="One-to-One", "E_1", paste0("E_",input$ComparisonZoomID))) })
 
 
 
@@ -175,13 +176,23 @@ server <- shinyServer(function(input, output, session) {
 
   ##################### 3.OCC to EVENT  tab ################################
 
-  output$Event_Tab_Controls_1 <- renderUI({tags$div(
 
-    radioButtons("Event_method_ID", "Select method to map occurrences to events:",
-                 c('Variable chunks','Uniform chunks', 'Time gap'), selected="Variable chunks", inline=TRUE))
+  output$Event_Tab_Controls_0 <- renderUI({tags$div(
+
+    radioButtons("MappingID", "Map occurrences to events using:",
+                 c('One-to-One','Clustering'), selected="One-to-One", inline=TRUE))
+  })
+
+  output$Event_Tab_Controls_1 <- renderUI({tags$div(
+  if (input$MappingID == "Clustering"){
+    radioButtons("Event_method_ID", "How to form chunks of occurrences for clustering into events:",
+                 c('Variable chunks','Uniform chunks', 'Time gap'), selected="Variable chunks", inline=TRUE)}
+    )
     })
 
     output$Event_Tab_Controls_2 <- renderUI({
+      if (input$MappingID == "Clustering"){
+
       if (input$Event_method_ID == 'Variable chunks')
       {tags$div(checkboxGroupInput("CHUNK_CF_ID","Start new event when ALL of these change:",
                                    get_EVENT_CF(),
@@ -195,7 +206,7 @@ server <- shinyServer(function(input, output, session) {
                     threshold_slider_max(threadedOcc()),
                     threshold_slider_selected(threadedOcc()),
                     step = 1, ticks=FALSE)}
-    })
+    }})
 
     output$Event_Tab_Controls_3 <- renderUI({tags$div(
     textInput("EventMapName", label = h4("Enter label to store/retrieve this mapping"), value = ""),
@@ -207,32 +218,29 @@ server <- shinyServer(function(input, output, session) {
       threadGapBarchart(threadedOcc(),input$Event_method_ID)
     })
 
-  output$Event_Tab_Output_1  = renderText( "Add a nested tabset with table, threadmap, and ngrams... " )
+  output$Event_Tab_Output_1  = renderText( " " )
 
   output$Event_Tab_Output_2  = renderTable({ head( threadedEvents()) })
-  output$Event_Tab_Output_3  = renderPlot({ plot(threadedCluster()) })
+  output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
 
 
 
-  ##################### 5.THREAD  tab ################################
+  ##################### ThreadMap display  ################################
 
   output$Thread_Tab_Controls_1 <- renderUI({tags$div(
-  radioButtons("displayTimeForThreads", "Display threads by:",
-               c("event time" = "event",
-                 "clock time" = "clock"),inline=TRUE))
-    sliderInput("ThreadMapZoomID",
-                "Zoom in and out by event similarity:",
-                1,100,5, step = 1, ticks=FALSE)})
 
-  # output$threadMapEvents <- renderPlotly({
-  #   threadMap(threadedEvents(),"threadNum", "seqNum",get_Zoom_TM()) })
+    ifelse(input$MappingID == "One-to-One",
+            "<h4>Zooming not available with one-to-one mapping of occurrences to events</h4>",
+        sliderInput("ThreadMapZoomID",
+                "Zoom in and out by event similarity:",
+                1,100,5, step = 1, ticks=FALSE)) ) })
 
   output$threadMapEvents <- renderPlot({
     traminer_threadMap(threadedEvents(), "threadNum", get_Zoom_TM())
   })
 
 
-  ##################### NGRAM  tab ################################
+  ##################### NGRAM  display ################################
 
 
   output$nGramBarchart = renderPlotly({
@@ -258,15 +266,6 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("NetworkZoomID",
                 "Zoom in and out by event similarity:",
                 2,100,2, step = 1, ticks=FALSE))})
-
-  # output$Network_Tab_Output_1 <- renderUI({tags$div(
-  #
-  #   renderText(paste( "Network complexity index =",
-  #                     estimate_network_complexity()
-  #                      ))
-  #
-  # )})
-
 
   output$eventNetwork <- renderVisNetwork({
     eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM()) })
@@ -304,9 +303,11 @@ server <- shinyServer(function(input, output, session) {
                    c(1,2,3,4,5), selected =1 ,inline=TRUE),
 
       sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE ),
-      sliderInput("ComparisonZoomID",
+      ifelse(input$MappingID == "One-to-One",
+             "",
+            sliderInput("ComparisonZoomID",
                   "Zoom in and out by event similarity:",
-                  1,100,5, step = 1, ticks=FALSE)
+                  1,100,5, step = 1, ticks=FALSE))
     )
   })
 
@@ -323,10 +324,10 @@ server <- shinyServer(function(input, output, session) {
   ########################  MOVING WINDOW TAB ##############################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
-    sliderInput("MovingWindowSizeID","Window Size", 1,10,1,step=1,ticks=FALSE )
+    sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
   })
   output$Moving_Window_Tab_Controls_2 <- renderUI({
-    sliderInput("WindowLocationID","Window Location (pct)", 1,100,1,step=1,ticks=FALSE )
+    sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
   # just leave it blank for now...

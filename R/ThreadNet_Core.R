@@ -1,7 +1,7 @@
 ##########################################################################################################
 # THREADNET:  Core functions
 
-# (c) 2017 Michigan State University. This software may be used according to the terms provided in the
+# This software may be used according to the terms provided in the
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
 # Absolutely no warranty!
 ##########################################################################################################
@@ -167,14 +167,17 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
 ##############################################################################################################
-OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMapName,EVENT_CF, compare_CF, timescale){
+OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_chunk_size=1, tThreshold=1, chunk_CF, EventMapName,EVENT_CF, compare_CF, timescale){
 
   # Inputs: o = table of occurrences
+  #         mapping = one-to-one or clustering
   #         m = method parameter = c('Variable chunks','Uniform chunks')
   #         uniform_chunk_size = used to identify breakpoints -- from input slider
   #         tThreshold = used to identify breakpoints -- from input slider
   #         EventMapName = used to store this mapping in an environment
-  #         CF_compare = context factors used for comparison -- need to be copied over here when the thread is created.
+  #         chunk_CF - context factors used to delineate chunks
+  #         EVENT_CF - context factors used to define events
+  #         compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
   #
   # Outputs: e = event data frame, with occurrences aggregated into events
   #           Even with the 1_to_1 method, the data structure is different
@@ -189,24 +192,52 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
   if (EventMapName ==""){return(data.frame())}
 
   #### First get the break points between the occurrances.
-  # Method one:  "Variable chunks"
-  # Method two:  Time gap
-  #  Consider MOVING the code the assigns the gaps INTO THE PREVIOUS SECTION, as a result of re-threading
 
-  if (m=="Variable chunks"){
-    breakpoints = which(o$handoffGap == 0)
-  } else if (m=="Time gap") {
-    breakpoints = which(o$timeGap > tThreshold)
-  } else if (m=="Uniform chunks") {
-    breakpoints = seq(1,nrow(o),uniform_chunk_size)  # NO -- should be within each thread.
-  }
+# if we are mapping one-to-one, copy the input to the output and then add/rename some other columns as needed
+  if (mapping == "One-to-One"){
 
-  # Grab the breakpoints from the beginning of the threads as well
-  threadbreaks = which(o$seqNum == 1)
-  breakpoints = sort(union(threadbreaks,breakpoints))
+    # copy the occurrences.  Each occurrence is an event
+    e = o
+
+    # rename the threadNum and seqNum columns
+    names(e)[names(e)=="POVthreadNum"] <- "threadNum"
+    names(e)[names(e)=="POVseqNum"] <- "seqNum"
+
+    # Set eventStart and EventStop -- these are just equal to the row numbers
+    e["eventStart"] = 1:nrow(e)
+    e["eventStop"] = 1:nrow(e)
+
+    # occurrences have no duration
+    e["eventDuration"] = 0
+
+    # just add the one column with the combined values
+    e["E_1"] = as.factor(e[,newColName(EVENT_CF)])
+
+    # set the cluster solution to NULL
+    clust=NULL
+
+  } else # DO THE CLUSTERING
+    {
+
+       if (m=="Variable chunks"){
+         breakpoints = which(o$handoffGap == 0)
+        } else if (m=="Time gap") {
+          breakpoints = which(o$timeGap > tThreshold)
+        } else if (m=="Uniform chunks") {
+         breakpoints = seq(1,nrow(o),uniform_chunk_size)  # NO -- should be within each thread.
+        }
+
+
+        # Grab the breakpoints from the beginning of the threads as well
+        threadbreaks = which(o$seqNum == 1)
+         breakpoints = sort(union(threadbreaks,breakpoints))
+
 
   ### Use the break points to find the chunks -- just store the index back to the raw data
   nChunks = length(breakpoints)
+
+  print("nChunks")
+  print(nChunks)
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = data.frame(
@@ -261,7 +292,6 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
       e[chunkNo,cf] = o[start_idx,cf]
     }
 
-
     # Advance or reset the seq counters
     if (thisThread == lastThread){
       seqNo = seqNo +1
@@ -277,10 +307,6 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
   for (cf in compare_CF){
     e[cf] = as.factor(e[,cf])
   }
-
-
-  #  save(o,e,file="O_and_E.rdata")
-
 
   ### Use optimal string alignment to compare the chunks.  This is n^^2...
   # only need to compare unique chunks.
@@ -316,7 +342,12 @@ OccToEvents <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMap
     clevelName = paste0("E_",cluster_level)
     e[clevelName] = cutree(clust, k=cluster_level)
 
-  }
-#  return(e)
+      } # for cluster_level
+
+  }  # if mapping ^= "One-to-One"
+
+  # for debugging, this is really handy
+  #  save(o,e,file="O_and_E.rdata")
+
   return(list(threads = e, cluster = clust))
 }

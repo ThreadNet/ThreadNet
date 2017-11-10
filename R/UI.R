@@ -1,12 +1,11 @@
 ##########################################################################################################
 # THREADNET:  SHINY UI
 
-# (c) 2017 Michigan State University. This software may be used according to the terms provided in the
+# This software may be used according to the terms provided in the
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
 # Absolutely no warranty!
 ##########################################################################################################
-
-# Sept 7, 2017 using architecture and advice from Ezra Brooks & Pat Bills
+# Sept 7, 2017 New Shiny R version using architecture and advice from Ezra Brooks & Pat Bills
 
  pdf(NULL) # prevent plotly errors
 
@@ -62,6 +61,7 @@ ui <- fluidPage(
               ),
               tabPanel("Occurrences to Events",
                        tags$h4("Map occurrences into events"),
+                       uiOutput("Event_Tab_Controls_0"),
                        uiOutput("Event_Tab_Controls_1"),
                        uiOutput("Event_Tab_Controls_2"),
                        uiOutput("Event_Tab_Controls_3"),
@@ -70,7 +70,7 @@ ui <- fluidPage(
 
               ),
               tabPanel("Zooming in-out",
-                       tags$h3("Move slider to adjust granularity of event categories."),
+                  #     tags$h3("Move slider to adjust granularity of event categories."),
                        uiOutput("Thread_Tab_Controls_1"),
                        tabsetPanel(type = "tabs",
                           tabPanel("Repetitive Sub-sequences",
@@ -106,12 +106,18 @@ ui <- fluidPage(
                         tableOutput("currentParameterSettings")
                        ),
                tabPanel("Acknowledgements",
+                        tags$h4("Support:"),
+                          tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
+                          tags$p("Antecedents of Complexity in Healthcare Routines"),
                         tags$h4("Code advisors:"),
                               tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills"),
                         tags$h4("Collaborators:"),
                              tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
                         tags$h4("Related Publications:"),
-                        tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ))
+                        tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ),
+                        tags$h4("ThreadNet 2 (MatLab version):"),
+                        tags$a(href="http://routines.broad.msu.edu/ThreadNet/","http://routines.broad.msu.edu/ThreadNet/" )
+                        )
              )
   )
 
