@@ -45,27 +45,17 @@ compute_Rt <- function(freq, n, totalN){
   return(N/totalN)
 }
 
-routineness_metrics <- function(freq,n,totalN){
 
-  # how many kind of ngrams to include
-  g = length(freq)
+# Freq is from the ngram phrasetable
+routineness_metric <- function(o,TN,CF,n,m){
 
-  npatterns = matrix(1:g, nrow=g,ncol=1 )
-  entropy = matrix(data=0, nrow=g,ncol=1)
-  simpsonD= matrix(data=0, nrow=g,ncol=1)
-  Rp= matrix(data=0, nrow=g,ncol=1)
-  Rt= matrix(data=0, nrow=g,ncol=1)
+  # get the ngrams
+  ng=count_ngrams(o,TN,CF,n)
 
+print(ng[1:m,])
 
-  for (i in 1:length(freq)){
-    entropy[i] = compute_entropy(freq[1:i])
-    simpsonD[i] = compute_simpsonD(freq[1:i])
-    Rp[i] = 1-simpsonD[i]
-    Rt[i] = compute_Rt(freq[1:i], n, totalN)
-  }
-
-  rm = data.frame(npatterns,entropy,simpsonD,Rp, Rt)
-  return(rm)
+  # return the ratio of occurrences in the top m most frequent ngrams to total occurrences
+    return( sum(ng$freq[1:m])*n/nrow(o) )
 }
 
 # compressibility as an index of complexity.
