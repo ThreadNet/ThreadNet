@@ -65,7 +65,12 @@ ui <- fluidPage(
                        uiOutput("Event_Tab_Controls_1"),
                        uiOutput("Event_Tab_Controls_2"),
                        uiOutput("Event_Tab_Controls_3"),
-                       plotOutput("Event_Tab_Output_3"),
+                       conditionalPanel(
+                          condition="input.MappingID=='One-to-One'",
+                          plotlyOutput("Event_Tab_Output_3")),
+                      conditionalPanel(
+                          condition="input.MappingID=='Clustering'",
+                          plotOutput("Event_Tab_Output_4")),
                        tableOutput("Event_Tab_Output_2")
 
               ),

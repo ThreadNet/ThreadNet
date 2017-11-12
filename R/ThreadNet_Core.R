@@ -313,28 +313,24 @@ OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_ch
 
   # get the unique chunks -- use the combined column, not all the EVENT_CF columns
 
-  dm = matrix(0,nrow=nChunks,ncol=nChunks)
-  for (i in 1:nChunks){
-    for (j in 1:i){
-
-      chunk1 = unique(as.integer(unlist(o[e$eventStart[i]:e$eventStop[i],newColName(EVENT_CF)])))
-      chunk2 = unique(as.integer(unlist(o[e$eventStart[j]:e$eventStop[j],newColName(EVENT_CF)])))
-
-      # print(newColName(EVENT_CF))
-      # print("chunk1")
-      # print(chunk1)
-      # print("chunk2")
-      # print(chunk2)
-
-      dm[i,j] <- seq_dist(chunk1, chunk2, method='osa')
-
-      # print("dm[i,j]")
-      # print(dm[i,j])
-    }
-  }
+  # dm = matrix(0,nrow=nChunks,ncol=nChunks)
+  # for (i in 1:nChunks){
+  #   for (j in 1:i){
+  #
+  #     chunk1 = unique(as.integer(unlist(o[e$eventStart[i]:e$eventStop[i],newColName(EVENT_CF)])))
+  #     chunk2 = unique(as.integer(unlist(o[e$eventStart[j]:e$eventStop[j],newColName(EVENT_CF)])))
+  #
+  #     dm[i,j] <- seq_dist(chunk1, chunk2, method='osa')
+  #
+  #   }
+  # }
 
   ### Cluster the chunks
-  clust <- hclust(as.dist(dm), method="ward.D2")
+  # clust <- hclust(as.dist(dm), method="ward.D2")
+
+
+  clust = hclust( dist_matrix(o, e, newColName(EVENT_CF), nChunks),  method="ward.D2" )
+
 
   ## Create a new column for each cluster solution -- would be faster with data.table
   for (cluster_level in 1:nChunks){
@@ -350,4 +346,17 @@ OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_ch
   #  save(o,e,file="O_and_E.rdata")
 
   return(list(threads = e, cluster = clust))
+}
+
+# make vector of occurrences within each chunk
+# if we can implement this using lapply it will be faster
+
+
+dist_matrix <- function(o, e, CF, nChunks){
+
+  evector=vector(mode="list", length = nChunks)
+  for (i in 1:nChunks){
+    evector[i]=unique(as.integer(unlist(o[e$eventStart[i]:e$eventStop[i],CF])))
+  }
+  return( stringdistmatrix( evector, method="osa") )
 }

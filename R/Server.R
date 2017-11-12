@@ -221,19 +221,26 @@ server <- shinyServer(function(input, output, session) {
   output$Event_Tab_Output_1  = renderText( " " )
 
   output$Event_Tab_Output_2  = renderTable({ head( threadedEvents()) })
-  output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
+#  output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
 
+  output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
+
+
+  output$Event_Tab_Output_4  = renderPlot({ plot(threadedCluster()) } )
+
+  #         {plot_dendro(as.dendrogram(threadedCluster()), height = 600)}})  # not working in plotly
 
 
   ##################### ThreadMap display  ################################
 
-  output$Thread_Tab_Controls_1 <- renderUI({tags$div(
+  output$Thread_Tab_Controls_1 <- renderUI(
 
-    ifelse(input$MappingID == "One-to-One",
-            "<h4>Zooming not available with one-to-one mapping of occurrences to events</h4>",
-        sliderInput("ThreadMapZoomID",
+     if (input$MappingID == "One-to-One")
+            {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
+     else
+            {sliderInput("ThreadMapZoomID",
                 "Zoom in and out by event similarity:",
-                1,100,5, step = 1, ticks=FALSE)) ) })
+                1,100,5, step = 1, ticks=FALSE) })
 
   output$threadMapEvents <- renderPlot({
     traminer_threadMap(threadedEvents(), "threadNum", get_Zoom_TM())
@@ -303,11 +310,12 @@ server <- shinyServer(function(input, output, session) {
                    c(1,2,3,4,5), selected =1 ,inline=TRUE),
 
       sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE ),
-      ifelse(input$MappingID == "One-to-One",
-             "",
-            sliderInput("ComparisonZoomID",
+      if (input$MappingID == "One-to-One")
+            {tags$p("")}
+        else
+            {sliderInput("ComparisonZoomID",
                   "Zoom in and out by event similarity:",
-                  1,100,5, step = 1, ticks=FALSE))
+                  1,100,5, step = 1, ticks=FALSE)}
     )
   })
 
