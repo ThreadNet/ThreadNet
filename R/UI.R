@@ -38,7 +38,7 @@ ui <- fluidPage(
                                             plotlyOutput("ContextFlowers_3")
                                             ),
                                    tabPanel("Comparison Groups",
-                                            tags$h4("Choose dimensions for comparing patterns (OPTIONAL)."),
+                                            tags$h4("Choose dimensions for comparing patterns."),
                                             tags$h4("For clarity of interpretation, these should stay the same for a group of threads."),
                                             uiOutput("POV_Tab_Controls_1"),
                                             plotlyOutput("ContextFlowers_1")
