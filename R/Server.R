@@ -135,13 +135,13 @@ server <- shinyServer(function(input, output, session) {
   output$rawOccurrenceThreadMap <- renderPlot({
     traminer_threadMap(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF())  )
   })
-
+  # output$rawOccurrenceThreadMap <- renderPlotly({
+  #   threadMap(threadedOcc(), "POVthreadNum", "POVseqNum", newColName(get_EVENT_CF())  )
+  # })
   output$rawOccurrenceThreadMap_2 <- renderPlotly({
     threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF())  )
   })
-  # output$rawOccurrenceThreadMap_3 <- renderPlotly({
-  #   threadMap_test(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF())  )
-  # })
+
 
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
 

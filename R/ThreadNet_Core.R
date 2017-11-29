@@ -338,3 +338,9 @@ dist_matrix <- function(o, e, CF, nChunks){
   }
   return( stringdistmatrix( evector, method="osa") )
 }
+
+net_adj_matrix <- function(edges){
+
+  return(as_adj(graph_from_edgelist(as.matrix(edges))))
+
+}

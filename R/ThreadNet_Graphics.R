@@ -96,11 +96,11 @@ threadMap <- function(or,TN, timescale, CF){
   nColors = length(unique(or[,CF]))
   pal <- diverge_hcl(nColors)
 
-  tp=plot_ly(or, x = ~or[[timescale]], y = ~or[[TN]], color= ~or[,CF],
+  return( plot_ly(or, x = ~or[[timescale]], y = ~or[[TN]], color= ~or[,CF],
              colors=pal,
-             name = 'threads', type = 'scatter', mode='markers', symbols='square', marker=list(size=5, opacity=1),
+             name = 'threads', type = 'scatter', mode='markers', marker=list(size=5, opacity=1), # fill='tonextx',
              symbol= "line-ew", showlegend=FALSE)
-  return(tp)
+        )
 }
 
 
