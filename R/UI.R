@@ -7,7 +7,7 @@
 ##########################################################################################################
 # Sept 7, 2017 New Shiny R version using architecture and advice from Ezra Brooks & Pat Bills
 
- pdf(NULL) # prevent plotly errors
+ pdf(NULL) # prevent plotly error
 
 ui <- fluidPage(
 
