@@ -9,9 +9,26 @@
 
 
 # takes the output from the function that maps threads to networks
+#' Title
+#'
+#' @param net
+#'
+#' @return
+#' @export
+#'
+#' @examples
 estimate_network_complexity <- function(net){ return(estimate_task_complexity_index( nrow(net$nodeDF), nrow(net$edgeDF)) ) }
 
 # this version takes vertices and edges
+#' Title
+#'
+#' @param v
+#' @param e
+#'
+#' @return
+#' @export
+#'
+#' @examples
 estimate_task_complexity_index <- function(v,e){
 
   #INPUT ARGS:
@@ -35,6 +52,16 @@ estimate_task_complexity_index <- function(v,e){
 # total N = sum of occurrences -- should include ALL, not just the ones that
 #    were included in the ngrams
 #  n = ngram length
+#' Title
+#'
+#' @param freq
+#' @param n
+#' @param totalN
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compute_Rt <- function(freq, n, totalN){
 
   # count # of occurrences that match the observed ngrams
@@ -47,6 +74,18 @@ compute_Rt <- function(freq, n, totalN){
 
 
 # Freq is from the ngram phrasetable
+#' Title
+#'
+#' @param o
+#' @param TN
+#' @param CF
+#' @param n
+#' @param m
+#'
+#' @return
+#' @export
+#'
+#' @examples
 routineness_metric <- function(o,TN,CF,n,m){
 
   # get the ngrams
@@ -62,6 +101,15 @@ print(ng[1:m,])
 # use built-in functions for in=memory compression
 # normalized by length, so it's a compression ratio
 # near zero = highly repetitive.  Near 1 = nearly random
+#' Title
+#'
+#' @param df
+#' @param CF
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compression_index <- function(df,CF){ return(
     length(memCompress(paste0(as.character(df[[CF]])),type="gzip")) /
     length(paste0(as.character(df[[CF]]))) ) }
@@ -70,6 +118,14 @@ compression_index <- function(df,CF){ return(
 #compute entropy for a set of observations in a column from a data frame
 # freq is typically going to the $freq column from ngram table, or
 # the frequency of each level in the CFs, as counted by table()
+#' Title
+#'
+#' @param freq
+#'
+#' @return
+#' @export
+#'
+#' @examples
 compute_entropy <- function(freq){
   N = sum(freq)
   p = freq/N

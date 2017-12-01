@@ -8,7 +8,18 @@
 
 # These are the basic functions that convert threads to networks, etc.
 
-# convert threads to network
+#' Converts threads to network
+#'
+#' Converts a sequentially ordered streams of events (threads) and creates a unimodal, unidimensional network.
+#' Sequentially adjacent pairs of events become edges in the resulting network.
+#'
+#' @param et dataframe containing threads
+#' @param TN name of column in dataframe that contains a unique thread number for each thread
+#' @param CF name of the column in dataframe that contains the events that will form the nodes of the network
+#'
+#' @return a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
+#'
+#' @export
 threads_to_network <- function(et,TN,CF){
 
   # First get the node names & remove the spaces
@@ -56,14 +67,22 @@ threads_to_network <- function(et,TN,CF){
   return(list(nodeDF = nodes, edgeDF = edges))
 }
 
+
 ###############################################################
 # Counting ngrams is essential to several ThreadNet functions
+#' Counts ngrams in a set of threads
+#'
+#' This function counts n-grams within threads where the length of the thread is greater than n.
+#'
+#' @param o dataframe containing threads
+#' @param TN name of column in dataframe that contains a unique thread number for each thread
+#' @param CF name of the column in dataframe that contains the events that will form the nodes of the network
+#' @param n length of ngrams to count
+#'
+#' @return a dataframe with ngram, frequency and proportion in descending order
+#'
+#' @export
 count_ngrams <- function(o,TN,CF,n){
-  # o = datafrome of threaded occurrences or events
-  # TN = threadNum
-  # CF = contextuL factors to focus on
-  # n = length of n-gram
-
 
   # Cannot put all the values in one long string.  Need a vector of strings, one for each thread
   text_vector = vector(mode="character")
@@ -92,10 +111,19 @@ count_ngrams <- function(o,TN,CF,n){
 
 
 #################################################################
-# Make threads with new POV
-# THREAD_CF is a list of 1 or more context factors that define the threads (stay constant during each thread)
-# EVENT_CF is a list of 1 or more context factors that define events (change during threads)
-# o is the dataframe of cleaned ocurrences
+#
+#' Make new threads from a new POV
+#'
+#' Take the raw occurrences from the input file and sort them by time stamp within
+#' a set of contextual factors that remain constant for each thread.
+#'
+#' @param  o is the dataframe of cleaned ocurrences
+#' #' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)
+#' @param  EVENT_CF is a list of 1 or more context factors that define events (and change during threads)
+#'
+#' @return dataframe containing the same occurrences sorted from a different point of view
+#'
+#'@export
 ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
   # make sure there is a value
@@ -167,26 +195,28 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
 ##############################################################################################################
+#' Maps occurrences into events
+#'
+#' Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
+#' occurrences in isolation.  There are many ways to accomplish this mapping.
+#'
+#' @param  o  a dataframe of occurrences
+#' @param mapping = one-to-one or clustering
+#' @param m = method parameter = one of c('Variable chunks','Uniform chunks')
+#' @param uniform_chunk_size = used to identify breakpoints -- from input slider
+#' @param tThreshold = used to identify breakpoints -- from input slider
+#' @param EventMapName = used to store this mapping in an environment (not used yet)
+#' @param chunk_CF - context factors used to delineate chunks
+#' @param EVENT_CF - context factors used to define events
+#' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
+#' @param timescale hours, min or sec
+#'
+#' @result event data frame, with occurrences aggregated into events.  Dataframe includes: threadNum, seqNum,
+#' and set of columns E_1, E_2, ..., that indicate the membership of events in clusters of events.
+#'
+#' @export
 OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_chunk_size=1, tThreshold=1, chunk_CF, EventMapName,EVENT_CF, compare_CF, timescale){
 
-  # Inputs: o = table of occurrences
-  #         mapping = one-to-one or clustering
-  #         m = method parameter = c('Variable chunks','Uniform chunks')
-  #         uniform_chunk_size = used to identify breakpoints -- from input slider
-  #         tThreshold = used to identify breakpoints -- from input slider
-  #         EventMapName = used to store this mapping in an environment
-  #         chunk_CF - context factors used to delineate chunks
-  #         EVENT_CF - context factors used to define events
-  #         compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
-  #
-  # Outputs: e = event data frame, with occurrences aggregated into events
-  #           Even with the 1_to_1 method, the data structure is different
-  # tStamp
-  # tDuration
-  # chunk (points back to o)
-  # cluster membership (based on distance between chunks)
-  # threadNum
-  # SeqNum
 
   # Only run if eventMapName is filled in; return empty data frame otherwise
   if (EventMapName ==""){return(data.frame())}
