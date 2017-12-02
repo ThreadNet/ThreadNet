@@ -8,6 +8,14 @@
 
 # Read in, check, and clean up the data
 # need to see "tStamp" in the first column
+#' Title
+#'
+#' @param inFile
+#'
+#' @return
+#' @export
+#'
+#' @examples
 read_occurrences <- function(inFile){
 
   # if it's null return null, otherwise do the whole thing...
@@ -44,6 +52,15 @@ make_example_DF = function(){
 }
 
 # this function will clean up the raw occurrence data
+#' Title
+#'
+#' @param o
+#' @param cfnames
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cleanOcc = function(o, cfnames){
 
   ## clean up the spaces here and make it back into a factor
@@ -81,6 +98,15 @@ addOther <- function(x){
   return(x) }
 
 # how many threads in the data set?
+#' Title
+#'
+#' @param o
+#' @param TN
+#'
+#' @return
+#' @export
+#'
+#' @examples
 numThreads = function(o,TN) {length(unique(o[[TN]]))}
 
 # Time range for the data set (not really needed but nice)
@@ -112,10 +138,27 @@ make_subsets <- function(d,n){
 # names of the columns for contextual factors
 # grab all of the columns except the first, which has the time stamp
 # tStamp in the first column
+#' Title
+#'
+#' @param o
+#'
+#' @return
+#' @export
+#'
+#' @examples
 cfnames <- function(o){
   colnames(o)[2:length(colnames(o))]}
 
 ## this is used to populate the UI for comparison of categories within a CF
+#' Title
+#'
+#' @param o
+#' @param cf
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_CF_levels <- function(o,cf){
 
   return(levels(o[,cf]))
@@ -123,6 +166,16 @@ get_CF_levels <- function(o,cf){
 
 ##########################################################################################################
 # this function adds a new column to the occurrenes table based on a combination of context factors CF)
+#' Title
+#'
+#' @param o
+#' @param CF
+#' @param newCol
+#'
+#' @return
+#' @export
+#'
+#' @examples
 combineContextFactors <- function(o,CF,newCol){
 
   library(tidyr)
@@ -217,6 +270,15 @@ row_diff_tStamp <- function(this_row){
 # this function should work on either ocurrences or events. It requires tStamp field
 # it returns length and duration of each thread
 # TN is the column with the threadNum
+#' Title
+#'
+#' @param o
+#' @param TN
+#'
+#' @return
+#' @export
+#'
+#' @examples
 threadSizeTable <- function(o,TN){
 
 
@@ -244,6 +306,16 @@ threadSizeTable <- function(o,TN){
 
 
 #########################################################
+#' Title
+#'
+#' @param df
+#' @param TN
+#' @param CF
+#'
+#' @return
+#' @export
+#'
+#' @examples
 convert_TN_to_TramineR <- function(df, TN, CF){
   # dataframe must be sorted by time or sequence within each threadNumber
   # TN is the threadnumber
@@ -276,12 +348,32 @@ convert_TN_to_TramineR <- function(df, TN, CF){
 }
 
 # these functions suppose the moving window
+#' Title
+#'
+#' @param e
+#' @param TN
+#' @param SN
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_threadList <- function(e,TN,SN){
 
   # for the current data structure for events, you just pick all of the threads where seqNum == 1
   return(e[e[[SN]]==1,TN])
 }
 
+#' Title
+#'
+#' @param e
+#' @param s
+#' @param l
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_moving_window <- function(e, s, l ){
   # e = event df, wih threadNum and seqNum
   # s - Size of Window

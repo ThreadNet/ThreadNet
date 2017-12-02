@@ -9,26 +9,29 @@
 
 
 # takes the output from the function that maps threads to networks
-#' Title
+#' Estimates the number of paths in a directed graph
+#'
+#' This function takes a network descripts (nodes and edges, as generaged by the functino threads_to_network, and estimates the number of paths.
+#' as described in Haerem, Pentland and Miller (2015). The estimate correlates with the McCabe's (1975) cyclometric complexity.
 #'
 #' @param net
 #'
-#' @return
+#' @return number
 #' @export
 #'
 #' @examples
 estimate_network_complexity <- function(net){ return(estimate_task_complexity_index( nrow(net$nodeDF), nrow(net$edgeDF)) ) }
 
 # this version takes vertices and edges
-#' Title
+#' Estimates the number of paths in a directed graph
 #'
-#' @param v
-#' @param e
+#' Same as estimate_network_complexity, but takes different parameters
 #'
-#' @return
+#' @param v number of vertices (or nodes)
+#' @param e number of edges
+#'
+#' @return number
 #' @export
-#'
-#' @examples
 estimate_task_complexity_index <- function(v,e){
 
   #INPUT ARGS:

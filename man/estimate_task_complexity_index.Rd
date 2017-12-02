@@ -2,13 +2,18 @@
 % Please edit documentation in R/ThreadNet_Metrics.R
 \name{estimate_task_complexity_index}
 \alias{estimate_task_complexity_index}
-\title{Title}
+\title{Estimates the number of paths in a directed graph}
 \usage{
 estimate_task_complexity_index(v, e)
 }
 \arguments{
-\item{e}{}
+\item{v}{number of vertices (or nodes)}
+
+\item{e}{number of edges}
+}
+\value{
+number
 }
 \description{
-Title
+Same as estimate_network_complexity, but takes different parameters
 }

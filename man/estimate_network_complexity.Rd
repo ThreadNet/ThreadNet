@@ -2,13 +2,17 @@
 % Please edit documentation in R/ThreadNet_Metrics.R
 \name{estimate_network_complexity}
 \alias{estimate_network_complexity}
-\title{Title}
+\title{Estimates the number of paths in a directed graph}
 \usage{
 estimate_network_complexity(net)
 }
 \arguments{
 \item{net}{}
 }
+\value{
+number
+}
 \description{
-Title
+This function takes a network descripts (nodes and edges, as generaged by the functino threads_to_network, and estimates the number of paths.
+as described in Haerem, Pentland and Miller (2015). The estimate correlates with the McCabe's (1975) cyclometric complexity.
 }

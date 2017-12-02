@@ -13,6 +13,16 @@
 ###### Pie charts for context factors  ####
 # It would be nice to display some other helpful information, perhaps (like the % of possible combinations that occur)
 
+#' Title
+#'
+#' @param oc
+#' @param CF
+#' @param nPies
+#'
+#' @return
+#' @export
+#'
+#' @examples
 CF_multi_pie <- function(oc,CF,nPies){
 
   library(plotly)
@@ -89,6 +99,17 @@ CF_multi_pie <- function(oc,CF,nPies){
 # TN is the thread number
 # timescale can be the time stamp or the sequence number
 
+#' Title
+#'
+#' @param or
+#' @param TN
+#' @param timescale
+#' @param CF
+#'
+#' @return
+#' @export
+#'
+#' @examples
 threadMap <- function(or,TN, timescale, CF){
 
   # setting color palettes
@@ -111,6 +132,18 @@ threadMap <- function(or,TN, timescale, CF){
 # CF is the column to count the n-grams in
 # n is the length of the ngram
 # mincount is the minimum count to display
+#' Title
+#'
+#' @param o
+#' @param TN
+#' @param CF
+#' @param n
+#' @param mincount
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ng_bar_chart <- function(o,TN, CF, n, mincount){
 
 
@@ -144,6 +177,16 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #       et is a dataframe with the list of events to be graphed
 #       TN is the field with the thread ID
 #       CF is the coded event -- typically a factor with levels
+#' Title
+#'
+#' @param et
+#' @param TN
+#' @param CF
+#'
+#' @return
+#' @export
+#'
+#' @examples
 eventNetwork <- function(et,TN, CF){
 
   # first convert the threads to the network
@@ -177,6 +220,17 @@ eventNetwork <- function(et,TN, CF){
 # it has a bunch of extra code because of the groups...
 # needs to be re-written to use the network function
 
+#' Title
+#'
+#' @param et
+#' @param TN
+#' @param grp
+#' @param zoom_level
+#'
+#' @return
+#' @export
+#'
+#' @examples
 eventNetworkD3 <- function(et,TN, grp, zoom_level){
   # et is a dataframe of event threads
   # TN is the column that holds the threadNumber
@@ -273,6 +327,19 @@ eventNetworkD3 <- function(et,TN, grp, zoom_level){
 
 
 ######################################################################################
+#' Title
+#'
+#' @param e
+#' @param CF
+#' @param CF_levels
+#' @param nTimePeriods
+#' @param ng_size
+#' @param zoom_level
+#'
+#' @return
+#' @export
+#'
+#' @examples
 Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_level){
 
   # get the first event of each thread, so we can order them consistently by time
@@ -343,6 +410,16 @@ Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_le
 
 ###################################################################
 # Would like to re-implement in plotly for mouse-over and for speed
+#' Title
+#'
+#' @param df
+#' @param TN
+#' @param CF
+#'
+#' @return
+#' @export
+#'
+#' @examples
 traminer_threadMap <- function(df,TN, CF){
 
   # setting color palettes
