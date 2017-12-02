@@ -11,6 +11,14 @@
 # a set of variables that describes a set of one or more visits.
 
 # This is just a test
+#' Batch processing for larger numbers of threads
+#'
+#' ACHR stands for Antecedents of Complexity in Healthcare Routines.  This is function is set up to compute process parameters on thousands of patient visits.
+#'
+#' @param inFileName name of file (CSV format) containing the raw thread data.
+#'
+#' @return nothing
+#' @export
 ACHR_batch_V1 <- function(inFileName){
 
 
