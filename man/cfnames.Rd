@@ -2,13 +2,26 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{cfnames}
 \alias{cfnames}
-\title{Title}
+\title{cfnames provides names of all the contextual factors (except the time stamp)}
 \usage{
 cfnames(o)
 }
 \arguments{
-\item{o}{}
+\item{o}{data frame with threads}
+}
+\value{
+list of column names
 }
 \description{
-Title
+cfnames provides names of all the contextual factors (except the time stamp)
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }

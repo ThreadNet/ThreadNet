@@ -2,13 +2,29 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{numThreads}
 \alias{numThreads}
-\title{Title}
+\title{numThreads counts how many threads in the data set}
 \usage{
 numThreads(o, TN)
 }
 \arguments{
-\item{TN}{}
+\item{o}{data frame with occurrences or events}
+
+\item{TN}{column with thread number}
+}
+\value{
+number of threads
 }
 \description{
-Title
+Threads must have unique thred numbers for this function to work
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}},
+  \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }

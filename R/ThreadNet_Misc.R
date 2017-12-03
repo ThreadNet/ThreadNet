@@ -8,11 +8,13 @@
 
 # Read in, check, and clean up the data
 # need to see "tStamp" in the first column
-#' Title
+#' read_occurrences
+#'
+#' @family ThreadNet_Misc
 #'
 #' @param inFile
 #'
-#' @return
+#' @return dataframe with occurrences
 #' @export
 #'
 #' @examples
@@ -53,7 +55,7 @@ make_example_DF = function(){
 
 # this function will clean up the raw occurrence data
 #' Title
-#'
+#' @family ThreadNet_Misc
 #' @param o
 #' @param cfnames
 #'
@@ -70,7 +72,8 @@ cleanOcc = function(o, cfnames){
   }
 
   ## Add the category ">other<" for all of the factors to facilitate recoding later
-  o <- as.data.frame(lapply(o, addOther))
+ # This may not be needed anymore... commented out Dec 3 2017
+ # o <- as.data.frame(lapply(o, addOther))
 
   # add weekday and month
   o$weekday = as.factor(weekdays(as.Date(o$tStamp)))
@@ -97,16 +100,16 @@ addOther <- function(x){
     return(factor(x, levels=c(levels(x), ">other<")))
   return(x) }
 
-# how many threads in the data set?
-#' Title
+#' numThreads counts how many threads in the data set
 #'
-#' @param o
-#' @param TN
+#' Threads must have unique thred numbers for this function to work
 #'
-#' @return
+#' @family ThreadNet_Misc
+#' @param o data frame with occurrences or events
+#' @param TN column with thread number
+#'
+#' @return number of threads
 #' @export
-#'
-#' @examples
 numThreads = function(o,TN) {length(unique(o[[TN]]))}
 
 # Time range for the data set (not really needed but nice)
@@ -138,27 +141,24 @@ make_subsets <- function(d,n){
 # names of the columns for contextual factors
 # grab all of the columns except the first, which has the time stamp
 # tStamp in the first column
-#' Title
+#' cfnames provides names of all the contextual factors (except the time stamp)
+#' @family ThreadNet_Misc
+#' @param o data frame with threads
 #'
-#' @param o
-#'
-#' @return
+#' @return list of column names
 #' @export
 #'
-#' @examples
 cfnames <- function(o){
   colnames(o)[2:length(colnames(o))]}
 
 ## this is used to populate the UI for comparison of categories within a CF
-#' Title
+#' get_CF_levels returns the levels of a contextual factor
+#' @family ThreadNet_Misc
+#' @param o data frame with threads
+#' @param cf  a contextual factors (column)
 #'
-#' @param o
-#' @param cf
-#'
-#' @return
+#' @return list of unique factor levels
 #' @export
-#'
-#' @examples
 get_CF_levels <- function(o,cf){
 
   return(levels(o[,cf]))
@@ -166,19 +166,21 @@ get_CF_levels <- function(o,cf){
 
 ##########################################################################################################
 # this function adds a new column to the occurrenes table based on a combination of context factors CF)
-#' Title
+#' Creates a new column that combines some set of other columns
 #'
-#' @param o
-#' @param CF
-#' @param newCol
+#' For example, actor+action
 #'
-#' @return
+#' @family ThreadNet_Misc
+#' @param o data frame with threads
+#' @param CF contextual factors to be combined.
+#' @param newCol  name of the new combined conextual factor
+#'
+#' @return data frame with the new column
 #' @export
 #'
 #' @examples
 combineContextFactors <- function(o,CF,newCol){
 
-  library(tidyr)
 
   # Use the old column if there is one
   if (!(newCol %in% names(o))) {
@@ -267,18 +269,20 @@ row_diff_tStamp <- function(this_row){
 }
 
 
-# this function should work on either ocurrences or events. It requires tStamp field
-# it returns length and duration of each thread
-# TN is the column with the threadNum
-#' Title
+
+
+#' threadSizeTable provides a distribution of the length of threads
 #'
-#' @param o
-#' @param TN
+#' This function should work on either ocurrences or events.
+#' it returns length and duration of each thread.It requires tStamp field to compute duration.
 #'
-#' @return
+#' @family ThreadNet_Misc
+#'
+#' @param o data frame with threads
+#' @param TN column comtaining the threadNumber
+#'
+#' @return data frame with table of thread lengths
 #' @export
-#'
-#' @examples
 threadSizeTable <- function(o,TN){
 
 
@@ -306,13 +310,16 @@ threadSizeTable <- function(o,TN){
 
 
 #########################################################
-#' Title
+#' convert_TN_to_TramineR
 #'
-#' @param df
-#' @param TN
-#' @param CF
+#' converts the csv format used in ThreadNet to the format used by TraMiner.  Should provide a way to save this, as well.
 #'
-#' @return
+#' @family ThreadNet_Misc
+#' @param df  threads (occurrences or events)
+#' @param TN Column with threadNumber
+#' @param CF Contextual factor that will be used to define the state sequences in TraMineR
+#'
+#' @return Dataframe in TraMineR format (state sequeces in horizontal rows)
 #' @export
 #'
 #' @examples
@@ -348,36 +355,34 @@ convert_TN_to_TramineR <- function(df, TN, CF){
 }
 
 # these functions suppose the moving window
-#' Title
+#' get_threadList returns a list of all thread numbers
 #'
-#' @param e
-#' @param TN
-#' @param SN
+#' @family ThreadNet_Misc
 #'
-#' @return
+#' @param e  data frame with threaded events
+#' @param TN Column with threadNumber
+#' @param SN Column with sequence numbers
+#'
+#' @return list of thread numbers
 #' @export
-#'
-#' @examples
 get_threadList <- function(e,TN,SN){
 
   # for the current data structure for events, you just pick all of the threads where seqNum == 1
   return(e[e[[SN]]==1,TN])
 }
 
-#' Title
+#' get_moving_window returns a set of threads for a moving window
 #'
-#' @param e
-#' @param s
-#' @param l
+#' @family ThreadNet_Misc
 #'
-#' @return
+#' @param e data frame with threads (needs to have threadNum and seqNum)
+#' @param s size of window
+#' @param l location of window
+#'
+#' @return data from with just the threads in the window
 #' @export
 #'
-#' @examples
 get_moving_window <- function(e, s, l ){
-  # e = event df, wih threadNum and seqNum
-  # s - Size of Window
-  # l = Location of window
 
   # get the list of threads
   w=get_threadList(e,"threadNum","seqNum")

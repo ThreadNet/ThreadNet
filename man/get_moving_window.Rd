@@ -2,13 +2,30 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{get_moving_window}
 \alias{get_moving_window}
-\title{Title}
+\title{get_moving_window returns a set of threads for a moving window}
 \usage{
 get_moving_window(e, s, l)
 }
 \arguments{
-\item{l}{}
+\item{e}{data frame with threads (needs to have threadNum and seqNum)}
+
+\item{s}{size of window}
+
+\item{l}{location of window}
+}
+\value{
+data from with just the threads in the window
 }
 \description{
-Title
+get_moving_window returns a set of threads for a moving window
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }

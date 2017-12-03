@@ -2,13 +2,28 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{get_CF_levels}
 \alias{get_CF_levels}
-\title{Title}
+\title{get_CF_levels returns the levels of a contextual factor}
 \usage{
 get_CF_levels(o, cf)
 }
 \arguments{
-\item{cf}{}
+\item{o}{data frame with threads}
+
+\item{cf}{a contextual factors (column)}
+}
+\value{
+list of unique factor levels
 }
 \description{
-Title
+get_CF_levels returns the levels of a contextual factor
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }

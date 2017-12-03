@@ -2,13 +2,30 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{convert_TN_to_TramineR}
 \alias{convert_TN_to_TramineR}
-\title{Title}
+\title{convert_TN_to_TramineR}
 \usage{
 convert_TN_to_TramineR(df, TN, CF)
 }
 \arguments{
-\item{CF}{}
+\item{df}{threads (occurrences or events)}
+
+\item{TN}{Column with threadNumber}
+
+\item{CF}{Contextual factor that will be used to define the state sequences in TraMineR}
+}
+\value{
+Dataframe in TraMineR format (state sequeces in horizontal rows)
 }
 \description{
-Title
+converts the csv format used in ThreadNet to the format used by TraMiner.  Should provide a way to save this, as well.
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }

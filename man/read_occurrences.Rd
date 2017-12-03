@@ -2,13 +2,26 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{read_occurrences}
 \alias{read_occurrences}
-\title{Title}
+\title{read_occurrences}
 \usage{
 read_occurrences(inFile)
 }
 \arguments{
 \item{inFile}{}
 }
+\value{
+dataframe with occurrences
+}
 \description{
-Title
+read_occurrences
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{threadSizeTable}}
 }

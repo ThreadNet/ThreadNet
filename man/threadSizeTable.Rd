@@ -2,13 +2,29 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{threadSizeTable}
 \alias{threadSizeTable}
-\title{Title}
+\title{threadSizeTable provides a distribution of the length of threads}
 \usage{
 threadSizeTable(o, TN)
 }
 \arguments{
-\item{TN}{}
+\item{o}{data frame with threads}
+
+\item{TN}{column comtaining the threadNumber}
+}
+\value{
+data frame with table of thread lengths
 }
 \description{
-Title
+This function should work on either ocurrences or events.
+it returns length and duration of each thread.It requires tStamp field to compute duration.
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{read_occurrences}}
 }

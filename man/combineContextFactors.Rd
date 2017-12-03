@@ -2,13 +2,30 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{combineContextFactors}
 \alias{combineContextFactors}
-\title{Title}
+\title{Creates a new column that combines some set of other columns}
 \usage{
 combineContextFactors(o, CF, newCol)
 }
 \arguments{
-\item{newCol}{}
+\item{o}{data frame with threads}
+
+\item{CF}{contextual factors to be combined.}
+
+\item{newCol}{name of the new combined conextual factor}
+}
+\value{
+data frame with the new column
 }
 \description{
-Title
+For example, actor+action
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{get_threadList}}, \code{\link{numThreads}},
+  \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }

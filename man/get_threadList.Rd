@@ -2,13 +2,30 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{get_threadList}
 \alias{get_threadList}
-\title{Title}
+\title{get_threadList returns a list of all thread numbers}
 \usage{
 get_threadList(e, TN, SN)
 }
 \arguments{
-\item{SN}{}
+\item{e}{data frame with threaded events}
+
+\item{TN}{Column with threadNumber}
+
+\item{SN}{Column with sequence numbers}
+}
+\value{
+list of thread numbers
 }
 \description{
-Title
+get_threadList returns a list of all thread numbers
+}
+\seealso{
+Other ThreadNet_Misc: \code{\link{cfnames}},
+  \code{\link{cleanOcc}},
+  \code{\link{combineContextFactors}},
+  \code{\link{convert_TN_to_TramineR}},
+  \code{\link{get_CF_levels}},
+  \code{\link{get_moving_window}},
+  \code{\link{numThreads}}, \code{\link{read_occurrences}},
+  \code{\link{threadSizeTable}}
 }
