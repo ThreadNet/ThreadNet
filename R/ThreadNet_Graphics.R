@@ -18,15 +18,14 @@
 #' When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
 #' and also the number of levels when the factors are combined
 #'
-#'@family ThreadNet_Graphics
+#' @family ThreadNet_Graphics
 #'
 #' @param oc data frame of occurrences
 #' @param CF list of contextual factors (columns) to include in the display
 #'
-#' @return
-#' @export
+#' @return  plotyly pie charts (one or more)
 #'
-#' @examples
+#' @export
 CF_multi_pie <- function(oc,CF){
 
   # avoid unpleasant error messages
@@ -95,22 +94,22 @@ CF_multi_pie <- function(oc,CF){
   return(pies)
 }
 
-
+######################################################################
 # ThreadMap shows the threads in a horizongal layout
-# TN is the thread number
-# timescale can be the time stamp or the sequence number
-
-#' Title
+#' Shows threads in a horizontal layout
 #'
-#' @param or
-#' @param TN
-#' @param timescale
-#' @param CF
+#' Creates a plotly chart of threads in either clock time or event time, depending on the timescale parameter.
 #'
-#' @return
+#' @family ThreadNet_Graphics
+#'
+#' @param or Dataframe of threads
+#' @param TN name of column with thread number
+#' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
+#' @param CF name of contextual factor that will determine the colors
+#'
+#' @return  plotly object
 #' @export
 #'
-#' @examples
 threadMap <- function(or,TN, timescale, CF){
 
   # setting color palettes
@@ -126,22 +125,20 @@ threadMap <- function(or,TN, timescale, CF){
 }
 
 
-######################### ngram bar chart
-# create a bar chart for the ngrams of a CF
-# o is a table of occurrences, pre-processed with a threadNum
-# TN is the column that contains the threadNum
-# CF is the column to count the n-grams in
-# n is the length of the ngram
-# mincount is the minimum count to display
-#' Title
+################################################
+#' Create an ngram bar chart
 #'
-#' @param o
-#' @param TN
-#' @param CF
-#' @param n
-#' @param mincount
+#' Shows the n-grams within a set of threads (but not splitting across threads). This provides a visual indication of how repetitive the threads are.
 #'
-#' @return
+#' @family ThreadNet_Graphics
+#'
+#' @param o a dataframe of occurrences or events
+#' @param TN the column that contains the threadNum
+#' @param CF the contextual factor within which to count the n-grams
+#' @param n the length of the ngram
+#' @param mincount the minimum count to display
+#'
+#' @return plotly object
 #' @export
 #'
 #' @examples
@@ -174,20 +171,19 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 
 
 
-# Basic Network layout
-#       et is a dataframe with the list of events to be graphed
-#       TN is the field with the thread ID
-#       CF is the coded event -- typically a factor with levels
-#' Title
+#############################################################################
+#' Circular network layout for event network (USES visnetwork)
 #'
-#' @param et
-#' @param TN
-#' @param CF
+#' Should be replaced with a more expressive layout in plotly
 #'
-#' @return
+#' @family ThreadNet_Graphics
+#'
+#' @param et dataframe with the threads to be graphed
+#' @param TN the column with the threadNumber
+#' @param CF is the contetual factors (column)
+#'
+#' @return visnetwork object
 #' @export
-#'
-#' @examples
 eventNetwork <- function(et,TN, CF){
 
   # first convert the threads to the network
@@ -221,17 +217,20 @@ eventNetwork <- function(et,TN, CF){
 # it has a bunch of extra code because of the groups...
 # needs to be re-written to use the network function
 
-#' Title
+#' NetworkD3 force layout for event network
 #'
-#' @param et
-#' @param TN
-#' @param grp
-#' @param zoom_level
+#' Should be replaced with a more expressive layout in plotly
 #'
-#' @return
+#' @family ThreadNet_Graphics
+#'
+#' @param et dataframe with the threads to be graphed
+#' @param TN the column with the threadNumber
+#' @param grp used to color some of the nodes
+#' @param zoom_level this is just the contextual factor (column) to be graphed
+#'
+#' @return networkD3 object
 #' @export
 #'
-#' @examples
 eventNetworkD3 <- function(et,TN, grp, zoom_level){
   # et is a dataframe of event threads
   # TN is the column that holds the threadNumber
@@ -328,16 +327,21 @@ eventNetworkD3 <- function(et,TN, grp, zoom_level){
 
 
 ######################################################################################
-#' Title
+#' Comparison plots
 #'
-#' @param e
-#' @param CF
-#' @param CF_levels
-#' @param nTimePeriods
-#' @param ng_size
-#' @param zoom_level
+#' Produce a set set of comparison sub-plots in an array.  Ideally, we should be able to use any of the plots. So far it is only bar charts.
+#' This is a prototype that could use rather extensive redesign...
 #'
-#' @return
+#' @family ThreadNet_Graphics
+#'
+#' @param e dataframe with threads to be plotted
+#' @param CF contextul factors
+#' @param CF_levels  list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)
+#' @param nTimePeriods how many time periods to divide the data?
+#' @param ng_size size of ngram
+#' @param zoom_level choose the zoom level, if applicable
+#'
+#' @return plotly object, including subplots
 #' @export
 #'
 #' @examples
@@ -410,17 +414,19 @@ Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_le
 
 
 ###################################################################
-# Would like to re-implement in plotly for mouse-over and for speed
-#' Title
+
+#' Use TraMiner plotting function to produce threadmap
+#'
+#' Would like to re-implement in plotly for mouse-over and for better interactivity and speed
+#'
+#' @family ThreadNet_Graphics
 #'
 #' @param df
 #' @param TN
 #' @param CF
 #'
-#' @return
+#' @return standard R plot
 #' @export
-#'
-#' @examples
 traminer_threadMap <- function(df,TN, CF){
 
   # setting color palettes

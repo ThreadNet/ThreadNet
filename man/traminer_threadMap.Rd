@@ -2,13 +2,22 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{traminer_threadMap}
 \alias{traminer_threadMap}
-\title{Title}
+\title{Use TraMiner plotting function to produce threadmap}
 \usage{
 traminer_threadMap(df, TN, CF)
 }
 \arguments{
 \item{CF}{}
 }
+\value{
+standard R plot
+}
 \description{
-Title
+Would like to re-implement in plotly for mouse-over and for better interactivity and speed
+}
+\seealso{
+Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
+  \code{\link{Comparison_Plots}},
+  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
+  \code{\link{ng_bar_chart}}, \code{\link{threadMap}}
 }

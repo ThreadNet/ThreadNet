@@ -33,3 +33,8 @@ OccToEvents(o, mapping = "One-to-One", m = "Variable chunks",
 Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
 occurrences in isolation.  There are many ways to accomplish this mapping.
 }
+\seealso{
+Other ThreadNet_Core: \code{\link{ThreadOccByPOV}},
+  \code{\link{count_ngrams}},
+  \code{\link{threads_to_network}}
+}

@@ -2,13 +2,28 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{eventNetworkD3}
 \alias{eventNetworkD3}
-\title{Title}
+\title{NetworkD3 force layout for event network}
 \usage{
 eventNetworkD3(et, TN, grp, zoom_level)
 }
 \arguments{
-\item{zoom_level}{}
+\item{et}{dataframe with the threads to be graphed}
+
+\item{TN}{the column with the threadNumber}
+
+\item{grp}{used to color some of the nodes}
+
+\item{zoom_level}{this is just the contextual factor (column) to be graphed}
+}
+\value{
+networkD3 object
 }
 \description{
-Title
+Should be replaced with a more expressive layout in plotly
+}
+\seealso{
+Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
+  \code{\link{Comparison_Plots}},
+  \code{\link{eventNetwork}}, \code{\link{ng_bar_chart}},
+  \code{\link{threadMap}}, \code{\link{traminer_threadMap}}
 }

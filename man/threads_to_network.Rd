@@ -20,3 +20,7 @@ a list containing two dataframes, one for the nodes (nodeDF) and one for the edg
 Converts a sequentially ordered streams of events (threads) and creates a unimodal, unidimensional network.
 Sequentially adjacent pairs of events become edges in the resulting network.
 }
+\seealso{
+Other ThreadNet_Core: \code{\link{OccToEvents}},
+  \code{\link{ThreadOccByPOV}}, \code{\link{count_ngrams}}
+}

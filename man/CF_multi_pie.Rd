@@ -2,13 +2,25 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{CF_multi_pie}
 \alias{CF_multi_pie}
-\title{Title}
+\title{Creates pie charts for one or more contextual factors}
 \usage{
-CF_multi_pie(oc, CF, nPies)
+CF_multi_pie(oc, CF)
 }
 \arguments{
-\item{nPies}{}
+\item{oc}{data frame of occurrences}
+
+\item{CF}{list of contextual factors (columns) to include in the display}
+}
+\value{
+plotyly pie charts (one or more)
 }
 \description{
-Title
+When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
+and also the number of levels when the factors are combined
+}
+\seealso{
+Other ThreadNet_Graphics: \code{\link{Comparison_Plots}},
+  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
+  \code{\link{ng_bar_chart}}, \code{\link{threadMap}},
+  \code{\link{traminer_threadMap}}
 }

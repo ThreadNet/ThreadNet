@@ -2,13 +2,30 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{ng_bar_chart}
 \alias{ng_bar_chart}
-\title{Title}
+\title{Create an ngram bar chart}
 \usage{
 ng_bar_chart(o, TN, CF, n, mincount)
 }
 \arguments{
-\item{mincount}{}
+\item{o}{a dataframe of occurrences or events}
+
+\item{TN}{the column that contains the threadNum}
+
+\item{CF}{the contextual factor within which to count the n-grams}
+
+\item{n}{the length of the ngram}
+
+\item{mincount}{the minimum count to display}
+}
+\value{
+plotly object
 }
 \description{
-Title
+Shows the n-grams within a set of threads (but not splitting across threads). This provides a visual indication of how repetitive the threads are.
+}
+\seealso{
+Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
+  \code{\link{Comparison_Plots}},
+  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
+  \code{\link{threadMap}}, \code{\link{traminer_threadMap}}
 }

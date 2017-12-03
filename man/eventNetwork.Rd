@@ -2,13 +2,26 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{eventNetwork}
 \alias{eventNetwork}
-\title{Title}
+\title{Circular network layout for event network (USES visnetwork)}
 \usage{
 eventNetwork(et, TN, CF)
 }
 \arguments{
-\item{CF}{}
+\item{et}{dataframe with the threads to be graphed}
+
+\item{TN}{the column with the threadNumber}
+
+\item{CF}{is the contetual factors (column)}
+}
+\value{
+visnetwork object
 }
 \description{
-Title
+Should be replaced with a more expressive layout in plotly
+}
+\seealso{
+Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
+  \code{\link{Comparison_Plots}},
+  \code{\link{eventNetworkD3}}, \code{\link{ng_bar_chart}},
+  \code{\link{threadMap}}, \code{\link{traminer_threadMap}}
 }

@@ -2,13 +2,33 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{Comparison_Plots}
 \alias{Comparison_Plots}
-\title{Title}
+\title{Comparison plots}
 \usage{
 Comparison_Plots(e, CF, CF_levels, nTimePeriods = 1, ng_size, zoom_level)
 }
 \arguments{
-\item{zoom_level}{}
+\item{e}{dataframe with threads to be plotted}
+
+\item{CF}{contextul factors}
+
+\item{CF_levels}{list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)}
+
+\item{nTimePeriods}{how many time periods to divide the data?}
+
+\item{ng_size}{size of ngram}
+
+\item{zoom_level}{choose the zoom level, if applicable}
+}
+\value{
+plotly object, including subplots
 }
 \description{
-Title
+Produce a set set of comparison sub-plots in an array.  Ideally, we should be able to use any of the plots. So far it is only bar charts.
+This is a prototype that could use rather extensive redesign...
+}
+\seealso{
+Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
+  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
+  \code{\link{ng_bar_chart}}, \code{\link{threadMap}},
+  \code{\link{traminer_threadMap}}
 }

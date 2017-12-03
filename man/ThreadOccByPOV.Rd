@@ -19,3 +19,8 @@ dataframe containing the same occurrences sorted from a different point of view
 Take the raw occurrences from the input file and sort them by time stamp within
 a set of contextual factors that remain constant for each thread.
 }
+\seealso{
+Other ThreadNet_Core: \code{\link{OccToEvents}},
+  \code{\link{count_ngrams}},
+  \code{\link{threads_to_network}}
+}
