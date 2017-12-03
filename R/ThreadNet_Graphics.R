@@ -13,20 +13,21 @@
 ###### Pie charts for context factors  ####
 # It would be nice to display some other helpful information, perhaps (like the % of possible combinations that occur)
 
-#' Title
+#' Creates pie charts for one or more contextual factors
 #'
-#' @param oc
-#' @param CF
-#' @param nPies
+#' When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
+#' and also the number of levels when the factors are combined
+#'
+#'@family ThreadNet_Graphics
+#'
+#' @param oc data frame of occurrences
+#' @param CF list of contextual factors (columns) to include in the display
 #'
 #' @return
 #' @export
 #'
 #' @examples
-CF_multi_pie <- function(oc,CF,nPies){
-
-  library(plotly)
-  library(tidyr)
+CF_multi_pie <- function(oc,CF){
 
   # avoid unpleasant error messages
   if (length(CF)==0) {return(plotly_empty())}

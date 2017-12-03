@@ -12,6 +12,7 @@
 #'
 #' Converts a sequentially ordered streams of events (threads) and creates a unimodal, unidimensional network.
 #' Sequentially adjacent pairs of events become edges in the resulting network.
+#' @family ThreadNet_Core
 #'
 #' @param et dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
@@ -73,6 +74,7 @@ threads_to_network <- function(et,TN,CF){
 #' Counts ngrams in a set of threads
 #'
 #' This function counts n-grams within threads where the length of the thread is greater than n.
+#' @family ThreadNet_Core
 #'
 #' @param o dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
@@ -116,6 +118,7 @@ count_ngrams <- function(o,TN,CF,n){
 #'
 #' Take the raw occurrences from the input file and sort them by time stamp within
 #' a set of contextual factors that remain constant for each thread.
+#' @family ThreadNet_Core
 #'
 #' @param  o is the dataframe of cleaned ocurrences
 #' #' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)
@@ -199,6 +202,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 #'
 #' Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
 #' occurrences in isolation.  There are many ways to accomplish this mapping.
+#' @family ThreadNet_Core
 #'
 #' @param  o  a dataframe of occurrences
 #' @param mapping = one-to-one or clustering

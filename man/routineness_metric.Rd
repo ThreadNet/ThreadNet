@@ -2,13 +2,31 @@
 % Please edit documentation in R/ThreadNet_Metrics.R
 \name{routineness_metric}
 \alias{routineness_metric}
-\title{Title}
+\title{Computes a metric of routineness based on frequency of ngrams}
 \usage{
 routineness_metric(o, TN, CF, n, m)
 }
 \arguments{
-\item{m}{}
+\item{o}{data frame with occurresnces or events}
+
+\item{TN}{name of column with threadNumbers}
+
+\item{CF}{name of column with contextual factor}
+
+\item{n}{size of ngram}
+
+\item{m}{how many of the most frequent ngrams to include. When m > 1, there is a risk of duplication.}
+}
+\value{
+number, index of routineness.
 }
 \description{
-Title
+Computes the fraction of observed behavior that conforms to an observed pattern.
+Current version uses ngrams, but it would be good to use spmf pattern mining to avoid including duplicate patterns  (e.g., a-b-c and b-c-d)
+}
+\seealso{
+Other ThreadNet_Metrics: \code{\link{compression_index}},
+  \code{\link{compute_entropy}},
+  \code{\link{estimate_network_complexity}},
+  \code{\link{estimate_task_complexity_index}}
 }

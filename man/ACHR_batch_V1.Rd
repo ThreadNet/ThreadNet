@@ -10,7 +10,7 @@ ACHR_batch_V1(inFileName)
 \item{inFileName}{name of file (CSV format) containing the raw thread data.}
 }
 \value{
-nothing
+data frame ready for further analysis
 }
 \description{
 ACHR stands for Antecedents of Complexity in Healthcare Routines.  This is function is set up to compute process parameters on thousands of patient visits.

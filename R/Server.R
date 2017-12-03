@@ -121,15 +121,15 @@ server <- shinyServer(function(input, output, session) {
 
   # this paints the nice pie charts including the COMBINED column
   output$ContextFlowers_1 = renderPlotly({
-    CF_multi_pie(selectOcc(), get_COMPARISON_CF(),length(get_CF()) )
+    CF_multi_pie(selectOcc(), get_COMPARISON_CF()  )
   })
 
   output$ContextFlowers_2 = renderPlotly({
-    CF_multi_pie(selectOcc(), get_THREAD_CF(),length(get_CF()) )
+    CF_multi_pie(selectOcc(), get_THREAD_CF()  )
   })
 
   output$ContextFlowers_3 = renderPlotly({
-    CF_multi_pie(selectOcc(), get_EVENT_CF(),length(get_CF()) )
+    CF_multi_pie(selectOcc(), get_EVENT_CF()  )
   })
 
   output$rawOccurrenceThreadMap <- renderPlot({

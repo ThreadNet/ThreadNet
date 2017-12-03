@@ -2,13 +2,25 @@
 % Please edit documentation in R/ThreadNet_Metrics.R
 \name{compression_index}
 \alias{compression_index}
-\title{Title}
+\title{Computes the compressibility of the data in one column of a data frame}
 \usage{
 compression_index(df, CF)
 }
 \arguments{
-\item{CF}{}
+\item{df}{a data frame containing occurrences or events}
+
+\item{CF}{a column or contextual factor in that data frame}
+}
+\value{
+number containing compressibility index, 0 < i < 1
 }
 \description{
-Title
+Compressibility is an index of complexity -- more compressible means less complex.  This function computes the ratio of compressed data
+to the original data.  Should be between zero and one.  Uses built-in functions for in=memory compression
+}
+\seealso{
+Other ThreadNet_Metrics: \code{\link{compute_entropy}},
+  \code{\link{estimate_network_complexity}},
+  \code{\link{estimate_task_complexity_index}},
+  \code{\link{routineness_metric}}
 }

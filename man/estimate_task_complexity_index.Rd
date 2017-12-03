@@ -17,3 +17,9 @@ number
 \description{
 Same as estimate_network_complexity, but takes different parameters
 }
+\seealso{
+Other ThreadNet_Metrics: \code{\link{compression_index}},
+  \code{\link{compute_entropy}},
+  \code{\link{estimate_network_complexity}},
+  \code{\link{routineness_metric}}
+}

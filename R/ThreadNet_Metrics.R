@@ -15,7 +15,7 @@
 #' as described in Haerem, Pentland and Miller (2015). The estimate correlates with the McCabe's (1975) cyclometric complexity.
 #'
 #' @family ThreadNet_Metrics
-#' #'
+#'
 #' @param net
 #'
 #' @return number
