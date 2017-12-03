@@ -17,7 +17,8 @@
 #'
 #' @param inFileName name of file (CSV format) containing the raw thread data.
 #'
-#' @return nothing
+#' @return data frame ready for further analysis
+#'
 #' @export
 ACHR_batch_V1 <- function(inFileName){
 

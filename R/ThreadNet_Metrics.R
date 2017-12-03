@@ -14,6 +14,8 @@
 #' This function takes a network descripts (nodes and edges, as generaged by the functino threads_to_network, and estimates the number of paths.
 #' as described in Haerem, Pentland and Miller (2015). The estimate correlates with the McCabe's (1975) cyclometric complexity.
 #'
+#' @family ThreadNet_Metrics
+#' #'
 #' @param net
 #'
 #' @return number
@@ -26,6 +28,8 @@ estimate_network_complexity <- function(net){ return(estimate_task_complexity_in
 #' Estimates the number of paths in a directed graph
 #'
 #' Same as estimate_network_complexity, but takes different parameters
+#'
+#' @family ThreadNet_Metrics
 #'
 #' @param v number of vertices (or nodes)
 #' @param e number of edges
@@ -49,86 +53,68 @@ estimate_task_complexity_index <- function(v,e){
   return(  0.08 + 0.08*e - 0.08*v )
 }
 
-# compute Rt for a set of observations in a column from a data frame
-# Rt = the fraction (0 < Rt < 1) of the data that conforms to the patterns
-# freq = same set of ngrams used for simpson's D, typically the largest portion of the distribution
-# total N = sum of occurrences -- should include ALL, not just the ones that
-#    were included in the ngrams
-#  n = ngram length
-#' Title
+
+#################################################################
+#' Computes a metric of routineness based on frequency of ngrams
 #'
-#' @param freq
-#' @param n
-#' @param totalN
+#' Computes the fraction of observed behavior that conforms to an observed pattern.
+#' Current version uses ngrams, but it would be good to use spmf pattern mining to avoid including duplicate patterns  (e.g., a-b-c and b-c-d)
 #'
-#' @return
+#' @family ThreadNet_Metrics
+#'
+#' @param o  data frame with occurresnces or events
+#' @param TN  name of column with threadNumbers
+#' @param CF name of column with contextual factor
+#' @param n size of ngram
+#' @param m how many of the most frequent ngrams to include. When m > 1, there is a risk of duplication.
+#'
+#' @return number, index of routineness.
+#'
 #' @export
-#'
-#' @examples
-compute_Rt <- function(freq, n, totalN){
-
-  # count # of occurrences that match the observed ngrams
-  # just multiply count * length
-  N = sum(freq)*n
-
-  # return the fraction of the total
-  return(N/totalN)
-}
-
-
-# Freq is from the ngram phrasetable
-#' Title
-#'
-#' @param o
-#' @param TN
-#' @param CF
-#' @param n
-#' @param m
-#'
-#' @return
-#' @export
-#'
-#' @examples
 routineness_metric <- function(o,TN,CF,n,m){
 
   # get the ngrams
   ng=count_ngrams(o,TN,CF,n)
 
-print(ng[1:m,])
+# print(ng[1:m,])
 
   # return the ratio of occurrences in the top m most frequent ngrams to total occurrences
     return( sum(ng$freq[1:m])*n/nrow(o) )
 }
 
-# compressibility as an index of complexity.
-# use built-in functions for in=memory compression
-# normalized by length, so it's a compression ratio
-# near zero = highly repetitive.  Near 1 = nearly random
-#' Title
+
+#############################################################################
+#' Computes the compressibility of the data in one column of a data frame
 #'
-#' @param df
-#' @param CF
+#' Compressibility is an index of complexity -- more compressible means less complex.  This function computes the ratio of compressed data
+#' to the original data.  Should be between zero and one.  Uses built-in functions for in=memory compression
 #'
-#' @return
+#' @family ThreadNet_Metrics
+#'
+#' @param df  a data frame containing occurrences or events
+#' @param CF  a column or contextual factor in that data frame
+#'
+#' @return number containing compressibility index, 0 < i < 1
 #' @export
-#'
-#' @examples
 compression_index <- function(df,CF){ return(
     length(memCompress(paste0(as.character(df[[CF]])),type="gzip")) /
     length(paste0(as.character(df[[CF]]))) ) }
 
 
+#######################################################################
 #compute entropy for a set of observations in a column from a data frame
 # freq is typically going to the $freq column from ngram table, or
 # the frequency of each level in the CFs, as counted by table()
-#' Title
+#' Compute the entropy of a contextual factor
 #'
-#' @param freq
+#' Each column in the raw data represents a contextual factor.  This function computes the entropy of each factor that is selected for use in the
+#' analysis.
+#' @family ThreadNet_Metrics
 #'
-#' @return
+#' @param freq is the frequency distribution of the levels in the factor
+#'
+#' @return number
 #' @export
-#'
-#' @examples
 compute_entropy <- function(freq){
   N = sum(freq)
   p = freq/N
