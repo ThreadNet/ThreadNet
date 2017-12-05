@@ -16,8 +16,8 @@ server <- shinyServer(function(input, output, session) {
   occ <- eventReactive(input$file1,read_occurrences(input$file1))
 
 
-  #selected columns from the raw data, and the topPct of the table
-  selectOcc = reactive(topPctOfTable(occ()[c("tStamp", input$CFcolumnsID)],input$occRowsToInclude ))
+  #selected columns from the raw data, and the subset of the table
+  selectOcc = reactive(SubsetOfTable(occ()[c("tStamp", input$CFcolumnsID)],input$occRowsToInclude ))
 
   # # recode the occurrences for the thresholds...
   # filterOcc = reactive({recodeThreshold(selectOcc(),get_CF(), cfthresh())})

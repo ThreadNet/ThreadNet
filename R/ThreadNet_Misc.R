@@ -28,19 +28,55 @@ read_occurrences <- function(inFile){
   o=read.csv(inFile$datapath)
 
   # check the file format.  Put in humorous example if the format is bad
-   if (check_file_format(o)!=1)
-     o=make_example_DF()
+   if (check_file_format(o)=="badformat")
+   {o=make_example_DF() }
+  else if (check_file_format(o)=="sequence")
+  {o=add_relative_timestamps(o,"sequence", 1) }
 
+  # clean up the data -- remove blanks, etc.
   o = cleanOcc(o,cfnames(o))
 
   return(o)}
 
 # This could be improved but is an important logical checkpoint
+# just checks that a required field is in the first column
 check_file_format = function(o){
 
-  if ((colnames(o)[1] != "tStamp"))  return(0)
+  if ((colnames(o)[1] == "tStamp"))
+  {return("tStamp")}
 
-  return(1)
+  else if ((colnames(o)[1] == "sequence"))
+  {return("sequence")}
+
+  else
+  {return("badformat")}
+}
+
+#' Add relative timestamps
+#'
+#' This function uses the sequence numbers to add a column with time stamp to the data, so that it can be used throughout the rest
+#' of the app, which expects to see a time stamp.  Start time for all threads is the same: "2017-01-01 00:00:00"  Happy New Year!
+#'
+#' @param o   data frame of occurrences
+#' @param SN column containing the sequence numbers
+#' @param tstep time step for events within each thread.  Default is one minute.
+#'
+#' @return  data frame of occurrences
+#' @export
+#'
+#' @examples
+add_relative_timestamps <- function(o, SN, tstep=1){
+
+  startTime <- as.POSIXlt("2017-01-01 00:00:00")
+
+  # add the column at the beginning
+  o <- cbind(startTime + 60*as.numeric(as.character(o[[SN]])), o)
+
+  # set the column name
+  colnames(o)[1] <- "tStamp"
+
+  return(o)
+
 }
 
 ##  Make an example data frame for display...
@@ -94,11 +130,11 @@ fixBlanks = function(s){
   return(s)
 }
 
-# add the >other< categeory
-addOther <- function(x){
-  if(is.factor(x))
-    return(factor(x, levels=c(levels(x), ">other<")))
-  return(x) }
+# NO LONGER NEEDED  12/2017 add the >other< categeory
+# addOther <- function(x){
+#   if(is.factor(x))
+#     return(factor(x, levels=c(levels(x), ">other<")))
+#   return(x) }
 
 #' numThreads counts how many threads in the data set
 #'
@@ -127,8 +163,8 @@ timeRangePhrase = function(tr){
   paste(floor(as.numeric(tr)),rangeunits,"from start to finish.")}
 
 # This function limits the number of rows that get used
-# topPctOfTable <- function(df,pct) {df[1:(floor((pct/100) * nrow(df))),] }
-topPctOfTable <- function(df,r) {df[r[1]:r[2],] }
+# SubsetOfTable <- function(df,pct) {df[1:(floor((pct/100) * nrow(df))),] }
+SubsetOfTable <- function(df,r) {df[r[1]:r[2],] }
 
 
 # this function is used to split up the threads into n ~equal buckets
