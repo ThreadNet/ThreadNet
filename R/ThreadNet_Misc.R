@@ -90,12 +90,15 @@ make_example_DF = function(){
 }
 
 # this function will clean up the raw occurrence data
-#' Title
-#' @family ThreadNet_Misc
-#' @param o
-#' @param cfnames
+#' Clean up occurrences
 #'
-#' @return
+#' Clean up removes blanks from the data. Blanks cause problems because the n-gram algorithm interprets blanks as seperate tokens.
+#'
+#' @family ThreadNet_Misc
+#' @param o  data frame with occurrences
+#' @param cfnames names of contextual factors (columns) to clean up.
+#'
+#' @return data frame with blanks removed.
 #' @export
 #'
 #' @examples
