@@ -10,7 +10,7 @@
 
 #' Converts threads to network
 #'
-#' Converts a sequentially ordered streams of events (threads) and creates a unimodal, unidimensional network.
+#' Converts a sequentially ordered streams of ;events (threads) and creates a unimodal, unidimensional network.
 #' Sequentially adjacent pairs of events become edges in the resulting network.
 #' @family ThreadNet_Core
 #'

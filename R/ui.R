@@ -93,7 +93,12 @@ ui <- fluidPage(
                                             visNetworkOutput("eventNetwork")),
                                           tabPanel("Force layout",
                                             uiOutput("Network_Tab_Controls_2"),
-                                            forceNetworkOutput("eventNetworkD3")))
+                                            forceNetworkOutput("eventNetworkD3"))
+                                          #  ,
+                                          # tabPanel("New layout",
+                                          #          uiOutput("Network_Tab_Controls_2"),
+                                          #          forceNetworkOutput("eventNetworkD3"))
+                                          )
                           )
                         )
               ),
