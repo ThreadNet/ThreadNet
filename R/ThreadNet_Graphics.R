@@ -186,29 +186,45 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #' @export
 eventNetwork <- function(et,TN, CF){
 
-  # first convert the threads to the network
-  n = threads_to_network(et,TN, CF)
-
+  n <- threads_to_network(et, TN, CF)
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
-  # print("nodes")
-  # print(n$nodeDF)
-  #
-  # print("edges")
-  # print(n$edgeDF)
+  edge_shapes <- list()
+  for(i in 1:length(n$edgeDF$from)) {
+    E <- n$edgeDF[i,]
 
-  return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
-           visEdges(arrows ="to",
-                    color = list(color = "black", highlight = "red")) %>%
-           visLayout(randomSeed = 12 ) %>%  # to have always the same network
-           visIgraphLayout(layout = "layout_in_circle") %>%
-           #      visIgraphLayout(layout = "layout_as_tree") %>%
-           visNodes(size = 10) %>%
-           visOptions(highlightNearest = list(enabled = T, hover = T),
-                      nodesIdSelection = T)
+    edge_shape = list(
+      type = "line",
+      line = list(color = "#030303", width = 0.3),
+      x0 = E[['from_x']],
+      x1 = E[['to_x']],
+      y0 = E[['from_y']],
+      y1 = E[['to_y']],
+      xref = "x",
+      yref = "y"
+    )
 
+    edge_shapes[[i]] <- edge_shape
+  }
+
+  x <- list(
+    title = 'Average Time'
   )
 
+  y <- list(
+    title = 'Frequency'
+  )
+
+  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos, mode = "markers", text = n$nodeDF$label, hoverinfo = "text")
+
+  p <- layout(
+    network,
+    title = title_phrase,
+    shapes = edge_shapes,
+    xaxis = x,
+    yaxis = y
+  )
+  return(p)
 }
 
 

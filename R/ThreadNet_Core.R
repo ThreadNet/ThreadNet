@@ -22,7 +22,7 @@
 #'
 #' @export
 threads_to_network <- function(et,TN,CF){
-
+  et$time<-as.numeric(et$tStamp)
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
   node_label=str_replace_all(node_label," ","_")
@@ -35,6 +35,14 @@ threads_to_network <- function(et,TN,CF){
     id = 1:length(node_label),
     label = node_label,
     title=node_label)
+
+  node_position_y = data.frame(table(et[[CF]]))
+  colnames(node_position_y) <- c('label', 'y_pos')
+  node_position_x = aggregate(et$time, list(et$actor), mean)
+  colnames(node_position_x) <- c('label', 'x_pos')
+
+  nodes = merge(nodes, node_position_y, by=c("label"))
+  nodes = merge(nodes, node_position_x, by=c("label"))
 
   # get the 2 grams for the edges
   ngdf = count_ngrams(et,TN, CF, 2)
@@ -65,6 +73,10 @@ threads_to_network <- function(et,TN,CF){
     to,
     label = paste(ngdf$freq)
   )
+
+  edges = merge(edges, nodes[,c('id', 'y_pos', 'x_pos')], by.x=c('from'), by.y=c('id'))
+  edges = merge(edges, nodes[,c('id', 'y_pos', 'x_pos')], by.x=c('to'), by.y=c('id'))
+  colnames(edges)<-c('from', 'to', 'label', 'from_y', 'from_x', 'to_y', 'to_x')
   return(list(nodeDF = nodes, edgeDF = edges))
 }
 

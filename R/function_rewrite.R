@@ -64,30 +64,11 @@ threads_to_network <- function(et,TN,CF){
   return(list(nodeDF = nodes, edgeDF = edges))
 }
 
-eventNetwork <- function(et,TN, CF){
 
-  # first convert the threads to the network
-  n = threads_to_network(et,TN, CF)
+eventNetwork <- function(n){
 
-#  title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
+  title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
-  # print("nodes")
-  # print(n$nodeDF)
-  #
-  # print("edges")
-  # print(n$edgeDF)
-
-  # return(visNetwork(n$nodeDF[,1:3], n$edgeDF[,1:3], width = "100%", main=title_phrase) %>%
-  #          visEdges(arrows ="to",
-  #                   color = list(color = "black", highlight = "red")) %>%
-  #          visLayout(randomSeed = 12 ) %>%  # to have always the same network
-  #          visIgraphLayout(layout = "layout_in_circle") %>%
-  #          #      visIgraphLayout(layout = "layout_as_tree") %>%
-  #          visNodes(size = 10) %>%
-  #          visOptions(highlightNearest = list(enabled = T, hover = T),
-  #                     nodesIdSelection = T)
-
-  #)
   edge_shapes <- list()
   for(i in 1:length(n$edgeDF$from)) {
     E <- n$edgeDF[i,]
@@ -106,21 +87,31 @@ eventNetwork <- function(et,TN, CF){
     edge_shapes[[i]] <- edge_shape
   }
 
+  x <- list(
+    title = 'Average Time'
+  )
+
+  y <- list(
+    title = 'Frequency'
+  )
+
   network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos, mode = "markers", text = n$nodeDF$label, hoverinfo = "text")
 
   p <- layout(
     network,
-    title = "title_phrase",
-    shapes = edge_shapes
+    title = title_phrase,
+    shapes = edge_shapes,
+    xaxis = x,
+    yaxis = y
   )
   return(p)
 
 }
 
 results<-threads_to_network(ds, 'threadNum', 'actor')
-eventNetwork(ds, 'threadNum', 'action')
+results=threads_to_network(ds, 'threadNum', 'actor')
+eventNetwork(results)
 
-results$edgeDF
 
 edge_shapes <- list()
 for(i in 1:length(results$edgeDF$from)) {

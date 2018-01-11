@@ -89,8 +89,8 @@ ui <- fluidPage(
                                   ),
                           tabPanel("Event Networks" ,
                                     tabsetPanel(type = "tabs",
-                                          tabPanel("Circular layout",
-                                            visNetworkOutput("eventNetwork")),
+                                          tabPanel("Positional layout",
+                                            plotlyOutput("eventNetwork")),
                                           tabPanel("Force layout",
                                             uiOutput("Network_Tab_Controls_2"),
                                             forceNetworkOutput("eventNetworkD3"))
