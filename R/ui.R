@@ -52,7 +52,7 @@ ui <- fluidPage(
                                    ),
                                    tabPanel("Preview Network",
                                             tags$h4("Network based on sequential adjacency of raw occurrences"),
-                                            visNetworkOutput("rawOccurrenceNetwork")
+                                            plotlyOutput("rawOccurrenceNetwork")
                                             ),
                                    tabPanel("Intermediate Data",
                                             tags$h4("This table shows the data threaded from your chosen POV"),

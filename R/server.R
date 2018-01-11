@@ -145,7 +145,7 @@ server <- shinyServer(function(input, output, session) {
 
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
 
-  output$rawOccurrenceNetwork <- renderVisNetwork({
+  output$rawOccurrenceNetwork <- renderPlotly({
     eventNetwork(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF())) })
 
   output$Thread_Tab_Output_1  = renderTable({ threadedOcc()  })
