@@ -1,6 +1,11 @@
 ds <- read.csv(file.choose())
 
-
+#Rewritten threads to network function to play nicely with plotly - positions of nodes here
+#This would be the place to put additional time measurements
+#Event time is sequence number
+#Size could be
+#Color could be
+#Nodes are defined in terms of combinations of factors
 threads_to_network <- function(et,TN,CF){
   #
   # CF<-'actor'
@@ -64,7 +69,7 @@ threads_to_network <- function(et,TN,CF){
   return(list(nodeDF = nodes, edgeDF = edges))
 }
 
-
+#Plotly Function to use information from threads_to_network to put positions of nodes and edges
 eventNetwork <- function(n){
 
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
