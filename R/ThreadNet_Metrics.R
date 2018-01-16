@@ -43,7 +43,10 @@ estimate_task_complexity_index <- function(v,e){
   # v = number of vertices
   # tested for range of 10 < v < 100
   # e = number of edges
-
+  print("edges")
+  print(e)
+  print("vertices")
+  print(v)
   #
   # OUTPUT ARG:
   # cidx correlates with Log10(simple paths) with r>= 0.8

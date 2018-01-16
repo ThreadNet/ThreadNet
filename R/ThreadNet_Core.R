@@ -69,7 +69,7 @@ threads_to_network <- function(et,TN,CF){
 }
 
 
-###############################################################
+################################################################
 # Counting ngrams is essential to several ThreadNet functions
 #' Counts ngrams in a set of threads
 #'

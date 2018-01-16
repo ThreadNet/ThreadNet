@@ -9,8 +9,9 @@
 
 server <- shinyServer(function(input, output, session) {
   options(warn=-1)
+  options(shiny.maxRequestSize=30*1024^2)
 
-  ###  Some basic functions that are used to structure the data as it moves through the pipeline
+  ###  Some basic functions that are used to structure the data           as it moves through the pipeline
 
   # make dataframe of occurrences that depends only file1
   occ <- eventReactive(input$file1,read_occurrences(input$file1))
