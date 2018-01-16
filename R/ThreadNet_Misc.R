@@ -27,6 +27,7 @@ read_occurrences <- function(inFile){
   # read in the table of occurrences
   o=read.csv(inFile$datapath)
 
+
   # check the file format.  Put in humorous example if the format is bad
    if (check_file_format(o)=="badformat")
    {o=make_example_DF() }
@@ -432,5 +433,28 @@ get_moving_window <- function(e, s, l ){
   # and now subset the rows for those threds
 
   return(e[e$threadNum %in% w,])
+
+}
+
+######################################################
+# Just putting this code here to play with for now.
+# this function finds the common events in two subsets of thread data
+common_events <- function(ss1, ss2, TN, CF, n){
+
+  # get the list of ngrams for each subset of threads
+  e1 = count_ngrams(ss1, TN, CF, n)[1]
+  e2 = count_ngrams(ss2, TN, CF, n)[1]
+
+  # return the intersection
+  return(intersect(as.matrix(e1), as.matrix(e2)))
+
+}
+
+rr_grams <- function(o,TN, CF, N, R) {
+  # N - max length of ngram
+  # R = threshold for repetition
+
+
+
 
 }
