@@ -128,7 +128,7 @@ fixBlanks = function(s){
   # take out blanks
   s=str_replace_all(s," ","_")
 
-  if (s==""){
+  if (is.na(s)){
     s="blank"
   }
   return(s)
