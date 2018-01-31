@@ -38,7 +38,7 @@ threads_to_network <- function(et,TN,CF){
 
   node_position_y = data.frame(table(et[[CF]]))
   colnames(node_position_y) <- c('label', 'y_pos')
-  node_position_x = aggregate(et$time, list(et$actor), mean)
+  node_position_x = aggregate(et$time, list(et[[CF]]), mean)
   colnames(node_position_x) <- c('label', 'x_pos')
 
   nodes = merge(nodes, node_position_y, by=c("label"))

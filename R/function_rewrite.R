@@ -8,9 +8,9 @@ ds <- read.csv(file.choose())
 #Nodes are defined in terms of combinations of factors
 threads_to_network <- function(et,TN,CF){
   #
-  # CF<-'actor'
-  # et <- ds
-  # TN <- 'threadNum'
+   CF<-'actor'
+   et <- ds
+   TN <- 'threadNum'
   et$time<-as.numeric(et$tStamp)
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
@@ -27,7 +27,7 @@ threads_to_network <- function(et,TN,CF){
 
   node_position_y = data.frame(table(et[[CF]]))
   colnames(node_position_y) <- c('label', 'y_pos')
-  node_position_x = aggregate(et$time, list(et$actor), mean)
+  node_position_x = aggregate(et$time, list(et[[CF]]), mean)
   colnames(node_position_x) <- c('label', 'x_pos')
 
   nodes = merge(nodes, node_position_y, by=c("label"))
@@ -113,7 +113,7 @@ eventNetwork <- function(n){
 
 }
 
-results<-threads_to_network(ds, 'threadNum', 'actor')
+results<-threads_to_network(ds, 'threadNum', 'action')
 results=threads_to_network(ds, 'threadNum', 'actor')
 eventNetwork(results)
 
