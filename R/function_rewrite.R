@@ -8,9 +8,9 @@ ds <- read.csv(file.choose())
 #Nodes are defined in terms of combinations of factors
 threads_to_network <- function(et,TN,CF){
   #
-   CF<-'actor'
-   et <- ds
-   TN <- 'threadNum'
+ #  CF<-'actor'
+#   et <- ds
+#   TN <- 'threadNum'
   et$time<-as.numeric(et$tStamp)
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
@@ -80,7 +80,7 @@ eventNetwork <- function(n){
 
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.3),
+      line = list(color = "#030303", width = 0.1),
       x0 = E[['from_x']],
       x1 = E[['to_x']],
       y0 = E[['from_y']],
@@ -99,8 +99,15 @@ eventNetwork <- function(n){
   y <- list(
     title = 'Frequency'
   )
+  color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
+  size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
+  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
+                     mode = "markers",
+                     marker = list(size= size_pal,
+                                   color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
 
-  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos, mode = "markers", text = n$nodeDF$label, hoverinfo = "text")
+                       ),
+                     text = n$nodeDF$label, hoverinfo = "text")
 
   p <- layout(
     network,
@@ -117,30 +124,4 @@ results<-threads_to_network(ds, 'threadNum', 'action')
 results=threads_to_network(ds, 'threadNum', 'actor')
 eventNetwork(results)
 
-
-edge_shapes <- list()
-for(i in 1:length(results$edgeDF$from)) {
-  E <- results$edgeDF[i,]
-
-  edge_shape = list(
-    type = "line",
-    line = list(color = "#030303", width = 0.3),
-    x0 = E[['from_x']],
-    x1 = E[['to_x']],
-    y0 = E[['from_y']],
-    y1 = E[['to_y']],
-    xref = "x",
-    yref = "y"
-  )
-
-  edge_shapes[[i]] <- edge_shape
-}
-
-network <- plot_ly(x = ~results$nodeDF$x_pos, y = ~results$nodeDF$y_pos, mode = "markers", text = results$nodeDF$label, hoverinfo = "text")
-
-p <- layout(
-  network,
-  title = 'Karate Network',
-  shapes = edge_shapes
-)
-p
+n$nodeDF$y_pos

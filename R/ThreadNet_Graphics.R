@@ -184,8 +184,8 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #'
 #' @return visnetwork object
 #' @export
-eventNetwork <- function(et,TN, CF){
 
+eventNetwork <- function(et, TN, CF){
   n <- threads_to_network(et, TN, CF)
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
@@ -195,7 +195,7 @@ eventNetwork <- function(et,TN, CF){
 
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.3),
+      line = list(color = "#030303", width = 0.1),
       x0 = E[['from_x']],
       x1 = E[['to_x']],
       y0 = E[['from_y']],
@@ -214,8 +214,15 @@ eventNetwork <- function(et,TN, CF){
   y <- list(
     title = 'Frequency'
   )
+  color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
+  size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
+  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
+                     mode = "markers",
+                     marker = list(size= size_pal,
+                                   color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
 
-  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos, mode = "markers", text = n$nodeDF$label, hoverinfo = "text")
+                     ),
+                     text = n$nodeDF$label, hoverinfo = "text")
 
   p <- layout(
     network,
@@ -225,9 +232,8 @@ eventNetwork <- function(et,TN, CF){
     yaxis = y
   )
   return(p)
+
 }
-
-
 ################################################################
 ##  Here is the networkD3 version of the same thing.
 # it has a bunch of extra code because of the groups...

@@ -22,6 +22,7 @@ library(xesreadR)
 library(colorspace)
 library(igraph)
 library(TraMineR)
+library(RColorBrewer)
 
 # this is another change
 
