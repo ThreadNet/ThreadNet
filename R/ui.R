@@ -110,7 +110,7 @@ ui <- fluidPage(
               tabPanel("Moving Window",
                        uiOutput("Moving_Window_Tab_Controls_1"),
                        uiOutput("Moving_Window_Tab_Controls_2"),
-                       visNetworkOutput("MovingWindow_Plot")
+                       plotlyOutput("MovingWindow_Plot")
               ),
 
               tabPanel("Parameter Settings",

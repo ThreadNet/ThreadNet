@@ -339,7 +339,7 @@ server <- shinyServer(function(input, output, session) {
   })
 
   # just leave it blank for now...
- output$MovingWindow_Plot <- renderVisNetwork({
+ output$MovingWindow_Plot <- renderPlotly({
    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
    eventNetwork( w, "threadNum", get_Zoom_TM()) })
 
