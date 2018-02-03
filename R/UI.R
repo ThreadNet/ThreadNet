@@ -93,7 +93,7 @@ ui <- fluidPage(
                                             visNetworkOutput("eventNetwork")),
                                           tabPanel("Force layout",
                                             uiOutput("Network_Tab_Controls_2"),
-                                            forceNetworkOutput("eventNetworkD3")))
+                                            forceNetworkOutput("eventNetworkD3", width = "100%", height = "1200px")))
                           )
                         )
               ),
@@ -115,8 +115,8 @@ ui <- fluidPage(
                         tags$h4("Support:"),
                           tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
                           tags$p("Antecedents of Complexity in Healthcare Routines"),
-                        tags$h4("Code advisors:"),
-                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills"),
+                        tags$h4("Code Gurus:"),
+                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes"),
                         tags$h4("Collaborators:"),
                              tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
                         tags$h4("Related Publications:"),

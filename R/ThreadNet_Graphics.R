@@ -239,7 +239,7 @@ eventNetworkD3 <- function(et,TN, grp, zoom_level){
 
 
   # First get the node names & remove the spaces
-  node_label = unique(et[[zoom_level]])
+  node_label = levels(factor(et[[zoom_level]]))  # unique(et[[zoom_level]])
   node_label=str_replace_all(node_label," ","_")
   nNodes = length(node_label)
 
@@ -321,8 +321,8 @@ eventNetworkD3 <- function(et,TN, grp, zoom_level){
   # print(edges)
 
   return( forceNetwork(Links = edges, Nodes = nodes, Source = "from",
-                       Target = "to", Value = "Value", NodeID = "id",
-                       Group = "Group", opacity = 1, zoom = T, bounded = T))
+                       Target = "to", Value = "Value", NodeID = "label",
+                       Group = "Group", opacity = 1, zoom = T, bounded = FALSE))
 }
 
 
