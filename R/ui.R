@@ -46,7 +46,7 @@ ui <- fluidPage(
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
-                                            plotOutput("rawOccurrenceThreadMap"),
+                                            plotlyOutput("rawOccurrenceThreadMap"),
                                          #   plotlyOutput("rawOccurrenceThreadMap"),
                                             plotlyOutput("rawOccurrenceThreadMap_2")
                                    ),
