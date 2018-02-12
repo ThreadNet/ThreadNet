@@ -106,11 +106,12 @@ CF_multi_pie <- function(oc,CF){
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
 #' @param CF name of contextual factor that will determine the colors
+#' @shape shape of plotted points
 #'
 #' @return  plotly object
 #' @export
 #'
-threadMap <- function(or,TN, timescale, CF){
+threadMap <- function(or,TN, timescale, CF, shape){
 
   # setting color palettes
   # first find the number of distinct colors
@@ -119,8 +120,8 @@ threadMap <- function(or,TN, timescale, CF){
 
   return( plot_ly(or, x = ~or[[timescale]], y = ~or[[TN]], color= ~or[,CF],
              colors=pal,
-             name = 'threads', type = 'scatter', mode='markers', marker=list(size=5, opacity=1), # fill='tonextx',
-             symbol= "line-ew", showlegend=FALSE)
+             name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
+             symbol= "line-ew", symbols=shape, showlegend=FALSE)
         )
 }
 
