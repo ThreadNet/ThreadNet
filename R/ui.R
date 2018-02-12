@@ -22,7 +22,7 @@ ui <- fluidPage(
                        uiOutput("Data_Tab_Controls_2"),
                        verbatimTextOutput("Data_Tab_Output_1" ),
                        uiOutput("Data_Tab_Controls_3"),
-                       tableOutput("Data_Tab_Output_2")
+                       dataTableOutput("Data_Tab_Output_2")
               ),
               tabPanel("Choose POV",
                        tags$h3("Select columns from your data to define your point of view."),
@@ -52,6 +52,7 @@ ui <- fluidPage(
                                    ),
                                    tabPanel("Preview Network",
                                             tags$h4("Network based on sequential adjacency of raw occurrences"),
+                                            uiOutput("Preview_Network_Tab_Controls_0"),
                                             plotlyOutput("rawOccurrenceNetwork")
                                             ),
                                    tabPanel("Intermediate Data",
@@ -90,7 +91,10 @@ ui <- fluidPage(
                           tabPanel("Event Networks" ,
                                     tabsetPanel(type = "tabs",
                                           tabPanel("Positional layout",
-                                            plotlyOutput("eventNetwork")),
+                                            uiOutput("Pos_Layout_Controls_0"),
+                                            plotlyOutput("eventNetwork"),
+                                            #plotlyOutput("eventNetworksubset_plot"),
+                                            dataTableOutput("eventNetworksubset_data")),
                                           tabPanel("Force layout",
                                             uiOutput("Network_Tab_Controls_2"),
                                             forceNetworkOutput("eventNetworkD3"))
@@ -110,6 +114,8 @@ ui <- fluidPage(
               tabPanel("Moving Window",
                        uiOutput("Moving_Window_Tab_Controls_1"),
                        uiOutput("Moving_Window_Tab_Controls_2"),
+                       uiOutput("Moving_Window_Tab_Controls_3"),
+                       dataTableOutput("test"),
                        plotlyOutput("MovingWindow_Plot")
               ),
 

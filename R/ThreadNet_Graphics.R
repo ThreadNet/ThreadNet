@@ -181,12 +181,13 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #' @param et dataframe with the threads to be graphed
 #' @param TN the column with the threadNumber
 #' @param CF is the contetual factors (column)
+#' @param timesplit time measure
 #'
 #' @return visnetwork object
 #' @export
 
-eventNetwork <- function(et, TN, CF){
-  n <- threads_to_network(et, TN, CF)
+eventNetwork <- function(et, TN, CF, timesplit){
+  n <- threads_to_network(et, TN, CF, timesplit)
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
   edge_shapes <- list()
@@ -222,7 +223,7 @@ eventNetwork <- function(et, TN, CF){
                                    color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
 
                      ),
-                     text = n$nodeDF$label, hoverinfo = "text")
+                     text = n$nodeDF$label, hoverinfo = "text", source = 'A')
 
   p <- layout(
     network,
@@ -480,3 +481,4 @@ threadLengthBarchart <- function(o, TN){
 
   return(tgbc)
 }
+

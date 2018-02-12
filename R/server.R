@@ -19,6 +19,7 @@ server <- shinyServer(function(input, output, session) {
   #selected columns from the raw data, and the subset of the table
   selectOcc = reactive(SubsetOfTable(occ()[c("tStamp", input$CFcolumnsID)],input$occRowsToInclude ))
 
+
   # # recode the occurrences for the thresholds...
   # filterOcc = reactive({recodeThreshold(selectOcc(),get_CF(), cfthresh())})
   #
@@ -43,7 +44,6 @@ server <- shinyServer(function(input, output, session) {
 
   threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
   threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
-
 
 
   ##################################################
@@ -112,7 +112,7 @@ server <- shinyServer(function(input, output, session) {
                                         timeRangePhrase(timeRange(selectOcc())))
   )
 
-  output$Data_Tab_Output_2  = renderTable({ selectOcc() })
+  output$Data_Tab_Output_2  = renderDataTable({ selectOcc() })
 
 
 
@@ -142,11 +142,16 @@ server <- shinyServer(function(input, output, session) {
     threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF())  )
   })
 
-
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
 
+  output$Preview_Network_Tab_Controls_0 <- renderUI({
+    radioButtons("Timesplit", "Time Measure:", choices = c('POVseqNum','timeGap'), selected="POVseqNum", inline=TRUE)
+  })
+
   output$rawOccurrenceNetwork <- renderPlotly({
-    eventNetwork(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF())) })
+      req(input$Timesplit)
+      eventNetwork(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF()), input$Timesplit)
+    })
 
   output$Thread_Tab_Output_1  = renderTable({ threadedOcc()  })
 
@@ -225,8 +230,11 @@ server <- shinyServer(function(input, output, session) {
 
   output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
 
-
-  output$Event_Tab_Output_4  = renderPlot({ plot(threadedCluster()) } )
+  output$Event_Tab_Output_4  = renderPlot({
+    plot(threadedCluster())
+    #plotDendroAndColors(threadedCluster())
+    #idendro(threadedCluster())
+    })
 
   #         {plot_dendro(as.dendrogram(threadedCluster()), height = 600)}})  # not working in plotly
 
@@ -273,10 +281,42 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("NetworkZoomID",
                 "Zoom in and out by event similarity:",
                 2,100,2, step = 1, ticks=FALSE))})
+######
+  output$Pos_Layout_Controls_0 <- renderUI({
+    radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
+  })
 
   output$eventNetwork <- renderVisNetwork({
-    eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM()) })
+      req(input$Timesplit2)
+      eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
+  })
 
+  event.data <- reactive({
+    event_data("plotly_click", source="A")
+    # click_data = event_data("plotly_click", source="A")
+    # click_data$pointNumber = click_data$pointNumber+1
+    # click_data$click_name = paste(input$EVENT_CF_ID, click_data$pointNumber, sep="")
+    # click_data
+  })
+  eventNetworksubset <- reactive({
+    req(event.data())
+    TE = threadedEvents()
+    #CF_levels()
+    #ENsubset = subset(TE, input$EVENT_CF_ID == event.data()$click_name)
+    ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
+    ENsubset
+  })
+
+  # output$eventNetworksubset_plot <- renderVisNetwork({
+  #   eventNetwork(eventNetworksubset(), "threadNum", get_Zoom_TM(), input$Timesplit2)
+  # })
+
+  output$eventNetworksubset_data <- renderDataTable({
+    test<-eventNetworksubset()
+    test
+    #event.data()
+  })
+######
   output$Network_Tab_Controls_2 <- renderUI({tags$div(
     checkboxGroupInput("NetworkGroupID","Select columns for comparison:",
                        get_COMPARISON_CF(),
@@ -338,10 +378,19 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
+  output$Moving_Tab_Controls_3 <- renderUI({
+    radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE)
+  })
+
+  output$test <- renderDataTable({
+    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
+    w
+  })
+
   # just leave it blank for now...
  output$MovingWindow_Plot <- renderPlotly({
    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
-   eventNetwork( w, "threadNum", get_Zoom_TM()) })
+   eventNetwork(w, "threadNum", get_Zoom_TM(), input$Timesplit3) })
 
 
   ############################  Admin, params, etc  ##############################

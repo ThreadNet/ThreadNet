@@ -17,12 +17,17 @@
 #' @param et dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
 #' @param CF name of the column in dataframe that contains the events that will form the nodes of the network
+#' @param timesplit time measure
 #'
 #' @return a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
 #'
 #' @export
-threads_to_network <- function(et,TN,CF){
-  et$time = et$POVseqNum
+
+
+threads_to_network <- function(et,TN,CF,timesplit){
+  et$time = et[[timesplit]]
+  #et$time = et$POVseqNum
+
   #et$time<-as.numeric(et$tStamp)
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
@@ -47,7 +52,6 @@ threads_to_network <- function(et,TN,CF){
 
   # get the 2 grams for the edges
   ngdf = count_ngrams(et,TN, CF, 2)
-
 
   # need to split 2-grams into from and to
   from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
@@ -80,8 +84,7 @@ threads_to_network <- function(et,TN,CF){
   colnames(edges)<-c('from', 'to', 'label', 'from_y', 'from_x', 'to_y', 'to_x')
   return(list(nodeDF = nodes, edgeDF = edges))
 }
-
-
+args(threads_to_network)
 ###############################################################
 # Counting ngrams is essential to several ThreadNet functions
 #' Counts ngrams in a set of threads
