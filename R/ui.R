@@ -93,6 +93,7 @@ ui <- fluidPage(
                                           tabPanel("Positional layout",
                                             uiOutput("Pos_Layout_Controls_0"),
                                             plotlyOutput("eventNetwork"),
+                                            verbatimTextOutput("hover"),
                                             #plotlyOutput("eventNetworksubset_plot"),
                                             dataTableOutput("eventNetworksubset_data")),
                                           tabPanel("Force layout",

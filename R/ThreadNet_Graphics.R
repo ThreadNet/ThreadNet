@@ -223,7 +223,7 @@ eventNetwork <- function(et, TN, CF, timesplit){
                                    color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
 
                      ),
-                     text = n$nodeDF$label, hoverinfo = "text", source = 'A')
+                     text = n$nodeDF$label, key = n$nodeDF$label, hoverinfo = "text", source = 'A')
 
   p <- layout(
     network,

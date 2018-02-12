@@ -298,12 +298,18 @@ server <- shinyServer(function(input, output, session) {
     # click_data$click_name = paste(input$EVENT_CF_ID, click_data$pointNumber, sep="")
     # click_data
   })
+
+  output$hover <- renderPrint({
+    d <- event_data("plotly_hover")
+    if (is.null(d)) "Hover events appear here (unhover to clear)" else d
+  })
+
   eventNetworksubset <- reactive({
     req(event.data())
     TE = threadedEvents()
     #CF_levels()
-    #ENsubset = subset(TE, input$EVENT_CF_ID == event.data()$click_name)
-    ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
+    ENsubset = subset(TE, input$EVENT_CF_ID == event.data()$key)
+    #ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
     ENsubset
   })
 
