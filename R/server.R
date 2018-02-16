@@ -229,13 +229,11 @@ server <- shinyServer(function(input, output, session) {
 
   output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
 
-  output$Event_Tab_Output_4  = renderPlot({
-    plot(threadedCluster())
-    #plotDendroAndColors(threadedCluster())
-    #idendro(threadedCluster())
+  output$Event_Tab_Output_4  = renderDendroNetwork({
+    #plot(threadedCluster())
+    dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
     })
-
-  #         {plot_dendro(as.dendrogram(threadedCluster()), height = 600)}})  # not working in plotly
+    #{plot_dendro(as.dendrogram(threadedCluster()), height = 600)}})  # not working in plotly
 
 
   ##################### ThreadMap display  ################################
@@ -303,11 +301,14 @@ server <- shinyServer(function(input, output, session) {
     if (is.null(d)) "Hover events appear here (unhover to clear)" else d
   })
 
+  EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF()) )
+
   eventNetworksubset <- reactive({
     req(event.data())
     TE = threadedEvents()
     #CF_levels()
-    ENsubset = subset(TE, input$EVENT_CF_ID == event.data()$key)
+    #newColName(get_EVENT_CF()) input$EVENT_CF_ID
+    ENsubset = subset(TE, EVENT_CF_levels() == event.data()$key)
     #ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
     ENsubset
   })

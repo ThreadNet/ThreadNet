@@ -24,7 +24,7 @@ library(igraph)
 library(TraMineR)
 library(RColorBrewer)
 
-#library(WGCNA)
+library(d3Network)
 # this is another change
 
 source("ThreadNet_Core.R")
