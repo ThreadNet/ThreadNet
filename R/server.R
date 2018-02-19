@@ -233,7 +233,10 @@ server <- shinyServer(function(input, output, session) {
     #plot(threadedCluster())
     dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
     })
-    #{plot_dendro(as.dendrogram(threadedCluster()), height = 600)}})  # not working in plotly
+
+  output$dendro_test = renderPlot({
+    plot(threadedCluster())
+  })
 
 
   ##################### ThreadMap display  ################################
@@ -301,14 +304,14 @@ server <- shinyServer(function(input, output, session) {
     if (is.null(d)) "Hover events appear here (unhover to clear)" else d
   })
 
-  EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF()) )
+  #EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF()) )
 
   eventNetworksubset <- reactive({
     req(event.data())
     TE = threadedEvents()
     #CF_levels()
     #newColName(get_EVENT_CF()) input$EVENT_CF_ID
-    ENsubset = subset(TE, EVENT_CF_levels() == event.data()$key)
+    ENsubset = subset(TE, actor == event.data()$key)
     #ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
     ENsubset
   })
