@@ -72,7 +72,8 @@ ui <- fluidPage(
                           plotlyOutput("Event_Tab_Output_3")),
                       conditionalPanel(
                           condition="input.MappingID=='Clustering'",
-                          dendroNetworkOutput("Event_Tab_Output_4")),
+                          dendroNetworkOutput("Event_Tab_Output_4"),
+                          plotOutput("dendro_test")),
                        tableOutput("Event_Tab_Output_2")
 
               ),

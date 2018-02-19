@@ -24,7 +24,6 @@ library(igraph)
 library(TraMineR)
 library(RColorBrewer)
 
-library(d3Network)
 # this is another change
 
 source("ThreadNet_Core.R")
