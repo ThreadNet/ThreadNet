@@ -22,7 +22,7 @@ ui <- fluidPage(
                        uiOutput("Data_Tab_Controls_2"),
                        verbatimTextOutput("Data_Tab_Output_1" ),
                        uiOutput("Data_Tab_Controls_3"),
-                       dataTableOutput("Data_Tab_Output_2")
+                       DT::dataTableOutput("Data_Tab_Output_2")
               ),
               tabPanel("Choose POV",
                        tags$h3("Select columns from your data to define your point of view."),
@@ -31,35 +31,46 @@ ui <- fluidPage(
                                             tags$h4("Threads are defined by contextual features that STAY THE SAME during the thread. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_2"),
                                             plotlyOutput("ContextFlowers_2")
-                                            ),
+                                   ),
                                    tabPanel("Define Events",
                                             tags$h4("Events are marked by contextual features that CHANGE within the threads. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_3"),
                                             plotlyOutput("ContextFlowers_3")
-                                            ),
+                                   ),
                                    tabPanel("Comparison Groups",
                                             tags$h4("Choose dimensions for comparing patterns."),
                                             tags$h4("For clarity of interpretation, these should stay the same for a group of threads."),
                                             uiOutput("POV_Tab_Controls_1"),
                                             plotlyOutput("ContextFlowers_1")
-                                            ),
+                                   ),
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
-                                            plotlyOutput("rawOccurrenceThreadMap"),
-                                         #   plotlyOutput("rawOccurrenceThreadMap"),
-                                            plotlyOutput("rawOccurrenceThreadMap_2")
+                                            radioButtons("graph_type", "Select Graph Type", choices = c("Sequence Number"="seqNum", "Timestamp"="tStamp", "Relative Time"="relTime")),
+                                            #dataTableOutput("testdata"),
+                                            conditionalPanel(
+                                              condition = "input.graph_type=='seqNum'",
+                                              plotlyOutput("rawOccurrenceThreadMap")
+                                            ),
+                                            conditionalPanel(
+                                              condition = "input.graph_type=='tStamp'",
+                                              plotlyOutput("rawOccurrenceThreadMap_2")
+                                            )#,
+                                            # conditionalPanel(
+                                            #   condition = "input.graph_type=='relTime'",
+                                            #   plotlyOutput("rawOccurrenceThreadMap_3")
+                                            # )
                                    ),
                                    tabPanel("Preview Network",
                                             tags$h4("Network based on sequential adjacency of raw occurrences"),
                                             uiOutput("Preview_Network_Tab_Controls_0"),
                                             plotlyOutput("rawOccurrenceNetwork")
-                                            ),
+                                   ),
                                    tabPanel("Intermediate Data",
                                             tags$h4("This table shows the data threaded from your chosen POV"),
                                             tableOutput("Thread_Tab_Output_1")
                                    )
-                                   )
+                       )
               ),
               tabPanel("Occurrences to Events",
                        tags$h4("Map occurrences into events"),
@@ -68,51 +79,51 @@ ui <- fluidPage(
                        uiOutput("Event_Tab_Controls_2"),
                        uiOutput("Event_Tab_Controls_3"),
                        conditionalPanel(
-                          condition="input.MappingID=='One-to-One'",
-                          plotlyOutput("Event_Tab_Output_3")),
-                      conditionalPanel(
-                          condition="input.MappingID=='Clustering'",
-                          dendroNetworkOutput("Event_Tab_Output_4"),
-                          plotOutput("dendro_test")),
+                         condition="input.MappingID=='One-to-One'",
+                         plotlyOutput("Event_Tab_Output_3")),
+                       conditionalPanel(
+                         condition="input.MappingID=='Clustering'",
+                         dendroNetworkOutput("Event_Tab_Output_4"),
+                         plotOutput("dendro_test")),
                        tableOutput("Event_Tab_Output_2")
 
               ),
               tabPanel("Zooming in-out",
-                  #     tags$h3("Move slider to adjust granularity of event categories."),
+                       #     tags$h3("Move slider to adjust granularity of event categories."),
                        uiOutput("Thread_Tab_Controls_1"),
                        tabsetPanel(type = "tabs",
-                          tabPanel("Repetitive Sub-sequences",
-                                  plotlyOutput("nGramBarchart"),
-                                  uiOutput("nGramControls")
-                                  ),
-                          tabPanel("Event Sequences",
-                                  tags$h4("Visualize threads"),
-                                  plotOutput("threadMapEvents")
-                                  ),
-                          tabPanel("Event Networks" ,
-                                    tabsetPanel(type = "tabs",
-                                          tabPanel("Positional layout",
-                                            uiOutput("Pos_Layout_Controls_0"),
-                                            plotlyOutput("eventNetwork"),
-                                            verbatimTextOutput("hover"),
-                                            #plotlyOutput("eventNetworksubset_plot"),
-                                            dataTableOutput("eventNetworksubset_data")),
-                                          tabPanel("Force layout",
-                                            uiOutput("Network_Tab_Controls_2"),
-                                            forceNetworkOutput("eventNetworkD3"))
-                                          #  ,
-                                          # tabPanel("New layout",
-                                          #          uiOutput("Network_Tab_Controls_2"),
-                                          #          forceNetworkOutput("eventNetworkD3"))
-                                          )
-                          )
-                        )
+                                   tabPanel("Repetitive Sub-sequences",
+                                            plotlyOutput("nGramBarchart"),
+                                            uiOutput("nGramControls")
+                                   ),
+                                   tabPanel("Event Sequences",
+                                            tags$h4("Visualize threads"),
+                                            plotOutput("threadMapEvents")
+                                   ),
+                                   tabPanel("Event Networks" ,
+                                            tabsetPanel(type = "tabs",
+                                                        tabPanel("Positional layout",
+                                                                 uiOutput("Pos_Layout_Controls_0"),
+                                                                 plotlyOutput("eventNetwork"),
+                                                                 verbatimTextOutput("hover"),
+                                                                 #plotlyOutput("eventNetworksubset_plot"),
+                                                                 dataTableOutput("eventNetworksubset_data")),
+                                                        tabPanel("Force layout",
+                                                                 uiOutput("Network_Tab_Controls_2"),
+                                                                 forceNetworkOutput("eventNetworkD3"))
+                                                        #  ,
+                                                        # tabPanel("New layout",
+                                                        #          uiOutput("Network_Tab_Controls_2"),
+                                                        #          forceNetworkOutput("eventNetworkD3"))
+                                            )
+                                   )
+                       )
               ),
               tabPanel("Comparisons",
                        uiOutput("Comparison_Tab_Controls_1"),
                        uiOutput("Comparison_Tab_Controls_2"),
                        plotlyOutput("Comparison_Plots")
-               ),
+              ),
               tabPanel("Moving Window",
                        uiOutput("Moving_Window_Tab_Controls_1"),
                        uiOutput("Moving_Window_Tab_Controls_2"),
@@ -122,22 +133,22 @@ ui <- fluidPage(
               ),
 
               tabPanel("Parameter Settings",
-                        tableOutput("currentParameterSettings")
-                       ),
-               tabPanel("Acknowledgements",
-                        tags$h4("Support:"),
-                          tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
-                          tags$p("Antecedents of Complexity in Healthcare Routines"),
-                        tags$h4("Code advisors:"),
-                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills"),
-                        tags$h4("Collaborators:"),
-                             tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
-                        tags$h4("Related Publications:"),
-                        tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ),
-                        tags$h4("ThreadNet 2 (MatLab version):"),
-                        tags$a(href="http://routines.broad.msu.edu/ThreadNet/","http://routines.broad.msu.edu/ThreadNet/" )
-                        )
-             )
+                       tableOutput("currentParameterSettings")
+              ),
+              tabPanel("Acknowledgements",
+                       tags$h4("Support:"),
+                       tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
+                       tags$p("Antecedents of Complexity in Healthcare Routines"),
+                       tags$h4("Code advisors:"),
+                       tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills"),
+                       tags$h4("Collaborators:"),
+                       tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
+                       tags$h4("Related Publications:"),
+                       tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ),
+                       tags$h4("ThreadNet 2 (MatLab version):"),
+                       tags$a(href="http://routines.broad.msu.edu/ThreadNet/","http://routines.broad.msu.edu/ThreadNet/" )
+              )
   )
+)
 
 
