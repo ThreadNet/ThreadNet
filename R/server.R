@@ -18,7 +18,7 @@ server <- shinyServer(function(input, output, session) {
 
 
   #selected columns from the raw data, and the subset of the table
-  selectOcc = reactive(SubsetOfTable(occ()[c("tStamp", input$CFcolumnsID)],input$occRowsToInclude ))
+  selectOcc = reactive(occ()[c("tStamp", input$CFcolumnsID)] )
 
   selcectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
 
