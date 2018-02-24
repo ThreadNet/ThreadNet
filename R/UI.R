@@ -22,7 +22,7 @@ ui <- fluidPage(
                        uiOutput("Data_Tab_Controls_2"),
                        verbatimTextOutput("Data_Tab_Output_1" ),
                        uiOutput("Data_Tab_Controls_3"),
-                       tableOutput("Data_Tab_Output_2")
+                       DT::dataTableOutput("Data_Tab_Output_2")
               ),
               tabPanel("Choose POV",
                        tags$h3("Select columns from your data to define your point of view."),
