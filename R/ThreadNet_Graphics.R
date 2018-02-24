@@ -106,11 +106,12 @@ CF_multi_pie <- function(oc,CF){
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
 #' @param CF name of contextual factor that will determine the colors
+#' @shape shape of plotted points
 #'
 #' @return  plotly object
 #' @export
 #'
-threadMap <- function(or,TN, timescale, CF){
+threadMap <- function(or,TN, timescale, CF, shape){
 
   # setting color palettes
   # first find the number of distinct colors
@@ -119,8 +120,8 @@ threadMap <- function(or,TN, timescale, CF){
 
   return( plot_ly(or, x = ~or[[timescale]], y = ~or[[TN]], color= ~or[,CF],
              colors=pal,
-             name = 'threads', type = 'scatter', mode='markers', marker=list(size=5, opacity=1), # fill='tonextx',
-             symbol= "line-ew", showlegend=FALSE)
+             name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
+             symbol= "line-ew", symbols=shape, showlegend=FALSE)
         )
 }
 
@@ -181,37 +182,60 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #' @param et dataframe with the threads to be graphed
 #' @param TN the column with the threadNumber
 #' @param CF is the contetual factors (column)
+#' @param timesplit time measure
 #'
 #' @return visnetwork object
 #' @export
-eventNetwork <- function(et,TN, CF){
 
-  # first convert the threads to the network
-  n = threads_to_network(et,TN, CF)
-
+eventNetwork <- function(et, TN, CF, timesplit){
+  n <- threads_to_network(et, TN, CF, timesplit)
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
-  # print("nodes")
-  # print(n$nodeDF)
-  #
-  # print("edges")
-  # print(n$edgeDF)
+  edge_shapes <- list()
+  for(i in 1:length(n$edgeDF$from)) {
+    E <- n$edgeDF[i,]
 
-  return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
-           visEdges(arrows ="to",
-                    color = list(color = "black", highlight = "red")) %>%
-           visLayout(randomSeed = 12 ) %>%  # to have always the same network
-           visIgraphLayout(layout = "layout_in_circle") %>%
-           #      visIgraphLayout(layout = "layout_as_tree") %>%
-           visNodes(size = 10) %>%
-           visOptions(highlightNearest = list(enabled = T, hover = T),
-                      nodesIdSelection = T)
+    edge_shape = list(
+      type = "line",
+      line = list(color = "#030303", width = 0.1),
+      x0 = E[['from_x']],
+      x1 = E[['to_x']],
+      y0 = E[['from_y']],
+      y1 = E[['to_y']],
+      xref = "x",
+      yref = "y"
+    )
 
+    edge_shapes[[i]] <- edge_shape
+  }
+
+  x <- list(
+    title = 'Average Time'
   )
 
+  y <- list(
+    title = 'Frequency'
+  )
+  color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
+  size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
+  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
+                     mode = "markers",
+                     marker = list(size= size_pal,
+                                   color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
+
+                     ),
+                     text = n$nodeDF$label, key = n$nodeDF$label, hoverinfo = "text", source = 'A')
+
+  p <- layout(
+    network,
+    title = title_phrase,
+    shapes = edge_shapes,
+    xaxis = x,
+    yaxis = y
+  )
+  return(p)
+
 }
-
-
 ################################################################
 ##  Here is the networkD3 version of the same thing.
 # it has a bunch of extra code because of the groups...
@@ -458,3 +482,4 @@ threadLengthBarchart <- function(o, TN){
 
   return(tgbc)
 }
+

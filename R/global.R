@@ -22,13 +22,14 @@ library(xesreadR)
 library(colorspace)
 library(igraph)
 library(TraMineR)
+library(RColorBrewer)
 
 # this is another change
 
-# source("ThreadNet_Core.R")
-# source("ThreadNet_Misc.R")
-# source("ThreadNet_Graphics.R")
-# source("ThreadNet_Metrics.R")
+source("ThreadNet_Core.R")
+source("ThreadNet_Misc.R")
+source("ThreadNet_Graphics.R")
+source("ThreadNet_Metrics.R")
 
 # Global variables, config settings, etc. can be defined here
 

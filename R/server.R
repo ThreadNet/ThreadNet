@@ -20,12 +20,14 @@ server <- shinyServer(function(input, output, session) {
   #selected columns from the raw data, and the subset of the table
   selectOcc = reactive(SubsetOfTable(occ()[c("tStamp", input$CFcolumnsID)],input$occRowsToInclude ))
 
+  selcectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
+
   # # recode the occurrences for the thresholds...
   # filterOcc = reactive({recodeThreshold(selectOcc(),get_CF(), cfthresh())})
   #
   # Sort and add columns for threadNum and seqNum for the selected POV
   threadedOcc = reactive({
-   ThreadOccByPOV(selectOcc(),get_THREAD_CF(),get_EVENT_CF()) })
+    ThreadOccByPOV(selcectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
 
 
   ######  From here on down, we are working with events, not occurrences   #######
@@ -44,7 +46,6 @@ server <- shinyServer(function(input, output, session) {
 
   threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
   threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
-
 
 
   ##################################################
@@ -108,13 +109,13 @@ server <- shinyServer(function(input, output, session) {
                        inline=TRUE)
   })
 
-
   output$Data_Tab_Output_1 = renderText(paste( nrow(selectOcc()),"Occurrences //",
-                                        timeRangePhrase(timeRange(selectOcc())))
+                                               timeRangePhrase(timeRange(selectOcc())))
   )
 
-  output$Data_Tab_Output_2  = renderTable({ selectOcc() })
-
+  output$Data_Tab_Output_2  = DT::renderDataTable({
+    selectOcc()
+  }, filter = "top")
 
 
   ##################### 2.POV  tab ################################
@@ -122,53 +123,69 @@ server <- shinyServer(function(input, output, session) {
 
   # this paints the nice pie charts including the COMBINED column
   output$ContextFlowers_1 = renderPlotly({
-    CF_multi_pie(selectOcc(), get_COMPARISON_CF()  )
+    CF_multi_pie(selcectOccFilter(), get_COMPARISON_CF()  )
   })
 
   output$ContextFlowers_2 = renderPlotly({
-    CF_multi_pie(selectOcc(), get_THREAD_CF()  )
+    CF_multi_pie(selcectOccFilter(), get_THREAD_CF()  )
   })
 
   output$ContextFlowers_3 = renderPlotly({
-    CF_multi_pie(selectOcc(), get_EVENT_CF()  )
+    CF_multi_pie(selcectOccFilter(), get_EVENT_CF()  )
   })
 
-  output$rawOccurrenceThreadMap <- renderPlot({
-    traminer_threadMap(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF())  )
+  output$rawOccurrenceThreadMap <- renderPlotly({
+    threadMap(threadedOcc(), "POVthreadNum", "POVseqNum", newColName(get_EVENT_CF()), 15  )
   })
-  # output$rawOccurrenceThreadMap <- renderPlotly({
-  #   threadMap(threadedOcc(), "POVthreadNum", "POVseqNum", newColName(get_EVENT_CF())  )
-  # })
+
   output$rawOccurrenceThreadMap_2 <- renderPlotly({
-    threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF())  )
+    threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
   })
 
+  # output$testdata <- renderDataTable({
+  #   test = subset(threadedOcc(), POVseqNum == 1)
+  #   test$tStamp_test = as.POSIXct(as.character(test$tStamp), format = "%Y-%m-%d %H:%M:%S")
+  #   test$diff = test$tStamp_test - (test$tStamp_test - min(test$tStamp_test))
+  #   test
+  #   #mutate(relTime = ifelse(POVseqNum==1, 0, tStamp-))
+  # })
+
+  # output$rawOccurrenceThreadMap_3 <- renderPlotly({
+  #
+  #   threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
+  # })
 
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
 
-  output$rawOccurrenceNetwork <- renderVisNetwork({
-    eventNetwork(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF())) })
+  output$Preview_Network_Tab_Controls_0 <- renderUI({
+    radioButtons("Timesplit", "Time Measure:", choices = c('POVseqNum','timeGap'), selected="POVseqNum", inline=TRUE)
+  })
+
+  output$rawOccurrenceNetwork <- renderPlotly({
+    req(input$Timesplit)
+    eventNetwork(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF()), input$Timesplit)
+  })
 
   output$Thread_Tab_Output_1  = renderTable({ threadedOcc()  })
 
   # need to create unique ID for each radiobutton based on the CF name
   output$POV_Tab_Controls_1 <- renderUI({
     checkboxGroupInput("COMPARISON_CF_ID","Select columns for comparison:",
-                       cfnames(selectOcc()),
+                       cfnames(selcectOccFilter()),
                        selected =  get_COMPARISON_CF(),
                        inline=TRUE)
-    })
+  })
 
   output$POV_Tab_Controls_2 <- renderUI({
     checkboxGroupInput("THREAD_CF_ID","Select columns to define threads:",
-                       cfnames(selectOcc()),
+                       cfnames(selcectOccFilter()),
                        selected =  get_THREAD_CF(),
                        inline=TRUE)
   })
 
   output$POV_Tab_Controls_3 <- renderUI({
     checkboxGroupInput("EVENT_CF_ID","Select columns to mark events:",
-                       cfnames(selectOcc()),
+                       cfnames(selcectOccFilter()),
                        selected =  get_EVENT_CF(),
                        inline=TRUE)
   })
@@ -185,14 +202,14 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$Event_Tab_Controls_1 <- renderUI({tags$div(
-  if (input$MappingID == "Clustering"){
-    radioButtons("Event_method_ID", "How to form chunks of occurrences for clustering into events:",
-                 c('Variable chunks','Uniform chunks', 'Time gap'), selected="Variable chunks", inline=TRUE)}
-    )
-    })
+    if (input$MappingID == "Clustering"){
+      radioButtons("Event_method_ID", "How to form chunks of occurrences for clustering into events:",
+                   c('Variable chunks','Uniform chunks', 'Time gap'), selected="Variable chunks", inline=TRUE)}
+  )
+  })
 
-    output$Event_Tab_Controls_2 <- renderUI({
-      if (input$MappingID == "Clustering"){
+  output$Event_Tab_Controls_2 <- renderUI({
+    if (input$MappingID == "Clustering"){
 
       if (input$Event_method_ID == 'Variable chunks')
       {tags$div(checkboxGroupInput("CHUNK_CF_ID","Start new event when ALL of these change:",
@@ -201,47 +218,51 @@ server <- shinyServer(function(input, output, session) {
                                    inline=TRUE))} else if (input$Event_method_ID == 'Uniform chunks')
                                    {tags$div(sliderInput("uniform_chunk_slider", "Select chunk size:", 1,20,1, ticks=FALSE))}
       else
-        {sliderInput("Threshold_slider",
-                    "Minimum time gap between distinct chunks:",
-                    threshold_slider_min(threadedOcc()),
-                    threshold_slider_max(threadedOcc()),
-                    threshold_slider_selected(threadedOcc()),
-                    step = 1, ticks=FALSE)}
+      {sliderInput("Threshold_slider",
+                   "Minimum time gap between distinct chunks:",
+                   threshold_slider_min(threadedOcc()),
+                   threshold_slider_max(threadedOcc()),
+                   threshold_slider_selected(threadedOcc()),
+                   step = 1, ticks=FALSE)}
     }})
 
-    output$Event_Tab_Controls_3 <- renderUI({tags$div(
+  output$Event_Tab_Controls_3 <- renderUI({tags$div(
     textInput("EventMapName", label = h4("Enter label to store/retrieve this mapping"), value = ""),
     actionButton("EventButton", "Go"))
   })
 
-    # show the bar chart
-    output$threadGapBarchart <- renderPlotly({
-      threadGapBarchart(threadedOcc(),input$Event_method_ID)
-    })
+  # show the bar chart
+  output$threadGapBarchart <- renderPlotly({
+    threadGapBarchart(threadedOcc(),input$Event_method_ID)
+  })
 
   output$Event_Tab_Output_1  = renderText( " " )
 
   output$Event_Tab_Output_2  = renderTable({ head( threadedEvents()) })
-#  output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
+  #  output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
 
   output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
 
+  output$Event_Tab_Output_4  = renderDendroNetwork({
+    #plot(threadedCluster())
+    dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
+  })
 
-  output$Event_Tab_Output_4  = renderPlot({ plot(threadedCluster()) } )
-
-  #         {plot_dendro(as.dendrogram(threadedCluster()), height = 600)}})  # not working in plotly
+  output$dendro_test = renderPlot({
+    plot(threadedCluster())
+  })
 
 
   ##################### ThreadMap display  ################################
 
   output$Thread_Tab_Controls_1 <- renderUI(
 
-     if (input$MappingID == "One-to-One")
-            {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
-     else
-            {sliderInput("ThreadMapZoomID",
-                "Zoom in and out by event similarity:",
-                1,100,5, step = 1, ticks=FALSE) })
+    if (input$MappingID == "One-to-One")
+    {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
+    else
+    {sliderInput("ThreadMapZoomID",
+                 "Zoom in and out by event similarity:",
+                 1,100,5, step = 1, ticks=FALSE) })
 
   output$threadMapEvents <- renderPlot({
     traminer_threadMap(threadedEvents(), "threadNum", get_Zoom_TM())
@@ -274,10 +295,51 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("NetworkZoomID",
                 "Zoom in and out by event similarity:",
                 2,100,2, step = 1, ticks=FALSE))})
+  ######
+  output$Pos_Layout_Controls_0 <- renderUI({
+    radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
+  })
 
   output$eventNetwork <- renderVisNetwork({
-    eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM()) })
+    req(input$Timesplit2)
+    eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
+  })
 
+  event.data <- reactive({
+    event_data("plotly_click", source="A")
+    # click_data = event_data("plotly_click", source="A")
+    # click_data$pointNumber = click_data$pointNumber+1
+    # click_data$click_name = paste(input$EVENT_CF_ID, click_data$pointNumber, sep="")
+    # click_data
+  })
+
+  output$hover <- renderPrint({
+    d <- event_data("plotly_hover")
+    if (is.null(d)) "Hover events appear here (unhover to clear)" else d
+  })
+
+  #EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF()) )
+
+  eventNetworksubset <- reactive({
+    req(event.data())
+    TE = threadedEvents()
+    #CF_levels()
+    #newColName(get_EVENT_CF()) input$EVENT_CF_ID
+    ENsubset = subset(TE, actor == event.data()$key)
+    #ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
+    ENsubset
+  })
+
+  # output$eventNetworksubset_plot <- renderVisNetwork({
+  #   eventNetwork(eventNetworksubset(), "threadNum", get_Zoom_TM(), input$Timesplit2)
+  # })
+
+  output$eventNetworksubset_data <- renderDataTable({
+    test<-eventNetworksubset()
+    test
+    #event.data()
+  })
+  ######
   output$Network_Tab_Controls_2 <- renderUI({tags$div(
     checkboxGroupInput("NetworkGroupID","Select columns for comparison:",
                        get_COMPARISON_CF(),
@@ -312,22 +374,22 @@ server <- shinyServer(function(input, output, session) {
 
       sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE ),
       if (input$MappingID == "One-to-One")
-            {tags$p("")}
-        else
-            {sliderInput("ComparisonZoomID",
-                  "Zoom in and out by event similarity:",
-                  1,100,5, step = 1, ticks=FALSE)}
+      {tags$p("")}
+      else
+      {sliderInput("ComparisonZoomID",
+                   "Zoom in and out by event similarity:",
+                   1,100,5, step = 1, ticks=FALSE)}
     )
   })
 
   output$Comparison_Plots <- renderPlotly(
-#    input$visualize_DV_button
-  Comparison_Plots(threadedEvents(),
-                            input$selectComparisonID,
-                            input$selectComparisonGroupsID,
-                            input$NumTimePeriodsToCompare,
-                            input$nGramLengthCompID,
-                            get_Zoom_COMP()) )
+    #    input$visualize_DV_button
+    Comparison_Plots(threadedEvents(),
+                     input$selectComparisonID,
+                     input$selectComparisonGroupsID,
+                     input$NumTimePeriodsToCompare,
+                     input$nGramLengthCompID,
+                     get_Zoom_COMP()) )
 
 
   ########################  MOVING WINDOW TAB ##############################
@@ -339,10 +401,19 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
+  output$Moving_Tab_Controls_3 <- renderUI({
+    radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE)
+  })
+
+  output$test <- renderDataTable({
+    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
+    w
+  })
+
   # just leave it blank for now...
- output$MovingWindow_Plot <- renderVisNetwork({
-   w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
-   eventNetwork( w, "threadNum", get_Zoom_TM()) })
+  output$MovingWindow_Plot <- renderPlotly({
+    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
+    eventNetwork(w, "threadNum", get_Zoom_TM(), input$Timesplit3) })
 
 
   ############################  Admin, params, etc  ##############################
@@ -375,8 +446,8 @@ server <- shinyServer(function(input, output, session) {
 
 
   ############################  Explantory tool tips ##############################
- # requires package shinybs
-   # addTooltip(session, "PctOccToDisplayID", "For large data sets, this can be helpful", placement = "bottom", trigger = "hover",
+  # requires package shinybs
+  # addTooltip(session, "PctOccToDisplayID", "For large data sets, this can be helpful", placement = "bottom", trigger = "hover",
   #            options = NULL)
 
 
