@@ -90,17 +90,17 @@ server <- shinyServer(function(input, output, session) {
     )
   })
 
-  output$Data_Tab_Controls_2 =  renderUI({
-    tags$div(align="center",
-             sliderInput("occRowsToInclude",
-                         "Occurrences to use",
-                         1,nrow(occ()),value=c(1,nrow(occ())),step=1,ticks=FALSE ),
-
-             radioButtons("timeScaleID", "Select temporal granularity:",
-                          c("secs","mins","hours","days"),selected="mins",inline=TRUE  )
-    )
-
-  })
+  # output$Data_Tab_Controls_2 =  renderUI({
+  #   tags$div(align="center",
+  #            sliderInput("occRowsToInclude",
+  #                        "Occurrences to use",
+  #                        1,nrow(occ()),value=c(1,nrow(occ())),step=1,ticks=FALSE ),
+  #
+  #            radioButtons("timeScaleID", "Select temporal granularity:",
+  #                         c("secs","mins","hours","days"),selected="mins",inline=TRUE  )
+  #   )
+  #
+  # })
 
   output$Data_Tab_Controls_3 =  renderUI({
     checkboxGroupInput("CFcolumnsID","Select columns to include in analysis:",
@@ -109,9 +109,9 @@ server <- shinyServer(function(input, output, session) {
                        inline=TRUE)
   })
 
-  output$Data_Tab_Output_1 = renderText(paste( nrow(selectOcc()),"Occurrences //",
-                                               timeRangePhrase(timeRange(selectOcc())))
-  )
+  # output$Data_Tab_Output_1 = renderText(paste( nrow(selectOcc()),"Occurrences //",
+  #                                              timeRangePhrase(timeRange(selectOcc())))
+  # )
 
   output$Data_Tab_Output_2  = DT::renderDataTable({
     selectOcc()

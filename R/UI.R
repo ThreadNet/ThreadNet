@@ -19,8 +19,8 @@ ui <- fluidPage(
   tabsetPanel(type = "tabs",
               tabPanel("Occurrences",
                        uiOutput("Data_Tab_Controls_1"),
-                       uiOutput("Data_Tab_Controls_2"),
-                       verbatimTextOutput("Data_Tab_Output_1" ),
+                       # uiOutput("Data_Tab_Controls_2"),
+                       # verbatimTextOutput("Data_Tab_Output_1" ),
                        uiOutput("Data_Tab_Controls_3"),
                        DT::dataTableOutput("Data_Tab_Output_2")
               ),
