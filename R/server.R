@@ -122,9 +122,9 @@ server <- shinyServer(function(input, output, session) {
 
 
   # this paints the nice pie charts including the COMBINED column
-  output$ContextFlowers_1 = renderPlotly({
-    CF_multi_pie(selcectOccFilter(), get_COMPARISON_CF()  )
-  })
+  # output$ContextFlowers_1 = renderPlotly({
+  #   CF_multi_pie(selcectOccFilter(), get_COMPARISON_CF()  )
+  # })
 
   output$ContextFlowers_2 = renderPlotly({
     CF_multi_pie(selcectOccFilter(), get_THREAD_CF()  )
@@ -166,7 +166,7 @@ server <- shinyServer(function(input, output, session) {
     eventNetwork(threadedOcc(), "POVthreadNum", newColName(get_EVENT_CF()), input$Timesplit)
   })
 
-  output$Thread_Tab_Output_1  = renderTable({ threadedOcc()  })
+  output$Thread_Tab_Output_1  = DT::renderDataTable({ threadedOcc()  })
 
   # need to create unique ID for each radiobutton based on the CF name
   output$POV_Tab_Controls_1 <- renderUI({

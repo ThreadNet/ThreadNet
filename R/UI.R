@@ -37,26 +37,17 @@ ui <- fluidPage(
                                             uiOutput("POV_Tab_Controls_3"),
                                             plotlyOutput("ContextFlowers_3")
                                             ),
-                                   tabPanel("Comparison Groups",
-                                            tags$h4("Choose dimensions for comparing patterns."),
-                                            tags$h4("For clarity of interpretation, these should stay the same for a group of threads."),
-                                            uiOutput("POV_Tab_Controls_1"),
-                                            plotlyOutput("ContextFlowers_1")
-                                            ),
+
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
-                                            plotOutput("rawOccurrenceThreadMap"),
-                                         #   plotlyOutput("rawOccurrenceThreadMap"),
+                                            # plotOutput("rawOccurrenceThreadMap"),
                                             plotlyOutput("rawOccurrenceThreadMap_2")
                                    ),
-                                   tabPanel("Preview Network",
-                                            tags$h4("Network based on sequential adjacency of raw occurrences"),
-                                            visNetworkOutput("rawOccurrenceNetwork")
-                                            ),
+
                                    tabPanel("Intermediate Data",
                                             tags$h4("This table shows the data threaded from your chosen POV"),
-                                            tableOutput("Thread_Tab_Output_1")
+                                            DT::dataTableOutput("Thread_Tab_Output_1")
                                    )
                                    )
               ),
