@@ -20,14 +20,14 @@ server <- shinyServer(function(input, output, session) {
   #selected columns from the raw data, and the subset of the table
   selectOcc = reactive(occ()[c("tStamp", input$CFcolumnsID)] )
 
-  selcectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
+  selectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
 
   # # recode the occurrences for the thresholds...
   # filterOcc = reactive({recodeThreshold(selectOcc(),get_CF(), cfthresh())})
   #
   # Sort and add columns for threadNum and seqNum for the selected POV
   threadedOcc = reactive({
-    ThreadOccByPOV(selcectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
+    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
 
 
   ######  From here on down, we are working with events, not occurrences   #######
@@ -122,16 +122,13 @@ server <- shinyServer(function(input, output, session) {
 
 
   # this paints the nice pie charts including the COMBINED column
-  # output$ContextFlowers_1 = renderPlotly({
-  #   CF_multi_pie(selcectOccFilter(), get_COMPARISON_CF()  )
-  # })
 
   output$ContextFlowers_2 = renderPlotly({
-    CF_multi_pie(selcectOccFilter(), get_THREAD_CF()  )
+    CF_multi_pie(selectOccFilter(), get_THREAD_CF()  )
   })
 
   output$ContextFlowers_3 = renderPlotly({
-    CF_multi_pie(selcectOccFilter(), get_EVENT_CF()  )
+    CF_multi_pie(selectOccFilter(), get_EVENT_CF()  )
   })
 
   output$rawOccurrenceThreadMap <- renderPlotly({
@@ -142,18 +139,6 @@ server <- shinyServer(function(input, output, session) {
     threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
   })
 
-  # output$testdata <- renderDataTable({
-  #   test = subset(threadedOcc(), POVseqNum == 1)
-  #   test$tStamp_test = as.POSIXct(as.character(test$tStamp), format = "%Y-%m-%d %H:%M:%S")
-  #   test$diff = test$tStamp_test - (test$tStamp_test - min(test$tStamp_test))
-  #   test
-  #   #mutate(relTime = ifelse(POVseqNum==1, 0, tStamp-))
-  # })
-
-  # output$rawOccurrenceThreadMap_3 <- renderPlotly({
-  #
-  #   threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
-  # })
 
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
 
@@ -171,21 +156,21 @@ server <- shinyServer(function(input, output, session) {
   # need to create unique ID for each radiobutton based on the CF name
   output$POV_Tab_Controls_1 <- renderUI({
     checkboxGroupInput("COMPARISON_CF_ID","Select columns for comparison:",
-                       cfnames(selcectOccFilter()),
+                       cfnames(selectOccFilter()),
                        selected =  get_COMPARISON_CF(),
                        inline=TRUE)
   })
 
   output$POV_Tab_Controls_2 <- renderUI({
     checkboxGroupInput("THREAD_CF_ID","Select columns to define threads:",
-                       cfnames(selcectOccFilter()),
+                       cfnames(selectOccFilter()),
                        selected =  get_THREAD_CF(),
                        inline=TRUE)
   })
 
   output$POV_Tab_Controls_3 <- renderUI({
     checkboxGroupInput("EVENT_CF_ID","Select columns to mark events:",
-                       cfnames(selcectOccFilter()),
+                       cfnames(selectOccFilter()),
                        selected =  get_EVENT_CF(),
                        inline=TRUE)
   })
@@ -300,6 +285,15 @@ server <- shinyServer(function(input, output, session) {
     radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
   })
 
+  # use this to select how to color the nodes in force layout
+  output$Network_Tab_Controls_2 <- renderUI({tags$div(
+    radioButtons("NetworkGroupID","Select dimension for coloring nodes:",
+                       choices = cfnames(selectOccFilter()),
+                       selected =  cfnames(selectOccFilter())[1],
+                       inline=TRUE))
+  })
+
+
   output$eventNetwork <- renderVisNetwork({
     req(input$Timesplit2)
     eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
@@ -340,11 +334,11 @@ server <- shinyServer(function(input, output, session) {
     #event.data()
   })
   ######
-  output$Network_Tab_Controls_2 <- renderUI({tags$div(
-    checkboxGroupInput("NetworkGroupID","Select columns for comparison:",
-                       get_COMPARISON_CF(),
-                       selected =get_COMPARISON_CF()[1],
-                       inline=TRUE))})
+  # output$Network_Tab_Controls_2 <- renderUI({tags$div(
+  #   checkboxGroupInput("NetworkGroupID","Select columns for comparison:",
+  #                      get_COMPARISON_CF(),
+  #                      selected =get_COMPARISON_CF()[1],
+  #                      inline=TRUE))})
 
   output$eventNetworkD3 <- renderForceNetwork({
     eventNetworkD3(threadedEvents(), "threadNum", input$NetworkGroupID, get_Zoom_TM())
