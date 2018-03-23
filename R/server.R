@@ -333,12 +333,7 @@ server <- shinyServer(function(input, output, session) {
     test
     #event.data()
   })
-  ######
-  # output$Network_Tab_Controls_2 <- renderUI({tags$div(
-  #   checkboxGroupInput("NetworkGroupID","Select columns for comparison:",
-  #                      get_COMPARISON_CF(),
-  #                      selected =get_COMPARISON_CF()[1],
-  #                      inline=TRUE))})
+
 
   output$eventNetworkD3 <- renderForceNetwork({
     eventNetworkD3(threadedEvents(), "threadNum", input$NetworkGroupID, get_Zoom_TM())

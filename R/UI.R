@@ -53,17 +53,37 @@ ui <- fluidPage(
               ),
               tabPanel("Occurrences to Events",
                        tags$h4("Map occurrences into events"),
-                       uiOutput("Event_Tab_Controls_0"),
-                       uiOutput("Event_Tab_Controls_1"),
-                       uiOutput("Event_Tab_Controls_2"),
-                       uiOutput("Event_Tab_Controls_3"),
-                       conditionalPanel(
-                          condition="input.MappingID=='One-to-One'",
-                          plotlyOutput("Event_Tab_Output_3")),
-                      conditionalPanel(
-                          condition="input.MappingID=='Clustering'",
-                          plotOutput("Event_Tab_Output_4")),
-                       tableOutput("Event_Tab_Output_2")
+                       tabsetPanel(type = "tabs",
+                                   tabPanel("One-to-One",
+                                            tags$h4("Each occurrence in the raw data is interpreted as an event."),
+                                            uiOutput("Event_Tab_Controls_0"),
+                                            uiOutput("Event_Tab_Controls_1"),
+                                            uiOutput("Event_Tab_Controls_2"),
+                                            uiOutput("Event_Tab_Controls_3"),
+                                            conditionalPanel(
+                                              condition="input.MappingID=='One-to-One'",
+                                              plotlyOutput("Event_Tab_Output_3")),
+                                            conditionalPanel(
+                                              condition="input.MappingID=='Clustering'",
+                                              plotOutput("Event_Tab_Output_4")),
+                                            tableOutput("Event_Tab_Output_2")
+                                   ),
+                                   tabPanel("Context-based chunks",
+                                            tags$h4("Occurrences are grouped into events based on changes in contextual factors.")
+                                   ),
+
+                                   tabPanel("Frequent ngrams",
+                                            tags$h4("Select ngrams to use in forming events -- Not implemented yet")
+                                   ),
+
+                                   tabPanel("Frequent maximal patterns",
+                                            tags$h4("Form events based on maximal patterns-- Not implemented yet")
+                                   ),
+                                   tabPanel("Select event mapping to use or export",
+                                            tags$h4("Select event mapping to use or export -- Not implemented yet")
+                                   )
+                       )
+
 
               ),
               tabPanel("Zooming in-out",
