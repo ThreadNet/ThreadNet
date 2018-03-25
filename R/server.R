@@ -32,19 +32,30 @@ server <- shinyServer(function(input, output, session) {
 
   ######  From here on down, we are working with events, not occurrences   #######
   threadedEventCluster <- reactive({
-    input$EventButton
-    isolate(OccToEvents(threadedOcc(),
-                        input$MappingID,
-                        input$Event_method_ID,
-                        input$uniform_chunk_slider,
-                        input$Threshold_slider,
+    input$EventButton1
+    isolate(OccToEvents1(threadedOcc(),
                         input$CHUNK_CF_ID,
-                        input$EventMapName,
+                        input$EventMapName1,
                         get_EVENT_CF(),
-                        get_COMPARISON_CF(),
-                        get_timeScale()) )})
+                        get_COMPARISON_CF()
+                        ) )})
+
+
+  # threadedEventCluster <- reactive({
+  #   input$EventButton
+  #   isolate(OccToEvents(threadedOcc(),
+  #                        input$MappingID,
+  #                        input$Event_method_ID,
+  #                        input$uniform_chunk_slider,
+  #                        input$Threshold_slider,
+  #                        input$CHUNK_CF_ID,
+  #                        input$EventMapName,
+  #                        get_EVENT_CF(),
+  #                        get_COMPARISON_CF(),
+  #                        get_timeScale()) )})
 
   threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
+
   threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
 
@@ -62,7 +73,7 @@ server <- shinyServer(function(input, output, session) {
   # get_POV returns the choice of POV from the POV tab
   get_THREAD_CF <<- reactive({ return(input$THREAD_CF_ID) })
   get_EVENT_CF <<- reactive({ return(input$EVENT_CF_ID) })
-  get_COMPARISON_CF <<- reactive({ return(input$COMPARISON_CF_ID) })
+  get_COMPARISON_CF <<- reactive({ return(setdiff(get_CF(), union(get_THREAD_CF(),get_EVENT_CF()))) })
 
 
   # get an environment here for storing/retriving the information about the events...
@@ -242,6 +253,10 @@ server <- shinyServer(function(input, output, session) {
                        actionButton("Delete_Mapping", "Delete") )
 
             })
+
+            output$One_to_one_Tab_Output_1  = DT::renderDataTable({
+              threadedEvents()
+            }, filter = "top")
 
             output$Event_Tab_Output_4  = renderDendroNetwork({
               #plot(threadedCluster())

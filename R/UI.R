@@ -6,13 +6,14 @@
 # Absolutely no warranty!
 ##########################################################################################################
 # Sept 7, 2017 New Shiny R version using architecture and advice from Ezra Brooks & Pat Bills
+# March 21, 2018 New organization of tabs.
 
 # pdf(NULL) # prevent plotly errors
 
 ui <- fluidPage(
 
   # Application title
-  tags$h3(align='center', "ThreadNet 3 Prototype"),
+  tags$h3(align='center', "ThreadNet 3 Development"),
 
   #  tags$audio( src='tellusastory.mp3',type='audio/mpeg', controls='TRUE'),
 
@@ -54,8 +55,8 @@ ui <- fluidPage(
                        tags$h4("Map occurrences into events"),
                        tabsetPanel(type = "tabs",
                                    tabPanel("One-to-One",
-                                            uiOutput("One_to_One_controls")
-
+                                            uiOutput("One_to_One_controls"),
+                                            DT::dataTableOutput("One_to_one_Tab_Output_1")
                                    ),
                                    tabPanel("Contextual Chunks",
                                             uiOutput("Contextual_Chunk_controls")
@@ -77,7 +78,6 @@ ui <- fluidPage(
                                             uiOutput("Manage_Event_Map_controls")
                                    )
                        )
-
 
               ),
               tabPanel("Visualize",

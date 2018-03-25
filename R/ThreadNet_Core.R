@@ -234,6 +234,41 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 #' and set of columns E_1, E_2, ..., that indicate the membership of events in clusters of events.
 #'
 #' @export
+OccToEvents1 <- function(o, chunk_CF, EventMapName,EVENT_CF, compare_CF){
+
+
+  # Only run if eventMapName is filled in; return empty data frame otherwise
+  if (EventMapName ==""){return(data.frame())}
+
+  #### First get the break points between the occurrances.
+
+  # we are mapping one-to-one, so copy the input to the output and then add/rename some other columns as needed
+
+    # copy the occurrences.  Each occurrence is an event
+    e = o
+
+    # rename the threadNum and seqNum columns
+    names(e)[names(e)=="POVthreadNum"] <- "threadNum"
+    names(e)[names(e)=="POVseqNum"] <- "seqNum"
+
+    # Set eventStart and EventStop -- these are just equal to the row numbers
+    e["eventStart"] = 1:nrow(e)
+    e["eventStop"] = 1:nrow(e)
+
+    # occurrences have no duration
+    e["eventDuration"] = 0
+
+    # just add the one column with the combined values
+    e["E_1"] = as.factor(e[,newColName(EVENT_CF)])
+
+    # set the cluster solution to NULL
+    clust=NULL
+
+    #  need return the threads and also the cluster solution for display
+    return(list(threads = e, cluster = clust))
+
+}
+
 OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_chunk_size=1, tThreshold=1, chunk_CF, EventMapName,EVENT_CF, compare_CF, timescale){
 
 
@@ -376,6 +411,7 @@ OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_ch
   #  need return the threads and also the cluster solution for display
   return(list(threads = e, cluster = clust))
 }
+
 
 
 # this function pulls out the chunks from the occurrence data and computes their similarity
