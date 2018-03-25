@@ -91,28 +91,32 @@ ui <- fluidPage(
 
 
               ),
-              tabPanel("Zooming in-out",
-                  #     tags$h3("Move slider to adjust granularity of event categories."),
-                       uiOutput("Thread_Tab_Controls_1"),
+              tabPanel("Visualize",
+                       uiOutput("Visualize_Tab_Controls_1"),
+                       uiOutput("Visualize_Tab_Controls_2"),
                        tabsetPanel(type = "tabs",
                           tabPanel("Repetitive Sub-sequences",
                                   plotlyOutput("nGramBarchart"),
                                   uiOutput("nGramControls")
                                   ),
-                          tabPanel("Event Sequences",
-                                  tags$h4("Visualize threads"),
+
+                          tabPanel("Whole Sequences",
+                                  tags$h4("Put plotly threadmap here..."),
                                   plotOutput("threadMapEvents")
                                   ),
-                          tabPanel("Event Networks" ,
-                                    tabsetPanel(type = "tabs",
-                                          tabPanel("Circular layout",
-                                            visNetworkOutput("eventNetwork")),
-                                          tabPanel("Force layout",
-                                            uiOutput("Network_Tab_Controls_2"),
-                                            forceNetworkOutput("eventNetworkD3", width = "100%", height = "1200px")))
-                          )
-                        )
+
+                          tabPanel("Circular layout",
+                                   tags$p("Put plotly circular layout here")),
+
+                          tabPanel("Force layout",
+                                   uiOutput("Network_Tab_Controls_2"),
+                                   forceNetworkOutput("eventNetworkD3", width = "100%", height = "1200px")),
+
+                          tabPanel("Custom layout",
+                                tags$p("Put plotly custom layout here")))
+
               ),
+
               tabPanel("Comparisons",
                        uiOutput("Comparison_Tab_Controls_1"),
                        uiOutput("Comparison_Tab_Controls_2"),

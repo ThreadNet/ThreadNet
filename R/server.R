@@ -77,7 +77,7 @@ server <- shinyServer(function(input, output, session) {
 
 
 
-  ################## 1.DATA TAB ####################
+  ################## 1.READ DATA TAB ####################
 
   output$Data_Tab_Controls_1 =  renderUI({
     tags$div(align="center",
@@ -224,7 +224,7 @@ server <- shinyServer(function(input, output, session) {
             tags$div(align="left",
                      tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
 
-                     selectizeInput("NGramInputID",label = h4("Choose input for this mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                     selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
 
                      textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal-"),
 
@@ -236,7 +236,7 @@ server <- shinyServer(function(input, output, session) {
               tags$div(align="left",
                        tags$h4("Select event mapping to export or delete -- Not implemented yet"),
 
-                       selectizeInput("NGramInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
 
                        actionButton("Export_Mapping", "Export"),
                        actionButton("Delete_Mapping", "Delete") )
@@ -288,16 +288,36 @@ server <- shinyServer(function(input, output, session) {
     ng_bar_chart(threadedEvents(), "threadNum", get_Zoom_TM(), input$nGramLengthID, input$nGramDisplayThresholdID)
   })
 
-  # controls for the sequences pages
+
+
+  ##################### 4.VISUALIZE tab ################################
+
+
+  # Controls for the whole set of tabs
+output$Visualize_Tab_Controls_1 = renderUI({
+
+  selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
+})
+
+  output$Visualize_Tab_Controls_2 = renderUI({
+  if (input$MappingID == "One-to-One")
+  {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
+  else
+  {sliderInput("ThreadMapZoomID",
+               "Zoom in and out by event similarity:",
+               1,100,5, step = 1, ticks=FALSE) }
+
+
+})
+
+  # controls for sub-sequence display
   output$nGramControls <- renderUI({
     tagList(
-      # sliderInput("nGramZoomID",
-      #             "Zoom in and out by event similarity:",
-      #             1,20,5, step = 1, ticks=FALSE),
       sliderInput("nGramLengthID","nGram Size", 1,10,2,step=1,ticks=FALSE ),
       sliderInput("nGramDisplayThresholdID","Display threshold", 1,50,1,step=1,ticks=FALSE )
     )
   })
+
 
 
   ##################### 6.NETWORK  tab ################################
