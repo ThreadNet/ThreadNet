@@ -90,19 +90,8 @@ server <- shinyServer(function(input, output, session) {
     )
   })
 
-  # output$Data_Tab_Controls_2 =  renderUI({
-  #   tags$div(align="center",
-  #            sliderInput("occRowsToInclude",
-  #                        "Occurrences to use",
-  #                        1,nrow(occ()),value=c(1,nrow(occ())),step=1,ticks=FALSE ),
-  #
-  #            radioButtons("timeScaleID", "Select temporal granularity:",
-  #                         c("secs","mins","hours","days"),selected="mins",inline=TRUE  )
-  #   )
-  #
-  # })
 
-  output$Data_Tab_Controls_3 =  renderUI({
+  output$Data_Tab_Controls_2 =  renderUI({
     checkboxGroupInput("CFcolumnsID","Select columns to include in analysis:",
                        cfnames(occ()),
                        selected=cfnames(occ()),
@@ -180,62 +169,102 @@ server <- shinyServer(function(input, output, session) {
   ##################### 3.OCC to EVENT  tab ################################
 
 
-  output$Event_Tab_Controls_0 <- renderUI({tags$div(
+  output$One_to_One_controls  = renderUI({
+    tags$div(align="left",
+             tags$h4("One-to-One: Each occurrence in the raw data is interpreted as an event (INPUT = Occurrences)."),
+             tags$p(" "),
+             textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
 
-    radioButtons("MappingID", "Map occurrences to events using:",
-                 c('One-to-One','Clustering'), selected="One-to-One", inline=TRUE))
+             actionButton("EventButton1", "Go")  )
+
   })
+    output$Contextual_Chunk_controls = renderUI({
+      tags$div(align="left",
+               tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
+               tags$p(" "),
+               checkboxGroupInput("CHUNK_CF_ID",label = h4("Start new event when ALL of these change:"),
+                                                                              get_EVENT_CF(),
+                                                                              selected =  input$CHUNK_CF_ID,
+                                                                              inline=TRUE),
 
-  output$Event_Tab_Controls_1 <- renderUI({tags$div(
-    if (input$MappingID == "Clustering"){
-      radioButtons("Event_method_ID", "How to form chunks of occurrences for clustering into events:",
-                   c('Variable chunks','Uniform chunks', 'Time gap'), selected="Variable chunks", inline=TRUE)}
-  )
-  })
+               textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks-"),
 
-  output$Event_Tab_Controls_2 <- renderUI({
-    if (input$MappingID == "Clustering"){
+               actionButton("EventButton2", "Go")  )
 
-      if (input$Event_method_ID == 'Variable chunks')
-      {tags$div(checkboxGroupInput("CHUNK_CF_ID","Start new event when ALL of these change:",
-                                   get_EVENT_CF(),
-                                   selected =  input$CHUNK_CF_ID,
-                                   inline=TRUE))} else if (input$Event_method_ID == 'Uniform chunks')
-                                   {tags$div(sliderInput("uniform_chunk_slider", "Select chunk size:", 1,20,1, ticks=FALSE))}
-      else
-      {sliderInput("Threshold_slider",
-                   "Minimum time gap between distinct chunks:",
-                   threshold_slider_min(threadedOcc()),
-                   threshold_slider_max(threadedOcc()),
-                   threshold_slider_selected(threadedOcc()),
-                   step = 1, ticks=FALSE)}
-    }})
+    })
 
-  output$Event_Tab_Controls_3 <- renderUI({tags$div(
-    textInput("EventMapName", label = h4("Enter label to store/retrieve this mapping"), value = ""),
-    actionButton("EventButton", "Go"))
-  })
+      output$Regular_Expression_controls = renderUI({
+        tags$div(align="left",
+                 tags$h4("Regular Expressions: Use regular expressions to form events -- Not implemented yet"),
+                 tags$p(" "),
+                 selectizeInput("RegExInputID",label = h4("Choose input for this mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                 tags$p(" "),
+                 textInput("RegExForEvents", label = h4("Enter regular expression(s)"), value = ""),
+                 tags$p(" "),
 
-  # show the bar chart
-  output$threadGapBarchart <- renderPlotly({
-    threadGapBarchart(threadedOcc(),input$Event_method_ID)
-  })
+                 textInput("EventMapName3", label = h4("Enter label for this mapping"), value = "RegEx-"),
 
-  output$Event_Tab_Output_1  = renderText( " " )
+                 actionButton("EventButton3", "Go")  )
 
-  output$Event_Tab_Output_2  = renderTable({ head( threadedEvents()) })
-  #  output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
+      })
 
-  output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
+        output$Frequent_Ngram_controls = renderUI({
+          tags$div(align="left",
+                   tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
+                   tags$p(" "),
+                   selectizeInput("NGramInputID","INPUT:", c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
 
-  output$Event_Tab_Output_4  = renderDendroNetwork({
-    #plot(threadedCluster())
-    dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
-  })
+                   textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams-"),
 
-  output$dendro_test = renderPlot({
-    plot(threadedCluster())
-  })
+                   actionButton("EventButton4", "Go")  )
+
+        })
+
+          output$Maximal_Pattern_controls = renderUI({
+            tags$div(align="left",
+                     tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
+
+                     selectizeInput("NGramInputID",label = h4("Choose input for this mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+
+                     textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal-"),
+
+                     actionButton("EventButton5", "Go")  )
+
+          })
+
+            output$Manage_Event_Map_controls= renderUI({
+              tags$div(align="left",
+                       tags$h4("Select event mapping to use, export or delete -- Not implemented yet"),
+
+                       selectizeInput("NGramInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+
+
+                       actionButton("Use_Mapping", "Use"),
+                       actionButton("Export_Mapping", "Export"),
+                       actionButton("Delete_Mapping", "Delete") )
+
+            })
+
+            output$Event_Tab_Output_4  = renderDendroNetwork({
+              #plot(threadedCluster())
+              dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
+            })
+
+            output$dendro_test = renderPlot({
+              plot(threadedCluster())
+            })
+
+
+  #
+  # # show the bar chart
+  # output$threadGapBarchart <- renderPlotly({
+  #   threadGapBarchart(threadedOcc(),input$Event_method_ID)
+  # })
+
+  # output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
+  #
+  # output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
+
 
 
   ##################### ThreadMap display  ################################

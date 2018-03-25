@@ -17,11 +17,10 @@ ui <- fluidPage(
   #  tags$audio( src='tellusastory.mp3',type='audio/mpeg', controls='TRUE'),
 
   tabsetPanel(type = "tabs",
-              tabPanel("Occurrences",
+              tabPanel("Read Data",
+                       tags$h4("Read data from CSV. First column should be tStamp (mm/dd/yyyy hh:mm:ss)"),
                        uiOutput("Data_Tab_Controls_1"),
-                       # uiOutput("Data_Tab_Controls_2"),
-                       # verbatimTextOutput("Data_Tab_Output_1" ),
-                       uiOutput("Data_Tab_Controls_3"),
+                       uiOutput("Data_Tab_Controls_2"),
                        DT::dataTableOutput("Data_Tab_Output_2")
               ),
               tabPanel("Choose POV",
@@ -55,32 +54,38 @@ ui <- fluidPage(
                        tags$h4("Map occurrences into events"),
                        tabsetPanel(type = "tabs",
                                    tabPanel("One-to-One",
-                                            tags$h4("Each occurrence in the raw data is interpreted as an event."),
-                                            uiOutput("Event_Tab_Controls_0"),
-                                            uiOutput("Event_Tab_Controls_1"),
-                                            uiOutput("Event_Tab_Controls_2"),
-                                            uiOutput("Event_Tab_Controls_3"),
-                                            conditionalPanel(
-                                              condition="input.MappingID=='One-to-One'",
-                                              plotlyOutput("Event_Tab_Output_3")),
-                                            conditionalPanel(
-                                              condition="input.MappingID=='Clustering'",
-                                              plotOutput("Event_Tab_Output_4")),
-                                            tableOutput("Event_Tab_Output_2")
+                                            uiOutput("One_to_One_controls")
+
+                                            # uiOutput("Event_Tab_Controls_0"),
+                                            # uiOutput("Event_Tab_Controls_1"),
+                                            # uiOutput("Event_Tab_Controls_2"),
+                                            # uiOutput("Event_Tab_Controls_3"),
+                                            # conditionalPanel(
+                                            #   condition="input.MappingID=='One-to-One'",
+                                            #   plotlyOutput("Event_Tab_Output_3")),
+                                            # conditionalPanel(
+                                            #   condition="input.MappingID=='Clustering'",
+                                            #   plotOutput("Event_Tab_Output_4")),
+                                            # tableOutput("Event_Tab_Output_2")
                                    ),
-                                   tabPanel("Context-based chunks",
-                                            tags$h4("Occurrences are grouped into events based on changes in contextual factors.")
+                                   tabPanel("Contextual Chunks",
+                                            uiOutput("Contextual_Chunk_controls")
                                    ),
 
-                                   tabPanel("Frequent ngrams",
-                                            tags$h4("Select ngrams to use in forming events -- Not implemented yet")
+                                   tabPanel("Regular Expressions",
+                                            uiOutput("Regular_Expression_controls")
                                    ),
 
-                                   tabPanel("Frequent maximal patterns",
-                                            tags$h4("Form events based on maximal patterns-- Not implemented yet")
+                                   tabPanel("Frequent Ngrams",
+                                            uiOutput("Frequent_Ngram_controls")
                                    ),
-                                   tabPanel("Select event mapping to use or export",
-                                            tags$h4("Select event mapping to use or export -- Not implemented yet")
+
+                                   tabPanel("Maximal Patterns",
+                                            uiOutput("Maximal_Pattern_controls")
+                                   ),
+
+                                   tabPanel("Manage Event Maps",
+                                            uiOutput("Manage_Event_Map_controls")
                                    )
                        )
 
