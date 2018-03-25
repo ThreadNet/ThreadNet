@@ -56,17 +56,6 @@ ui <- fluidPage(
                                    tabPanel("One-to-One",
                                             uiOutput("One_to_One_controls")
 
-                                            # uiOutput("Event_Tab_Controls_0"),
-                                            # uiOutput("Event_Tab_Controls_1"),
-                                            # uiOutput("Event_Tab_Controls_2"),
-                                            # uiOutput("Event_Tab_Controls_3"),
-                                            # conditionalPanel(
-                                            #   condition="input.MappingID=='One-to-One'",
-                                            #   plotlyOutput("Event_Tab_Output_3")),
-                                            # conditionalPanel(
-                                            #   condition="input.MappingID=='Clustering'",
-                                            #   plotOutput("Event_Tab_Output_4")),
-                                            # tableOutput("Event_Tab_Output_2")
                                    ),
                                    tabPanel("Contextual Chunks",
                                             uiOutput("Contextual_Chunk_controls")
@@ -96,8 +85,8 @@ ui <- fluidPage(
                        uiOutput("Visualize_Tab_Controls_2"),
                        tabsetPanel(type = "tabs",
                           tabPanel("Repetitive Sub-sequences",
-                                  plotlyOutput("nGramBarchart"),
-                                  uiOutput("nGramControls")
+                                  uiOutput("nGramControls"),
+                                  plotlyOutput("nGramBarchart")
                                   ),
 
                           tabPanel("Whole Sequences",
@@ -120,12 +109,32 @@ ui <- fluidPage(
               tabPanel("Comparisons",
                        uiOutput("Comparison_Tab_Controls_1"),
                        uiOutput("Comparison_Tab_Controls_2"),
-                       plotlyOutput("Comparison_Plots")
+                       fluidRow(
+                         column(6,"SubsetA",
+                                tags$p("subset A"),
+                                plotlyOutput("Comparison_Plots_A")
+                                ),
+                         column(6,"Subsetb",
+                                tags$p("subset B"),
+                                plotlyOutput("Comparison_Plots_B")
+                                )
+                                )
                ),
+
               tabPanel("Moving Window",
                        uiOutput("Moving_Window_Tab_Controls_1"),
                        uiOutput("Moving_Window_Tab_Controls_2"),
-                       visNetworkOutput("MovingWindow_Plot")
+                       uiOutput("Moving_Window_Tab_Controls_3"),
+                       uiOutput("Moving_Window_Tab_Controls_4"),
+                       fluidRow(
+                         column(6,"SubsetA",
+                                plotlyOutput("MovingWindow_Plot_A")
+                         ),
+                         column(6,"SubsetB",
+                                plotlyOutput("MovingWindow_Plot_B")
+                         )
+                       )
+
               ),
 
               tabPanel("Parameter Settings",

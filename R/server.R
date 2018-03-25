@@ -295,19 +295,16 @@ server <- shinyServer(function(input, output, session) {
 
   # Controls for the whole set of tabs
 output$Visualize_Tab_Controls_1 = renderUI({
-
   selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
 })
 
   output$Visualize_Tab_Controls_2 = renderUI({
-  if (input$MappingID == "One-to-One")
-  {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
-  else
-  {sliderInput("ThreadMapZoomID",
+    if (input$VisualizeEventMapInputID == "One-to-One")
+       {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
+    else
+        {sliderInput("ThreadMapZoomID",
                "Zoom in and out by event similarity:",
                1,100,5, step = 1, ticks=FALSE) }
-
-
 })
 
   # controls for sub-sequence display
@@ -320,13 +317,21 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
 
 
-  ##################### 6.NETWORK  tab ################################
+  ##################### 5. COMPARE  tab ################################
 
-  output$Network_Tab_Controls_1 <- renderUI({tags$div(
+  output$Comparison_Tab_Controls_1 <- renderUI({
+    selectizeInput("CompareMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
+    })
 
-    sliderInput("NetworkZoomID",
-                "Zoom in and out by event similarity:",
-                2,100,2, step = 1, ticks=FALSE))})
+  output$Comparison_Tab_Controls_2 <- renderUI(
+    if (input$CompareMapInputID == "One-to-One")
+    {tags$p("Zooming not available with one-to-one mapping of occurrences to events")}
+    else
+    {sliderInput("CompareZoomID",
+                 "Zoom in and out by event similarity:",
+                 1,100,5, step = 1, ticks=FALSE) }
+    )
+
   ######
   output$Pos_Layout_Controls_0 <- renderUI({
     radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
@@ -341,10 +346,10 @@ output$Visualize_Tab_Controls_1 = renderUI({
   })
 
 
-  output$eventNetwork <- renderVisNetwork({
-    req(input$Timesplit2)
-    eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
-  })
+  # output$eventNetwork <- renderVisNetwork({
+  #   req(input$Timesplit2)
+  #   eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
+  # })
 
   event.data <- reactive({
     event_data("plotly_click", source="A")
@@ -387,7 +392,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
   })
 
 
-  ########################  COMPARISON TAB ##############################
 
   # Get subsets of threadedEvents and create sub-plots for them
 
@@ -396,11 +400,11 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
   # controls for the comparison input panels
   # Use all of the column names here...
-  output$Comparison_Tab_Controls_1 <- renderUI({
+  output$Comparison_Tab_Controls_1_old <- renderUI({
     selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF())
   })
 
-  output$Comparison_Tab_Controls_2 <- renderUI({
+  output$Comparison_Tab_Controls_2_old <- renderUI({
     tagList(
       selectizeInput("selectComparisonGroupsID","Compare specific groups:",
                      CF_levels(), multiple=TRUE),
@@ -408,13 +412,8 @@ output$Visualize_Tab_Controls_1 = renderUI({
       radioButtons("NumTimePeriodsToCompare", "How many time periods to compare:",
                    c(1,2,3,4,5), selected =1 ,inline=TRUE),
 
-      sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE ),
-      if (input$MappingID == "One-to-One")
-      {tags$p("")}
-      else
-      {sliderInput("ComparisonZoomID",
-                   "Zoom in and out by event similarity:",
-                   1,100,5, step = 1, ticks=FALSE)}
+      sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE )
+
     )
   })
 
@@ -428,16 +427,29 @@ output$Visualize_Tab_Controls_1 = renderUI({
                      get_Zoom_COMP()) )
 
 
-  ########################  MOVING WINDOW TAB ##############################
+  ######################## 6. MOVING WINDOW TAB ##############################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
+  })
+
+  output$Moving_Window_Tab_Controls_2 <- renderUI(
+    if (input$MovingWindowMapInputID == "One-to-One")
+    {tags$p("Zooming not available with one-to-one mapping of occurrences to events")}
+    else
+    {sliderInput("MovingWindowZoomID",
+                 "Zoom in and out by event similarity:",
+                 1,100,5, step = 1, ticks=FALSE) }
+  )
+
+  output$Moving_Window_Tab_Controls_3 <- renderUI({
     sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
   })
-  output$Moving_Window_Tab_Controls_2 <- renderUI({
+  output$Moving_Window_Tab_Controls_4 <- renderUI({
     sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
-  output$Moving_Tab_Controls_3 <- renderUI({
+  output$Moving_Tab_Controls_5 <- renderUI({
     radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE)
   })
 
@@ -462,12 +474,11 @@ output$Visualize_Tab_Controls_1 = renderUI({
     # Add each name-value pair... adjust as necessary.  Lists need to be pasted and unlisted...
     p <- addRow( p, "File name", input$file1[1] )
     p <- addRow( p, "Columns to include",  paste( unlist(input$CFcolumnsID), collapse=', ') )
-    p <- addRow( p, "Range of occurrences included",  paste( unlist(input$occRowsToInclude), collapse=', ') )
-    p <- addRow( p, "Temporal granularity",  input$timeScaleID  )
+    # p <- addRow( p, "Range of occurrences included",  paste( unlist(input$occRowsToInclude), collapse=', ') )
+    # p <- addRow( p, "Temporal granularity",  input$timeScaleID  )
 
     p <- addRow( p, "Define threads by",  paste( unlist(input$THREAD_CF_ID), collapse=', ') )
     p <- addRow( p, "Define events by",  paste( unlist(input$EVENT_CF_ID), collapse=', ') )
-    p <- addRow( p, "Make comparisons by",  paste( unlist(input$COMPARISON_CF_ID), collapse=', ') )
 
 
     # convert to data frame and add column names
