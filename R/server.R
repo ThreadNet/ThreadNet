@@ -175,7 +175,7 @@ server <- shinyServer(function(input, output, session) {
              tags$p(" "),
              textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
 
-             actionButton("EventButton1", "Go")  )
+             actionButton("EventButton1", "Create New Mapping")  )
 
   })
     output$Contextual_Chunk_controls = renderUI({
@@ -189,7 +189,7 @@ server <- shinyServer(function(input, output, session) {
 
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks-"),
 
-               actionButton("EventButton2", "Go")  )
+               actionButton("EventButton2", "Create New Mapping")  )
 
     })
 
@@ -204,7 +204,7 @@ server <- shinyServer(function(input, output, session) {
 
                  textInput("EventMapName3", label = h4("Enter label for this mapping"), value = "RegEx-"),
 
-                 actionButton("EventButton3", "Go")  )
+                 actionButton("EventButton3", "Create New Mapping")  )
 
       })
 
@@ -216,7 +216,7 @@ server <- shinyServer(function(input, output, session) {
 
                    textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams-"),
 
-                   actionButton("EventButton4", "Go")  )
+                   actionButton("EventButton4", "Create New Mapping")  )
 
         })
 
@@ -228,18 +228,16 @@ server <- shinyServer(function(input, output, session) {
 
                      textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal-"),
 
-                     actionButton("EventButton5", "Go")  )
+                     actionButton("EventButton5", "Create New Mapping")  )
 
           })
 
             output$Manage_Event_Map_controls= renderUI({
               tags$div(align="left",
-                       tags$h4("Select event mapping to use, export or delete -- Not implemented yet"),
+                       tags$h4("Select event mapping to export or delete -- Not implemented yet"),
 
                        selectizeInput("NGramInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
 
-
-                       actionButton("Use_Mapping", "Use"),
                        actionButton("Export_Mapping", "Export"),
                        actionButton("Delete_Mapping", "Delete") )
 
