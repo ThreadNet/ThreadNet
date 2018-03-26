@@ -338,7 +338,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
     selectizeInput("CompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names(eventMappings) )
     })
 
-  output$Pos_Layout_Controls_2 <- renderUI({
+  output$Comparison_Tab_Controls_2 <- renderUI({
     radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
   })
 
