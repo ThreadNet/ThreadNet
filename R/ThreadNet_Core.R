@@ -264,8 +264,24 @@ OccToEvents1 <- function(o, chunk_CF, EventMapName,EVENT_CF, compare_CF){
     # set the cluster solution to NULL
     clust=NULL
 
+    # Add the mapping to the global list of mappings
+    map = list(name = paste(EventMapName), threads = e, cluster = clust)
+
+    eventMappings <<- append(list(map), eventMappings )
+
+    print("start printing")
+    # print(eventMappings)
+
+    print( eventMappings[[1]]["name"] )
+    print( eventMappings[[2]]["name"] )
+    print( eventMappings[[3]]["name"] )
+
+    print( eventMappings[[1]]["cluster"] )
+    print( eventMappings[[2]]["cluster"] )
+    print( eventMappings[[3]]["cluster"] )
+
     #  need return the threads and also the cluster solution for display
-    return(list(threads = e, cluster = clust))
+    return(map)
 
 }
 

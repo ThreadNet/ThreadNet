@@ -17,7 +17,6 @@ library(stringr)
 library(stringdist)
 library(ggplot2)
 library(networkD3)
-library(visNetwork)
 library(xesreadR)
 library(colorspace)
 library(igraph)
@@ -32,5 +31,5 @@ source("ThreadNet_Graphics.R")
 source("ThreadNet_Metrics.R")
 
 # Global variables, config settings, etc. can be defined here
-
+eventMappings <<-list()
 
