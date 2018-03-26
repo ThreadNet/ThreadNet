@@ -109,6 +109,7 @@ ui <- fluidPage(
               tabPanel("Comparisons",
                        uiOutput("Comparison_Tab_Controls_1"),
                        uiOutput("Comparison_Tab_Controls_2"),
+                       uiOutput("Comparison_Tab_Controls_3"),
                        fluidRow(
                          column(6,"SubsetA",
                                 tags$p("subset A"),

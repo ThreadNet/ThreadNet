@@ -208,7 +208,7 @@ server <- shinyServer(function(input, output, session) {
         tags$div(align="left",
                  tags$h4("Regular Expressions: Use regular expressions to form events -- Not implemented yet"),
                  tags$p(" "),
-                 selectizeInput("RegExInputID",label = h4("Choose input for this mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                 selectizeInput("RegExInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names(eventMappings)  ),
                  tags$p(" "),
                  textInput("RegExForEvents", label = h4("Enter regular expression(s)"), value = ""),
                  tags$p(" "),
@@ -223,7 +223,7 @@ server <- shinyServer(function(input, output, session) {
           tags$div(align="left",
                    tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
                    tags$p(" "),
-                   selectizeInput("NGramInputID","INPUT:", c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                   selectizeInput("NGramInputID","INPUT:", get_event_mapping_names(eventMappings) ),
 
                    textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams-"),
 
@@ -235,7 +235,7 @@ server <- shinyServer(function(input, output, session) {
             tags$div(align="left",
                      tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
 
-                     selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                     selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names(eventMappings) ),
 
                      textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal-"),
 
@@ -247,7 +247,7 @@ server <- shinyServer(function(input, output, session) {
               tags$div(align="left",
                        tags$h4("Select event mapping to export or delete -- Not implemented yet"),
 
-                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' )),
+                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names(eventMappings) ),
 
                        actionButton("Export_Mapping", "Export"),
                        actionButton("Delete_Mapping", "Delete") )
@@ -310,7 +310,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Controls for the whole set of tabs
 output$Visualize_Tab_Controls_1 = renderUI({
-  selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
+  selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names(eventMappings) )
 })
 
   output$Visualize_Tab_Controls_2 = renderUI({
@@ -335,10 +335,14 @@ output$Visualize_Tab_Controls_1 = renderUI({
   ##################### 5. COMPARE  tab ################################
 
   output$Comparison_Tab_Controls_1 <- renderUI({
-    selectizeInput("CompareMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
+    selectizeInput("CompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names(eventMappings) )
     })
 
-  output$Comparison_Tab_Controls_2 <- renderUI(
+  output$Pos_Layout_Controls_2 <- renderUI({
+    radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
+  })
+
+  output$Comparison_Tab_Controls_3 <- renderUI(
     if (input$CompareMapInputID == "One-to-One")
     {tags$p("Zooming not available with one-to-one mapping of occurrences to events")}
     else

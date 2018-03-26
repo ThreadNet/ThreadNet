@@ -436,6 +436,20 @@ get_moving_window <- function(e, s, l ){
 
 }
 
+#####################################################
+# eventMappings is a global variable, but pass it in here
+get_event_mapping_names <- function(em){
+
+  n=length(em)
+  print (n)
+e_names=unlist(em[[1]][["name"]])
+for (i in 2:n) {
+  e_names = c(e_names, unlist(em[[i]][["name"]]) )
+}
+return(e_names)
+}
+
+
 ######################################################
 # Just putting this code here to play with for now.
 # this function finds the common events in two subsets of thread data
