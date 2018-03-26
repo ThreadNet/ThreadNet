@@ -40,23 +40,15 @@ server <- shinyServer(function(input, output, session) {
                         get_COMPARISON_CF()
                         ) )})
 
+  # These will work for the Visualize tab.  Need parallel functions for the other tabs.
+  threadedEvents <- reactive({ print(input$VisualizeEventMapInputID)
+                            get_event_mapping_threads( GlobalEventMappings,input$VisualizeEventMapInputID ) })
+  threadedCluster <- reactive({ get_event_mapping_cluster( GlobalEventMappings,input$VisualizeEventMapInputID ) })
 
-  # threadedEventCluster <- reactive({
-  #   input$EventButton
-  #   isolate(OccToEvents(threadedOcc(),
-  #                        input$MappingID,
-  #                        input$Event_method_ID,
-  #                        input$uniform_chunk_slider,
-  #                        input$Threshold_slider,
-  #                        input$CHUNK_CF_ID,
-  #                        input$EventMapName,
-  #                        get_EVENT_CF(),
-  #                        get_COMPARISON_CF(),
-  #                        get_timeScale()) )})
-
-  threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
-
-  threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
+#
+#     threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
+#
+#    threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
 
   ##################################################
@@ -208,7 +200,7 @@ server <- shinyServer(function(input, output, session) {
         tags$div(align="left",
                  tags$h4("Regular Expressions: Use regular expressions to form events -- Not implemented yet"),
                  tags$p(" "),
-                 selectizeInput("RegExInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ),
+                 selectizeInput("RegExInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ),
                  tags$p(" "),
                  textInput("RegExForEvents", label = h4("Enter regular expression(s)"), value = ""),
                  tags$p(" "),
@@ -223,7 +215,7 @@ server <- shinyServer(function(input, output, session) {
           tags$div(align="left",
                    tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
                    tags$p(" "),
-                   selectizeInput("NGramInputID","INPUT:", get_event_mapping_names() ),
+                   selectizeInput("NGramInputID","INPUT:", get_event_mapping_names( GlobalEventMappings ) ),
 
                    textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams-"),
 
@@ -235,7 +227,7 @@ server <- shinyServer(function(input, output, session) {
             tags$div(align="left",
                      tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
 
-                     selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names() ),
+                     selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
 
                      textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal-"),
 
@@ -247,12 +239,18 @@ server <- shinyServer(function(input, output, session) {
               tags$div(align="left",
                        tags$h4("Select event mapping to export or delete -- Not implemented yet"),
 
-                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() ),
+                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
 
-                       actionButton("Export_Mapping", "Export"),
-                       actionButton("Delete_Mapping", "Delete") )
+                       actionButton("ExportMappingButton", "Export"),
+                       actionButton("DeleteMappingButton", "Delete") )
 
             })
+
+            # reactive functions for the export and delete buttons
+            deleteEventMapping <- reactive({
+              input$DeleteMappingButton
+              isolate(delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID ))
+              })
 
             output$One_to_one_Tab_Output_1  = DT::renderDataTable({
               threadedEvents()
@@ -282,18 +280,10 @@ server <- shinyServer(function(input, output, session) {
 
   ##################### ThreadMap display  ################################
 
-  output$Thread_Tab_Controls_1 <- renderUI(
 
-    if (input$MappingID == "One-to-One")
-    {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
-    else
-    {sliderInput("ThreadMapZoomID",
-                 "Zoom in and out by event similarity:",
-                 1,100,5, step = 1, ticks=FALSE) })
-
-  output$threadMapEvents <- renderPlot({
-    traminer_threadMap(threadedEvents(), "threadNum", get_Zoom_TM())
-  })
+  # output$threadMapEvents <- renderPlot({
+  #   traminer_threadMap(threadedEvents(), "threadNum", get_Zoom_TM())
+  # })
 
 
   ##################### NGRAM  display ################################
@@ -310,7 +300,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Controls for the whole set of tabs
 output$Visualize_Tab_Controls_1 = renderUI({
-  selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() )
+  selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ), selected='One-to-One' )
 })
 
   output$Visualize_Tab_Controls_2 = renderUI({
@@ -335,7 +325,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
   ##################### 5. COMPARE  tab ################################
 
   output$Comparison_Tab_Controls_1 <- renderUI({
-    selectizeInput("CompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() )
+    selectizeInput("CompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
     })
 
   output$Comparison_Tab_Controls_2 <- renderUI({
@@ -449,7 +439,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
   ######################## 6. MOVING WINDOW TAB ##############################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
-    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), c('One-to-One','Chunks-','RegEx-','Ngrams-','Maximal-' ))
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) )
   })
 
   output$Moving_Window_Tab_Controls_2 <- renderUI(

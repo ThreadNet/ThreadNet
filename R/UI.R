@@ -19,7 +19,6 @@ ui <- fluidPage(
 
   tabsetPanel(type = "tabs",
               tabPanel("Read Data",
-                       tags$h4("Read data from CSV. First column should be tStamp (mm/dd/yyyy hh:mm:ss)"),
                        uiOutput("Data_Tab_Controls_1"),
                        uiOutput("Data_Tab_Controls_2"),
                        DT::dataTableOutput("Data_Tab_Output_2")
@@ -76,6 +75,7 @@ ui <- fluidPage(
 
                                    tabPanel("Manage Event Maps",
                                             uiOutput("Manage_Event_Map_controls")
+                                            # need to show the list of mapping names
                                    )
                        )
 
