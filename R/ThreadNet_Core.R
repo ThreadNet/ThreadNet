@@ -267,9 +267,9 @@ OccToEvents1 <- function(o, chunk_CF, EventMapName,EVENT_CF, compare_CF){
     # Add the mapping to the global list of mappings
     map = list(name = paste(EventMapName), threads = e, cluster = clust)
 
-    eventMappings <<- append(list(map), eventMappings )
+    GlobalEventMappings <<- append(list(map), GlobalEventMappings )
 
-    print( get_event_mapping_names(eventMappings) )
+    print( get_event_mapping_names() )
     #save(eventMappings, file="eventMappings.RData")
 
     #  need return the threads and also the cluster solution for display

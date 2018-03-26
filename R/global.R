@@ -31,5 +31,5 @@ source("ThreadNet_Graphics.R")
 source("ThreadNet_Metrics.R")
 
 # Global variables, config settings, etc. can be defined here
-eventMappings <<-list()
+GlobalEventMappings <<-list()
 

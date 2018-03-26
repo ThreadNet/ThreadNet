@@ -437,18 +437,60 @@ get_moving_window <- function(e, s, l ){
 }
 
 #####################################################
-# eventMappings is a global variable, but pass it in here
-get_event_mapping_names <- function(em){
+# GlobalEventMappings is a global variable
+get_event_mapping_names <- function(){
 
-  n=length(em)
+  n=length(GlobalEventMappings)
   print (n)
-e_names=unlist(em[[1]][["name"]])
+e_names=unlist(GlobalEventMappings[[1]][["name"]])
 for (i in 2:n) {
-  e_names = c(e_names, unlist(em[[i]][["name"]]) )
+  e_names = c(e_names, unlist(GlobalEventMappings[[i]][["name"]]) )
 }
 return(e_names)
 }
 
+
+get_event_mapping_threads <- function(mapname){
+
+  n=length(em)
+  print (n)
+  e_names=unlist(em[[1]][["name"]])
+  for (i in 2:n) {
+    e_names = c(e_names, unlist(em[[i]][["name"]]) )
+  }
+  return(e_names)
+}
+
+get_event_mapping_cluster <- function(mapname){
+
+  n=length(em)
+  print (n)
+  e_names=unlist(em[[1]][["name"]])
+  for (i in 2:n) {
+    e_names = c(e_names, unlist(em[[i]][["name"]]) )
+  }
+  return(e_names)
+}
+delete_event_mapping <- function(mapname){
+
+  n=length(em)
+  print (n)
+  e_names=unlist(em[[1]][["name"]])
+  for (i in 2:n) {
+    e_names = c(e_names, unlist(em[[i]][["name"]]) )
+  }
+  return(e_names)
+}
+export_event_mapping <- function(mapname){
+
+  n=length(em)
+  print (n)
+  e_names=unlist(em[[1]][["name"]])
+  for (i in 2:n) {
+    e_names = c(e_names, unlist(em[[i]][["name"]]) )
+  }
+  return(e_names)
+}
 
 ######################################################
 # Just putting this code here to play with for now.
