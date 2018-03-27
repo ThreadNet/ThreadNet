@@ -40,7 +40,6 @@ ui <- fluidPage(
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
-                                            # plotOutput("rawOccurrenceThreadMap"),
                                             plotlyOutput("rawOccurrenceThreadMap_2")
                                    ),
 
@@ -90,8 +89,7 @@ ui <- fluidPage(
                                   ),
 
                           tabPanel("Whole Sequences",
-                                  tags$h4("Put plotly threadmap here..."),
-                                  plotOutput("threadMapEvents")
+                                  plotlyOutput("WholeSequenceThreadMap")
                                   ),
 
                           tabPanel("Circular layout",

@@ -40,15 +40,16 @@ server <- shinyServer(function(input, output, session) {
                         get_COMPARISON_CF()
                         ) )})
 
-  # These will work for the Visualize tab.  Need parallel functions for the other tabs.
-  threadedEvents <- reactive({ print(input$VisualizeEventMapInputID)
-                            get_event_mapping_threads( GlobalEventMappings,input$VisualizeEventMapInputID ) })
-  threadedCluster <- reactive({ get_event_mapping_cluster( GlobalEventMappings,input$VisualizeEventMapInputID ) })
+  # These go on the occ to event page
+  threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
+  threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
-#
-#     threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
-#
-#    threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
+
+  # These will work for the Visualize tab.  Need parallel functions for the other tabs.
+  threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
+                            get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
+  threadedClusterViz <- reactive({ get_event_mapping_cluster( GlobalEventMappings, input$VisualizeEventMapInputID ) })
+
 
 
   ##################################################
@@ -75,8 +76,8 @@ server <- shinyServer(function(input, output, session) {
   get_timeScale <<- reactive({ return(input$timeScaleID) })
 
   # This slider controls the zoom level for zooming in-out
-  get_Zoom_TM <<- reactive({ return( ifelse (input$MappingID =="One-to-One", "E_1", paste0("E_",input$ThreadMapZoomID))) })
-  get_Zoom_COMP <<- reactive({ return( ifelse (input$MappingID =="One-to-One", "E_1", paste0("E_",input$ComparisonZoomID))) })
+  get_Zoom_TM <<- reactive({ return( ifelse (input$VisualizeEventMapInputID =="One-to-One", "E_1", paste0("E_",input$ThreadMapZoomID))) })
+  get_Zoom_COMP <<- reactive({ return( ifelse (input$CompareMapInputID =="One-to-One", "E_1", paste0("E_",input$ComparisonZoomID))) })
 
 
 
@@ -171,16 +172,15 @@ server <- shinyServer(function(input, output, session) {
 
   ##################### 3.OCC to EVENT  tab ################################
 
-
   output$One_to_One_controls  = renderUI({
     tags$div(align="left",
              tags$h4("One-to-One: Each occurrence in the raw data is interpreted as an event (INPUT = Occurrences)."),
              tags$p(" "),
              textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
-
              actionButton("EventButton1", "Create New Mapping")  )
 
   })
+
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
@@ -278,26 +278,9 @@ server <- shinyServer(function(input, output, session) {
 
 
 
-  ##################### ThreadMap display  ################################
-
-
-  # output$threadMapEvents <- renderPlot({
-  #   traminer_threadMap(threadedEvents(), "threadNum", get_Zoom_TM())
-  # })
-
-
-  ##################### NGRAM  display ################################
-
-
-  output$nGramBarchart = renderPlotly({
-    ng_bar_chart(threadedEvents(), "threadNum", get_Zoom_TM(), input$nGramLengthID, input$nGramDisplayThresholdID)
-  })
-
 
 
   ##################### 4.VISUALIZE tab ################################
-
-
   # Controls for the whole set of tabs
 output$Visualize_Tab_Controls_1 = renderUI({
   selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ), selected='One-to-One' )
@@ -320,7 +303,15 @@ output$Visualize_Tab_Controls_1 = renderUI({
     )
   })
 
+  #  NGRAM  display #
+  output$nGramBarchart = renderPlotly({
+    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_TM(), input$nGramLengthID, input$nGramDisplayThresholdID)
+  })
 
+# Whole sequence display
+  output$WholeSequenceThreadMap <- renderPlotly({
+    threadMap(threadedEventsViz(), "threadNum", "seqNum", newColName(get_EVENT_CF()), 15  )
+  })
 
   ##################### 5. COMPARE  tab ################################
 

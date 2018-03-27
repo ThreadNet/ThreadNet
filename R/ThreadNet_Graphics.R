@@ -145,10 +145,6 @@ threadMap <- function(or,TN, timescale, CF, shape){
 #' @examples
 ng_bar_chart <- function(o,TN, CF, n, mincount){
 
-
-  library(ngram)
-  library(plotly)
-
   # get the ngrams
   ngdf = count_ngrams(o,TN, CF, n)
 
