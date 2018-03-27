@@ -11,6 +11,14 @@ server <- shinyServer(function(input, output, session) {
   options(warn=-1)
   options(shiny.maxRequestSize=30*1024^2)
 
+  ##### make the global variables reactive  #########
+  # # One for the event mappings
+     observe( makeReactiveBinding("GlobalEventMappings", env=.GlobalEnv) )
+  #
+  # # One for the event clusters
+     observe( makeReactiveBinding("GlobalEventClusters", env=.GlobalEnv) )
+
+
   ###  Some basic functions that are used to structure the data           as it moves through the pipeline
 
   # make dataframe of occurrences that depends only file1
@@ -49,7 +57,6 @@ server <- shinyServer(function(input, output, session) {
   threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
                             get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
   threadedClusterViz <- reactive({ get_event_mapping_cluster( GlobalEventMappings, input$VisualizeEventMapInputID ) })
-
 
 
   ##################################################

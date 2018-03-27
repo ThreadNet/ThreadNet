@@ -32,4 +32,4 @@ source("ThreadNet_Metrics.R")
 
 # Global variables, config settings, etc. can be defined here
 GlobalEventMappings <<-list()
-
+GlobalEventClusters <<-list()

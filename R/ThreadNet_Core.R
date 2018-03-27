@@ -101,6 +101,13 @@ threads_to_network <- function(et,TN,CF,timesplit){
 #' @export
 count_ngrams <- function(o,TN,CF,n){
 
+  print("TN")
+  print(TN)
+  print("CF")
+  print(CF)
+  print("o")
+  print(o)
+
   # Cannot put all the values in one long string.  Need a vector of strings, one for each thread
   text_vector = vector(mode="character")
 
@@ -115,8 +122,8 @@ count_ngrams <- function(o,TN,CF,n){
     }
   }
 
-   # print("text_vector")
-   # print(text_vector)
+   print("text_vector")
+   print(text_vector)
 
   # return a data frame that includes the ngrams
   #    col 1 = ngrams
