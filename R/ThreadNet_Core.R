@@ -423,3 +423,28 @@ net_adj_matrix <- function(edges){
   return(as_adj(graph_from_edgelist(as.matrix(edges))))
 
 }
+
+# new data structure for events (BTP 3/28)
+make_event_df <- function(event_CF,compare_CF){
+
+  # Make a data frame with columns for each CF, and put one vector into each column
+  e = data.frame(
+    tStamp = numeric(),  # this is the event start time
+    eventDuration = numeric(),
+    occurrences = integer(),
+    threadNum = integer(),
+    seqNum = integer())
+
+  # add columns for each of the context factors used to define events
+  # first make the dataframes for each
+  cf1=setNames(data.frame(matrix(ncol = length(event_CF), nrow = 0)), event_CF)
+  cf2=setNames(data.frame(matrix(ncol = length(compare_CF), nrow = 0)), compare_CF)
+
+  # Then combine them
+  e = cbind(e, cf1, cf2)
+
+  # and add one more column for the event code/description
+  e$E_1 = character()
+
+  return(e)
+}
