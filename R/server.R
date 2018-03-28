@@ -19,7 +19,7 @@ server <- shinyServer(function(input, output, session) {
      observe( makeReactiveBinding("GlobalEventClusters", env=.GlobalEnv) )
 
 
-  ###  Some basic functions that are used to structure the data           as it moves through the pipeline
+  ###  Some basic functions that are used to structure the data as it moves through the pipeline
 
   # make dataframe of occurrences that depends only file1
   occ <- eventReactive(input$file1,read_occurrences(input$file1))
@@ -52,6 +52,21 @@ server <- shinyServer(function(input, output, session) {
   threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
   threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
+  # this is for the chunks
+  threadedEventCluster2 <- reactive({
+    input$EventButton2
+    isolate(OccToEvents2(threadedOcc(),
+                         input$CHUNK_CF_ID,
+                         input$EventMapName2,
+                         get_EVENT_CF(),
+                         get_COMPARISON_CF()
+    ) )})
+
+  # These go on the occ to event page
+  threadedEvents2 <- reactive({threadedEventCluster2()[["threads"]]})
+  threadedCluster2 <- reactive({threadedEventCluster2()[["cluster"]]})
+
+
 
   # These will work for the Visualize tab.  Need parallel functions for the other tabs.
   threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
@@ -73,7 +88,7 @@ server <- shinyServer(function(input, output, session) {
   # get_POV returns the choice of POV from the POV tab
   get_THREAD_CF <<- reactive({ return(input$THREAD_CF_ID) })
   get_EVENT_CF <<- reactive({ return(input$EVENT_CF_ID) })
-  get_COMPARISON_CF <<- reactive({ return(setdiff(get_CF(), union(get_THREAD_CF(),get_EVENT_CF()))) })
+  get_COMPARISON_CF <<- reactive({ return(setdiff(get_CF(), union(get_THREAD_CF(),get_EVENT_CF() ))) })
 
 
   # get an environment here for storing/retriving the information about the events...
@@ -191,11 +206,7 @@ server <- shinyServer(function(input, output, session) {
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
-               tags$p(" "),
-               checkboxGroupInput("CHUNK_CF_ID",label = h4("Start new event when ALL of these change:"),
-                                                                              get_EVENT_CF(),
-                                                                              selected =  input$CHUNK_CF_ID,
-                                                                              inline=TRUE),
+               tags$p(paste0("Start new event when ALL of these change:", get_EVENT_CF())),
 
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks-"),
 
@@ -242,6 +253,18 @@ server <- shinyServer(function(input, output, session) {
 
           })
 
+          output$Cluster_Event_controls = renderUI({
+            tags$div(align="left",
+                     tags$h4("Cluster Events: Group similar events to together to allow zooming"),
+
+                     selectizeInput("CLusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ),
+
+                     radioButtons("ClusterMethodID", "Cluster based on:", choices = c("Sequential similarity", "Contextual Similarity"), selected="Sequential similarity", inline=TRUE),
+
+                     actionButton("EventButton5", "Cluster Events")  )
+
+          })
+
             output$Manage_Event_Map_controls= renderUI({
               tags$div(align="left",
                        tags$h4("Select event mapping to export or delete -- Not implemented yet"),
@@ -261,6 +284,9 @@ server <- shinyServer(function(input, output, session) {
 
             output$One_to_one_Tab_Output_1  = DT::renderDataTable({
               threadedEvents()
+            }, filter = "top")
+            output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
+              threadedEvents2()
             }, filter = "top")
 
             output$Event_Tab_Output_4  = renderDendroNetwork({

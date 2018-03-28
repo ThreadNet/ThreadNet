@@ -57,7 +57,8 @@ ui <- fluidPage(
                                             DT::dataTableOutput("One_to_one_Tab_Output_1")
                                    ),
                                    tabPanel("Contextual Chunks",
-                                            uiOutput("Contextual_Chunk_controls")
+                                            uiOutput("Contextual_Chunk_controls"),
+                                            DT::dataTableOutput("Contextual_Chunks_Tab_Output_1")
                                    ),
 
                                    tabPanel("Regular Expressions",
@@ -70,6 +71,10 @@ ui <- fluidPage(
 
                                    tabPanel("Maximal Patterns",
                                             uiOutput("Maximal_Pattern_controls")
+                                   ),
+
+                                   tabPanel("Cluster Events",
+                                            uiOutput("Cluster_Event_controls")
                                    ),
 
                                    tabPanel("Manage Event Maps",

@@ -101,12 +101,12 @@ threads_to_network <- function(et,TN,CF,timesplit){
 #' @export
 count_ngrams <- function(o,TN,CF,n){
 
-  print("TN")
-  print(TN)
-  print("CF")
-  print(CF)
-  print("o")
-  print(o)
+  # print("TN")
+  # print(TN)
+  # print("CF")
+  # print(CF)
+  # print("o")
+  # print(o)
 
   # Cannot put all the values in one long string.  Need a vector of strings, one for each thread
   text_vector = vector(mode="character")
@@ -284,52 +284,23 @@ OccToEvents1 <- function(o, chunk_CF, EventMapName,EVENT_CF, compare_CF){
 
 }
 
-OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_chunk_size=1, tThreshold=1, chunk_CF, EventMapName,EVENT_CF, compare_CF, timescale){
 
+OccToEvents2 <- function(o,  chunk_CF, EventMapName,EVENT_CF, compare_CF){
+
+  # put this here for now
+  timescale='mins'
 
   # Only run if eventMapName is filled in; return empty data frame otherwise
   if (EventMapName ==""){return(data.frame())}
 
-  #### First get the break points between the occurrances.
+  #### First get the break points between the events
 
-# if we are mapping one-to-one, copy the input to the output and then add/rename some other columns as needed
-  if (mapping == "One-to-One"){
-
-    # copy the occurrences.  Each occurrence is an event
-    e = o
-
-    # rename the threadNum and seqNum columns
-    names(e)[names(e)=="POVthreadNum"] <- "threadNum"
-    names(e)[names(e)=="POVseqNum"] <- "seqNum"
-
-    # Set eventStart and EventStop -- these are just equal to the row numbers
-    e["eventStart"] = 1:nrow(e)
-    e["eventStop"] = 1:nrow(e)
-
-    # occurrences have no duration
-    e["eventDuration"] = 0
-
-    # just add the one column with the combined values
-    e["E_1"] = as.factor(e[,newColName(EVENT_CF)])
-
-    # set the cluster solution to NULL
-    clust=NULL
-
-  } else # DO THE CLUSTERING
-    {
-
-       if (m=="Variable chunks"){
+        # whenever there is a zero handoff gap that means everything has changed
          breakpoints = which(o$handoffGap == 0)
-        } else if (m=="Time gap") {
-          breakpoints = which(o$timeGap > tThreshold)
-        } else if (m=="Uniform chunks") {
-         breakpoints = seq(1,nrow(o),uniform_chunk_size)  # NO -- should be within each thread.
-        }
-
 
         # Grab the breakpoints from the beginning of the threads as well
         threadbreaks = which(o$seqNum == 1)
-         breakpoints = sort(union(threadbreaks,breakpoints))
+        breakpoints = sort(union(threadbreaks,breakpoints))
 
 
   ### Use the break points to find the chunks -- just store the index back to the raw data
@@ -418,13 +389,21 @@ OccToEvents <- function(o, mapping="One-to-One", m="Variable chunks", uniform_ch
 
       } # for cluster_level
 
-  }  # if mapping ^= "One-to-One"
+
 
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E.rdata")
 
+  # Add the mapping to the global list of mappings
+  map = list(name = paste(EventMapName), threads = e, cluster = clust)
+
+  GlobalEventMappings <<- append(list(map), GlobalEventMappings )
+
+  print( get_event_mapping_names( GlobalEventMappings ) )
+  save(GlobalEventMappings, file="eventMappings.RData")
+
   #  need return the threads and also the cluster solution for display
-  return(list(threads = e, cluster = clust))
+  return(map)
 }
 
 
