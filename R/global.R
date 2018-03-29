@@ -12,6 +12,7 @@
 library(shiny)
 library(plotly)
 library(tidyr)
+library(tibble)
 library(ngram)
 library(stringr)
 library(stringdist)

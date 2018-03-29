@@ -42,36 +42,34 @@ server <- shinyServer(function(input, output, session) {
   threadedEventCluster <- reactive({
     input$EventButton1
     isolate(OccToEvents1(threadedOcc(),
-                        input$CHUNK_CF_ID,
                         input$EventMapName1,
                         get_EVENT_CF(),
                         get_COMPARISON_CF()
                         ) )})
 
   # These go on the occ to event page
-  threadedEvents <- reactive({threadedEventCluster()[["threads"]]})
-  threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
+  threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
+ # threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
   # this is for the chunks
   threadedEventCluster2 <- reactive({
     input$EventButton2
     isolate(OccToEvents2(threadedOcc(),
-                         input$CHUNK_CF_ID,
                          input$EventMapName2,
                          get_EVENT_CF(),
                          get_COMPARISON_CF()
     ) )})
 
   # These go on the occ to event page
-  threadedEvents2 <- reactive({threadedEventCluster2()[["threads"]]})
-  threadedCluster2 <- reactive({threadedEventCluster2()[["cluster"]]})
+  threadedEvents2 <- reactive({make_nice_event_DT(threadedEventCluster2()[["threads"]])})
+ # threadedCluster2 <- reactive({threadedEventCluster2()[["cluster"]]})
 
 
 
   # These will work for the Visualize tab.  Need parallel functions for the other tabs.
   threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
                             get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
-  threadedClusterViz <- reactive({ get_event_mapping_cluster( GlobalEventMappings, input$VisualizeEventMapInputID ) })
+#  threadedClusterViz <- reactive({ get_event_mapping_cluster( GlobalEventMappings, input$VisualizeEventMapInputID ) })
 
 
   ##################################################
@@ -98,8 +96,8 @@ server <- shinyServer(function(input, output, session) {
   get_timeScale <<- reactive({ return(input$timeScaleID) })
 
   # This slider controls the zoom level for zooming in-out
-  get_Zoom_TM <<- reactive({ return( ifelse (input$VisualizeEventMapInputID =="One-to-One", "E_1", paste0("E_",input$ThreadMapZoomID))) })
-  get_Zoom_COMP <<- reactive({ return( ifelse (input$CompareMapInputID =="One-to-One", "E_1", paste0("E_",input$ComparisonZoomID))) })
+  get_Zoom_TM <<- reactive({ return( ifelse (input$VisualizeEventMapInputID =="One-to-One", "ZM_1", paste0("ZM_",input$ThreadMapZoomID))) })
+  get_Zoom_COMP <<- reactive({ return( ifelse (input$CompareMapInputID =="One-to-One", "ZM_1", paste0("ZM_",input$ComparisonZoomID))) })
 
 
 
@@ -257,13 +255,24 @@ server <- shinyServer(function(input, output, session) {
             tags$div(align="left",
                      tags$h4("Cluster Events: Group similar events to together to allow zooming"),
 
-                     selectizeInput("CLusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ),
+                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ),
 
                      radioButtons("ClusterMethodID", "Cluster based on:", choices = c("Sequential similarity", "Contextual Similarity"), selected="Sequential similarity", inline=TRUE),
 
-                     actionButton("EventButton5", "Cluster Events")  )
+                     actionButton("EventButton6", "Cluster Events")  )
 
           })
+
+
+          output$clusterResult <- renderDendroNetwork({
+            input$EventButton6
+            dendroNetwork(clusterEvents( get_event_mapping_threads( GlobalEventMappings,
+                                                                    input$ClusterEventsInputID),
+                                         ClusterEventsInputID,
+                                         input$ClusterMethodID ),
+                          treeOrientation = "vertical", textColour = "black")
+          })
+
 
             output$Manage_Event_Map_controls= renderUI({
               tags$div(align="left",
@@ -279,12 +288,19 @@ server <- shinyServer(function(input, output, session) {
             # reactive functions for the export and delete buttons
             deleteEventMapping <- reactive({
               input$DeleteMappingButton
-              isolate(delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID ))
+              delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
               })
+
+            exportEventMapping <- reactive({
+              input$ExportMappingButton
+              export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+            })
+
 
             output$One_to_one_Tab_Output_1  = DT::renderDataTable({
               threadedEvents()
             }, filter = "top")
+
             output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
               threadedEvents2()
             }, filter = "top")
@@ -305,9 +321,9 @@ server <- shinyServer(function(input, output, session) {
   #   threadGapBarchart(threadedOcc(),input$Event_method_ID)
   # })
 
-  # output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["E_1"]))} else {plot(threadedCluster()) }})
+  # output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["ZM_1"]))} else {plot(threadedCluster()) }})
   #
-  # output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "E_1", 1, 1)} )
+  # output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "ZM_1", 1, 1)} )
 
 
 

@@ -458,11 +458,13 @@ get_event_mapping_names <- function(gem){
 get_event_mapping_threads <- function(gem, mapname){
 
     # get the index for the mapname
-  print (paste0('mapname',mapname))
-  print(paste0('get_event_mapping_names', get_event_mapping_names(gem)))
-  print(paste0('are they equal', mapname==get_event_mapping_names(gem)))
+  # print (paste0('mapname',mapname))
+  # print(paste0('get_event_mapping_names', get_event_mapping_names(gem)))
+  # print(paste0('are they equal', mapname==get_event_mapping_names(gem)))
+
   idx=which(mapname==get_event_mapping_names(gem) )
-  print(idx)
+
+  # print(idx)
   if (idx==0) {
     print('mapname not found for threads')
     return(NULL)
@@ -499,7 +501,30 @@ delete_event_mapping <- function(gem, mapname){
 }
 export_event_mapping <- function(gem, mapname){
 
-  return(e_names)
+  nicename = paste0("EventMapping_",mapname)
+
+  assign(nicename, get_event_mapping_cluster(gem, mapname))
+
+  save(nicename, paste0(nicename,".Rdata"))
+
+  print(paste(nicename, "saved in file ", paste0(nicename,".Rdata")))
+
+  return(paste0(nicename,".Rdata"))
+}
+
+# Make a nice dataframe to display
+# Issue is that DT::renderdatatable cannot display lists correctly.
+make_nice_event_DT <- function(e){
+
+
+  # Add new column for the occurrences as a character string for display
+  tibble::add_column(e, paste(e$occurrences,sep=","), .after=1)
+
+  # Now remove the columns that have lists
+  e$occurrences = NULL
+  e[grep("V_",colnames(e))]=NULL
+
+  return(e)
 }
 
 ######################################################

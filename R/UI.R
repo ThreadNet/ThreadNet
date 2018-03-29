@@ -74,7 +74,8 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Cluster Events",
-                                            uiOutput("Cluster_Event_controls")
+                                            uiOutput("Cluster_Event_controls"),
+                                            plotlyOutput("clusterResult")
                                    ),
 
                                    tabPanel("Manage Event Maps",
