@@ -477,7 +477,7 @@ get_event_mapping_cluster <- function(gem, mapname){
 
   # get the index for the mapname
   idx=which(mapname==get_event_mapping_names(gem) )
-  print(idx)
+  #print(idx)
   if (idx==0) {
     print('mapname not found for clusters')
     return(NULL)
@@ -501,15 +501,14 @@ delete_event_mapping <- function(gem, mapname){
 }
 export_event_mapping <- function(gem, mapname){
 
-  nicename = paste0("EventMapping_",mapname)
+  nicename = paste0("EventMap_",mapname)
 
-  assign(nicename, get_event_mapping_cluster(gem, mapname))
+  assign(nicename, get_event_mapping_threads(gem, mapname))
 
-  save(nicename, paste0(nicename,".Rdata"))
+  save(list=nicename, file = paste0(nicename,".Rdata"))
 
-  print(paste(nicename, "saved in file ", paste0(nicename,".Rdata")))
+  print(paste(" EventMapping saved in file: ", paste0(nicename,".Rdata")))
 
-  return(paste0(nicename,".Rdata"))
 }
 
 # Make a nice dataframe to display

@@ -122,10 +122,6 @@ server <- shinyServer(function(input, output, session) {
                        inline=TRUE)
   })
 
-  # output$Data_Tab_Output_1 = renderText(paste( nrow(selectOcc()),"Occurrences //",
-  #                                              timeRangePhrase(timeRange(selectOcc())))
-  # )
-
   output$Data_Tab_Output_2  = DT::renderDataTable({
     selectOcc()
   }, filter = "top")
@@ -286,14 +282,14 @@ server <- shinyServer(function(input, output, session) {
             })
 
             # reactive functions for the export and delete buttons
-            deleteEventMapping <- reactive({
-              input$DeleteMappingButton
-              delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+            observeEvent(
+              input$DeleteMappingButton,
+              {delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
               })
 
-            exportEventMapping <- reactive({
-              input$ExportMappingButton
-              export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+            observeEvent(
+              input$ExportMappingButton,
+              {export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
             })
 
 
