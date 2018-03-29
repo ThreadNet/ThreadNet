@@ -490,11 +490,11 @@ delete_event_mapping <- function(gem, mapname){
   # get the index for the mapname
   idx=which(mapname==get_event_mapping_names(gem) )
 
-  GlobalEventMappings[[idx]][["name"]] <-NULL
-  GlobalEventMappings[[idx]][["threads"]] <-NULL
-  GlobalEventMappings[[idx]][["cluster"]] <-NULL
+  GlobalEventMappings[idx] <-NULL
+  # GlobalEventMappings[[idx]][["threads"]] <-NULL
+  # GlobalEventMappings[[idx]][["cluster"]] <-NULL
 
-  print(paste0('deleting', idx))
+  print(paste('deleting', mapname, idx))
   save(GlobalEventMappings, file="eventMappings_after_delete.RData")
 
 
@@ -517,7 +517,9 @@ make_nice_event_DT <- function(e){
 
 
   # Add new column for the occurrences as a character string for display
-  tibble::add_column(e, paste(e$occurrences,sep=","), .after=1)
+  # tibble::add_column(e, paste(e$occurrences,sep=","), .after=1)
+
+  e$OccurrenceList = paste(e$occurrences,sep=",")
 
   # Now remove the columns that have lists
   e$occurrences = NULL
@@ -525,6 +527,19 @@ make_nice_event_DT <- function(e){
 
   return(e)
 }
+
+# find the biggest column with ZM_, and then get the number that goes with that.
+# It will not be the same as the column number.
+zoom_upper_limit <- function(e){
+  upper_limit = as.integer(str_replace(colnames(e[max(grep("ZM_",colnames(e)))]),"ZM_",""))
+  return(upper_limit)
+}
+
+# sliderInput("ThreadMapZoomID",
+#             "Zoom in and out by event similarity:",
+#             1,100,5, step = 1, ticks=FALSE)
+
+
 
 ######################################################
 # Just putting this code here to play with for now.

@@ -95,10 +95,13 @@ server <- shinyServer(function(input, output, session) {
   # time scale for use throughout the app
   get_timeScale <<- reactive({ return(input$timeScaleID) })
 
-  # This slider controls the zoom level for zooming in-out
-  get_Zoom_TM <<- reactive({ return( ifelse (input$VisualizeEventMapInputID =="One-to-One", "ZM_1", paste0("ZM_",input$ThreadMapZoomID))) })
-  get_Zoom_COMP <<- reactive({ return( ifelse (input$CompareMapInputID =="One-to-One", "ZM_1", paste0("ZM_",input$ComparisonZoomID))) })
-
+  # These sliders controls the zoom level for zooming in-out
+  get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))==1 ,
+                                              "ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
+  get_Zoom_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID))==1 ,
+                                               "ZM_1", paste0("ZM_",input$ComparisonZoomID))) })
+  get_Zoom_MOV <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
+                                              "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
 
   ################## 1.READ DATA TAB ####################
@@ -202,7 +205,7 @@ server <- shinyServer(function(input, output, session) {
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
                tags$p(paste0("Start new event when ALL of these change:", get_EVENT_CF())),
 
-               textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks-"),
+               textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks_"),
 
                actionButton("EventButton2", "Create New Mapping")  )
 
@@ -217,7 +220,7 @@ server <- shinyServer(function(input, output, session) {
                  textInput("RegExForEvents", label = h4("Enter regular expression(s)"), value = ""),
                  tags$p(" "),
 
-                 textInput("EventMapName3", label = h4("Enter label for this mapping"), value = "RegEx-"),
+                 textInput("EventMapName3", label = h4("Enter label for this mapping"), value = "RegEx_"),
 
                  actionButton("EventButton3", "Create New Mapping")  )
 
@@ -229,7 +232,7 @@ server <- shinyServer(function(input, output, session) {
                    tags$p(" "),
                    selectizeInput("NGramInputID","INPUT:", get_event_mapping_names( GlobalEventMappings ) ),
 
-                   textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams-"),
+                   textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams_"),
 
                    actionButton("EventButton4", "Create New Mapping")  )
 
@@ -241,7 +244,7 @@ server <- shinyServer(function(input, output, session) {
 
                      selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
 
-                     textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal-"),
+                     textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal_"),
 
                      actionButton("EventButton5", "Create New Mapping")  )
 
@@ -272,7 +275,7 @@ server <- shinyServer(function(input, output, session) {
 
             output$Manage_Event_Map_controls= renderUI({
               tags$div(align="left",
-                       tags$h4("Select event mapping to export or delete -- Not implemented yet"),
+                       tags$h4("Select event mapping to export or delete"),
 
                        selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
 
@@ -285,11 +288,13 @@ server <- shinyServer(function(input, output, session) {
             observeEvent(
               input$DeleteMappingButton,
               {delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+                output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
               })
 
             observeEvent(
               input$ExportMappingButton,
               {export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+                output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
             })
 
 
@@ -332,12 +337,13 @@ output$Visualize_Tab_Controls_1 = renderUI({
 })
 
   output$Visualize_Tab_Controls_2 = renderUI({
-    if (input$VisualizeEventMapInputID == "One-to-One")
-       {tags$h4("Zooming not available with one-to-one mapping of occurrences to events")}
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))
+    if ( zoom_limit == 1)
+       {tags$h4("Zooming not available for this mapping")}
     else
-        {sliderInput("ThreadMapZoomID",
+        {sliderInput("VisualizeTabZoomID",
                "Zoom in and out by event similarity:",
-               1,100,5, step = 1, ticks=FALSE) }
+               1, zoom_limit, 1, step = 1, ticks=FALSE) }
 })
 
   # controls for sub-sequence display
@@ -350,13 +356,31 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
   #  NGRAM  display #
   output$nGramBarchart = renderPlotly({
-    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_TM(), input$nGramLengthID, input$nGramDisplayThresholdID)
+    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
   })
 
 # Whole sequence display
   output$WholeSequenceThreadMap <- renderPlotly({
-    threadMap(threadedEventsViz(), "threadNum", "seqNum", newColName(get_EVENT_CF()), 15  )
+    threadMap(threadedEventsViz(), "threadNum", "seqNum", get_Zoom_VIZ(), 15  )
   })
+
+  # Force network D3  display
+
+  # use this to select how to color the nodes in force layout
+  output$Network_Tab_Controls_2 <- renderUI({
+    button_choices = intersect(colnames(threadedEventsViz()), cfnames(selectOccFilter()))
+    tags$div(
+    radioButtons("NetworkGroupID","Select a dimension for coloring nodes:",
+                 choices = button_choices,
+                 selected =  button_choices[1], # always start with the first one
+                 inline=TRUE))
+  })
+
+  output$forceNetworkD3 <- renderForceNetwork({
+    forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
+  })
+
+
 
   ##################### 5. COMPARE  tab ################################
 
@@ -368,33 +392,24 @@ output$Visualize_Tab_Controls_1 = renderUI({
     radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
   })
 
-  output$Comparison_Tab_Controls_3 <- renderUI(
-    if (input$CompareMapInputID == "One-to-One")
-    {tags$p("Zooming not available with one-to-one mapping of occurrences to events")}
+  output$Comparison_Tab_Controls_3 <- renderUI({
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID))
+    if (zoom_limit == 1)
+    {tags$h4("Zooming not available with this mapping")}
     else
     {sliderInput("CompareZoomID",
                  "Zoom in and out by event similarity:",
-                 1,100,5, step = 1, ticks=FALSE) }
-    )
+                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+    })
 
   ######
   output$Pos_Layout_Controls_0 <- renderUI({
     radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
   })
 
-  # use this to select how to color the nodes in force layout
-  output$Network_Tab_Controls_2 <- renderUI({tags$div(
-    radioButtons("NetworkGroupID","Select dimension for coloring nodes:",
-                       choices = cfnames(selectOccFilter()),
-                       selected =  cfnames(selectOccFilter())[1],
-                       inline=TRUE))
-  })
 
 
-  # output$eventNetwork <- renderVisNetwork({
-  #   req(input$Timesplit2)
-  #   eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
-  # })
+
 
   event.data <- reactive({
     event_data("plotly_click", source="A")
@@ -421,9 +436,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
     ENsubset
   })
 
-  # output$eventNetworksubset_plot <- renderVisNetwork({
-  #   eventNetwork(eventNetworksubset(), "threadNum", get_Zoom_TM(), input$Timesplit2)
-  # })
+
 
   output$eventNetworksubset_data <- renderDataTable({
     test<-eventNetworksubset()
@@ -431,10 +444,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
     #event.data()
   })
 
-
-  output$eventNetworkD3 <- renderForceNetwork({
-    eventNetworkD3(threadedEvents(), "threadNum", input$NetworkGroupID, get_Zoom_TM())
-  })
 
 
 
@@ -478,14 +487,15 @@ output$Visualize_Tab_Controls_1 = renderUI({
     selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) )
   })
 
-  output$Moving_Window_Tab_Controls_2 <- renderUI(
-    if (input$MovingWindowMapInputID == "One-to-One")
-    {tags$p("Zooming not available with one-to-one mapping of occurrences to events")}
+  output$Moving_Window_Tab_Controls_2 <- renderUI({
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))
+    if (zoom_limit == 1)
+    {tags$h4("Zooming not available with this mapping")}
     else
     {sliderInput("MovingWindowZoomID",
-                 "Zoom in and out by event similarity:",
-                 1,100,5, step = 1, ticks=FALSE) }
-  )
+                 label = h4("Zoom in and out by event similarity:"),
+                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+ })
 
   output$Moving_Window_Tab_Controls_3 <- renderUI({
     sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
@@ -506,7 +516,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
   # just leave it blank for now...
   output$MovingWindow_Plot <- renderPlotly({
     w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
-    eventNetwork(w, "threadNum", get_Zoom_TM(), input$Timesplit3) })
+    eventNetwork(w, "threadNum", get_Zoom_MOV(), input$Timesplit3) })
 
 
   ############################  Admin, params, etc  ##############################

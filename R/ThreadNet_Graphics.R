@@ -251,11 +251,15 @@ eventNetwork <- function(et, TN, CF, timesplit){
 #' @return networkD3 object
 #' @export
 #'
-eventNetworkD3 <- function(et,TN, grp, zoom_level){
+forceNetworkD3 <- function(et,TN, grp, zoom_level){
   # et is a dataframe of event threads
   # TN is the column that holds the threadNumber
   # grp is one of the comparison columns
   # zoom_level is the column with the event code (node ID)
+
+#   print(paste("TN =", TN))
+#   print(paste("grp =", grp))
+#   print(paste("zoom_level =", zoom_level))
 
 
   # First get the node names & remove the spaces
@@ -268,9 +272,9 @@ eventNetworkD3 <- function(et,TN, grp, zoom_level){
     node_group = c(node_group, as.character(unlist( et[which(et[[zoom_level]]==node_label[n]),grp][1]) ) )
   }
 
+#    print(paste("node_label = ", node_label))
+#    print(paste("node_group = ", node_group))
 
-  # print("node_label")
-  # print(node_label)
 
   # set up the data frames we need to draw the network
   # needs to have name, group, size

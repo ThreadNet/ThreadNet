@@ -79,15 +79,20 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Manage Event Maps",
-                                            uiOutput("Manage_Event_Map_controls")
-                                            # need to show the list of mapping names
+                                            uiOutput("Manage_Event_Map_controls"),
+                                            verbatimTextOutput("delete_confirm")
                                    )
                        )
 
               ),
               tabPanel("Visualize",
-                       uiOutput("Visualize_Tab_Controls_1"),
-                       uiOutput("Visualize_Tab_Controls_2"),
+                       fluidRow(
+                         column(4,
+                                uiOutput("Visualize_Tab_Controls_1")),
+                       column(4,
+                              uiOutput("Visualize_Tab_Controls_2"))
+                       ),
+
                        tabsetPanel(type = "tabs",
                           tabPanel("Repetitive Sub-sequences",
                                   uiOutput("nGramControls"),
@@ -103,7 +108,7 @@ ui <- fluidPage(
 
                           tabPanel("Force layout",
                                    uiOutput("Network_Tab_Controls_2"),
-                                   forceNetworkOutput("eventNetworkD3", width = "100%", height = "1200px")),
+                                   forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
 
                           tabPanel("Custom layout",
                                 tags$p("Put plotly custom layout here")))

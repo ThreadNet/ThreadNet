@@ -187,6 +187,9 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   occ$timeGap  =  timeGap
   occ$handoffGap = handoffGap
 
+  # create new column for relative time stamp. Initialize to absolute tStamp and adjust below
+  occ$relativeTime = lubridate::mdy_hms(occ$tStamp)
+
   # then get the unique values in that POV
   occ[nPOV] = as.factor(occ[,nPOV])
   pov_list = levels(occ[[nPOV]])
@@ -209,6 +212,16 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
       # they all get the same thread number and incrementing seqNum
       occ[start_row:end_row, "POVthreadNum"] <- as.matrix(rep(as.integer(thrd),tlen))
       occ[start_row:end_row, "POVseqNum"] <- as.matrix(c(1:tlen))
+
+
+      # find the earliest time value for this thread
+      start_time = min(lubridate::mdy_hms(occ$tStamp[start_row:end_row]))
+      print(start_time)
+
+      # subtract that from all of the time stamps -- I can't get this to work...
+      # for (t in start_row:end_row){
+      #   occ$relativeTime[t] = lubridate::mdy_hms(occ$tStamp[t]) -  start_time
+      # }
 
       # increment the counters for the next thread
       start_row = end_row + 1

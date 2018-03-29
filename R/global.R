@@ -23,6 +23,7 @@ library(colorspace)
 library(igraph)
 library(TraMineR)
 library(RColorBrewer)
+library(lubridate)
 
 # this is another change
 
