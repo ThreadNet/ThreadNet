@@ -250,36 +250,55 @@ OccToEvents1 <- function(o, chunk_CF, EventMapName,EVENT_CF, compare_CF){
   #### First get the break points between the occurrances.
 
   # we are mapping one-to-one, so copy the input to the output and then add/rename some other columns as needed
+  e=o
 
-    # copy the occurrences.  Each occurrence is an event
-    e = o
+  #   tStamp = numeric(),  # this is the event start time
+  #   eventDuration = numeric(),
+  #   occurrences = integer(),
+  #   threadNum = integer(),
+  #   seqNum = integer())
+
+   # occurrences have no duration
+   o["eventDuration"] = 0
 
     # rename the threadNum and seqNum columns
     names(e)[names(e)=="POVthreadNum"] <- "threadNum"
     names(e)[names(e)=="POVseqNum"] <- "seqNum"
 
-    # Set eventStart and EventStop -- these are just equal to the row numbers
-    e["eventStart"] = 1:nrow(e)
-    e["eventStop"] = 1:nrow(e)
+    #  these are just equal to the row numbers -- one occurrence per event
+    e["occurrences"] =   1:nrow(e)
 
-    # occurrences have no duration
-    e["eventDuration"] = 0
+    # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
+      for (cf in EVENT_CF){
+        #make a new column for each CF
+        VCF = paste0("V_",cf)
+        e[[VCF]]= vector(mode = "integer",length=nrow(e))
+
+        for (r in 1:nrow(e)){
+        e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
+        }
+      }
+      for (cf in compare_CF){
+        #make a new column for each CF
+        VCF = paste0("V_",cf)
+        e[[VCF]]=vector(mode = "integer",length=nrow(e))
+
+        for (r in 1:nrow(e)){
+          e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
+      }
+  }
 
     # just add the one column with the combined values
     e["E_1"] = as.factor(e[,newColName(EVENT_CF)])
 
-    # set the cluster solution to NULL
-    clust=NULL
-
     # Add the mapping to the global list of mappings
-    map = list(name = paste(EventMapName), threads = e, cluster = clust)
+    map = list(name = paste(EventMapName), threads = e)
 
     GlobalEventMappings <<- append(list(map), GlobalEventMappings )
 
     print( get_event_mapping_names( GlobalEventMappings ) )
     save(GlobalEventMappings, file="eventMappings.RData")
 
-    #  need return the threads and also the cluster solution for display
     return(map)
 
 }
@@ -448,3 +467,14 @@ make_event_df <- function(event_CF,compare_CF){
 
   return(e)
 }
+
+# this will convert the context factor into a list (like this: 0 0 0 0 0 0 0 0 1 0 0)
+# o is the dataframe of occurrences
+# CF is the context factor (column)
+# r is the row (occurrence number in the One-to-One mapping)
+convert_CF_to_vector <- function(o,CF,r){
+
+  return(as.integer((levels(o[[CF]]) ==o[[r,CF]])*1))
+
+}
+
