@@ -122,8 +122,8 @@ count_ngrams <- function(o,TN,CF,n){
     }
   }
 
-   print("text_vector")
-   print(text_vector)
+   # print("text_vector")
+   # print(text_vector)
 
   # return a data frame that includes the ngrams
   #    col 1 = ngrams

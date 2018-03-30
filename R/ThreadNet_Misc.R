@@ -430,7 +430,7 @@ get_moving_window <- function(e, s, l ){
   # get get the appropriate subset of threads for the window
   w=w[l:(l+s-1)]
 
-  # and now subset the rows for those threds
+  # and now subset the rows for those threads
 
   return(e[e$threadNum %in% w,])
 
@@ -515,7 +515,6 @@ export_event_mapping <- function(gem, mapname){
 # Issue is that DT::renderdatatable cannot display lists correctly.
 make_nice_event_DT <- function(e){
 
-
   # Add new column for the occurrences as a character string for display
   # tibble::add_column(e, paste(e$occurrences,sep=","), .after=1)
 
@@ -527,6 +526,15 @@ make_nice_event_DT <- function(e){
 
   return(e)
 }
+
+comparison_DT <- function(e,cf){
+
+  # keep only the columns that are not in the CF list
+  comp_e = e[,cf]
+
+  return(comp_e)
+}
+
 
 # find the biggest column with ZM_, and then get the number that goes with that.
 # It will not be the same as the column number.

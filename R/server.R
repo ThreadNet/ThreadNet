@@ -47,7 +47,7 @@ server <- shinyServer(function(input, output, session) {
                         get_COMPARISON_CF()
                         ) )})
 
-  # These go on the occ to event page
+  # These go on the occ to event page.They suppress some columns
   threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
  # threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
 
@@ -66,10 +66,7 @@ server <- shinyServer(function(input, output, session) {
 
 
 
-  # These will work for the Visualize tab.  Need parallel functions for the other tabs.
-  threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
-                            get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
-#  threadedClusterViz <- reactive({ get_event_mapping_cluster( GlobalEventMappings, input$VisualizeEventMapInputID ) })
+
 
 
   ##################################################
@@ -100,7 +97,7 @@ server <- shinyServer(function(input, output, session) {
                                               "ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
   get_Zoom_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID))==1 ,
                                                "ZM_1", paste0("ZM_",input$ComparisonZoomID))) })
-  get_Zoom_MOV <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
+  get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
 
@@ -354,6 +351,11 @@ output$Visualize_Tab_Controls_1 = renderUI({
     )
   })
 
+  # Get data for the Visualize tab.  Need parallel functions for the other tabs.
+  threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
+    get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
+
+
   #  NGRAM  display #
   output$nGramBarchart = renderPlotly({
     ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
@@ -376,8 +378,16 @@ output$Visualize_Tab_Controls_1 = renderUI({
                  inline=TRUE))
   })
 
+  # output$circularLayoutNetwork = renderPlotly(
+  #
+  # )
+
   output$forceNetworkD3 <- renderForceNetwork({
     forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
+  })
+
+  output$VisualizeCustomNetwork <- renderPlotly({
+    eventNetwork(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
   })
 
 
@@ -388,9 +398,10 @@ output$Visualize_Tab_Controls_1 = renderUI({
     selectizeInput("CompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
     })
 
-  output$Comparison_Tab_Controls_2 <- renderUI({
-    radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
-  })
+  # Leave this out for now
+  # output$Comparison_Tab_Controls_2 <- renderUI({
+  #   radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
+  # })
 
   output$Comparison_Tab_Controls_3 <- renderUI({
     zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID))
@@ -398,9 +409,88 @@ output$Visualize_Tab_Controls_1 = renderUI({
     {tags$h4("Zooming not available with this mapping")}
     else
     {sliderInput("CompareZoomID",
-                 "Zoom in and out by event similarity:",
+                 label=h4("Zoom in and out by event similarity:"),
                  1,zoom_limit,1, step = 1, ticks=FALSE) }
     })
+
+  # Get data for the COMPARE tab.  Need parallel functions for the other tabs.
+  threadedEventsComp <- reactive({
+    get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID ) })
+
+
+  #  There will be two parallel plots, each with it's own DT (for input) and it's own output
+  # ####### SUBSET A   ##########
+  output$CompareSubSample_A  = DT::renderDataTable({
+    comparison_DT(threadedEventsComp(),  intersect(colnames(threadedEventsComp()), cfnames(selectOccFilter())) )
+  }, filter = "top")
+
+  output$Comparison_Plots_A <- renderPlotly({
+    threadMap(threadedEventsComp(), "threadNum", "seqNum", get_Zoom_COMP(), 15  )
+  })
+
+  #  There will be two parallel plots, each with it's own DT (for input) and it's own output
+  # ####### SUBSET B   ##########
+  output$CompareSubSample_B  = DT::renderDataTable({
+    comparison_DT(threadedEventsComp(),  intersect(colnames(threadedEventsComp()), cfnames(selectOccFilter())) )
+  }, filter = "top")
+
+  output$Comparison_Plots_B <- renderPlotly({
+    threadMap(threadedEventsComp(), "threadNum", "seqNum", get_Zoom_COMP(), 15  )
+  })
+
+
+  ######################## 6. MOVING WINDOW TAB ##############################
+
+  output$Moving_Window_Tab_Controls_1 <- renderUI({
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) )
+  })
+
+  output$Moving_Window_Tab_Controls_2 <- renderUI({
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))
+    if (zoom_limit == 1)
+    {tags$h4("Zooming not available with this mapping")}
+    else
+    {sliderInput("MovingWindowZoomID",
+                 label = h4("Zoom in and out by event similarity:"),
+                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+  })
+
+  output$Moving_Window_Tab_Controls_3 <- renderUI({
+    sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
+  })
+  output$Moving_Window_Tab_Controls_4 <- renderUI({
+    sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
+  })
+
+  output$Moving_Tab_Controls_5 <- renderUI({
+    radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE)
+  })
+
+  # Get data for the Moving Window tab.
+  threadedEventsMove <- reactive({
+    get_event_mapping_threads( GlobalEventMappings, input$MovingWindowMapInputID ) })
+
+
+   output$MovingWindow_Plot_A <- renderPlotly({
+     w = get_moving_window(threadedEventsMove(), -input$MovingWindowSizeID, input$WindowLocationID )
+     threadMap(w, "threadNum", "seqNum", get_Zoom_MOVE(), 15  )
+   })
+
+   output$MovingWindow_Plot_B <- renderPlotly({
+     w = get_moving_window(threadedEventsMove(), input$MovingWindowSizeID, input$WindowLocationID )
+     threadMap(w, "threadNum", "seqNum", get_Zoom_MOVE(), 15  )
+   })
+
+  #
+  # output$MovingWindow_Plot_A <- renderPlotly({
+  #   w = get_moving_window(threadedEvents(),-input$MovingWindowSizeID, input$WindowLocationID )
+  #   eventNetwork(w, "threadNum", get_Zoom_MOV(), input$Timesplit3) })
+  #
+  #
+  # output$MovingWindow_Plot_B <- renderPlotly({
+  #   w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
+  #   eventNetwork(w, "threadNum", get_Zoom_MOV(), input$Timesplit3) })
+  #
 
   ######
   output$Pos_Layout_Controls_0 <- renderUI({
@@ -429,7 +519,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
   eventNetworksubset <- reactive({
     req(event.data())
     TE = threadedEvents()
-    #CF_levels()
     #newColName(get_EVENT_CF()) input$EVENT_CF_ID
     ENsubset = subset(TE, actor == event.data()$key)
     #ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
@@ -449,30 +538,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
   # Get subsets of threadedEvents and create sub-plots for them
 
-
-  CF_levels = reactive( get_CF_levels( threadedEvents(),input$selectComparisonID) )
-
-  # controls for the comparison input panels
-  # Use all of the column names here...
-  output$Comparison_Tab_Controls_1_old <- renderUI({
-    selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF())
-  })
-
-  output$Comparison_Tab_Controls_2_old <- renderUI({
-    tagList(
-      selectizeInput("selectComparisonGroupsID","Compare specific groups:",
-                     CF_levels(), multiple=TRUE),
-
-      radioButtons("NumTimePeriodsToCompare", "How many time periods to compare:",
-                   c(1,2,3,4,5), selected =1 ,inline=TRUE),
-
-      sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE )
-
-    )
-  })
-
   output$Comparison_Plots <- renderPlotly(
-    #    input$visualize_DV_button
     Comparison_Plots(threadedEvents(),
                      input$selectComparisonID,
                      input$selectComparisonGroupsID,
@@ -481,42 +547,12 @@ output$Visualize_Tab_Controls_1 = renderUI({
                      get_Zoom_COMP()) )
 
 
-  ######################## 6. MOVING WINDOW TAB ##############################
-
-  output$Moving_Window_Tab_Controls_1 <- renderUI({
-    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) )
-  })
-
-  output$Moving_Window_Tab_Controls_2 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))
-    if (zoom_limit == 1)
-    {tags$h4("Zooming not available with this mapping")}
-    else
-    {sliderInput("MovingWindowZoomID",
-                 label = h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,1, step = 1, ticks=FALSE) }
- })
-
-  output$Moving_Window_Tab_Controls_3 <- renderUI({
-    sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
-  })
-  output$Moving_Window_Tab_Controls_4 <- renderUI({
-    sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
-  })
-
-  output$Moving_Tab_Controls_5 <- renderUI({
-    radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE)
-  })
-
   output$test <- renderDataTable({
     w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
     w
   })
 
-  # just leave it blank for now...
-  output$MovingWindow_Plot <- renderPlotly({
-    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
-    eventNetwork(w, "threadNum", get_Zoom_MOV(), input$Timesplit3) })
+
 
 
   ############################  Admin, params, etc  ##############################

@@ -180,7 +180,7 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #' @param CF is the contetual factors (column)
 #' @param timesplit time measure
 #'
-#' @return visnetwork object
+#' @return plotly object
 #' @export
 
 eventNetwork <- function(et, TN, CF, timesplit){
