@@ -102,6 +102,9 @@ server <- shinyServer(function(input, output, session) {
   get_Zoom_COMP_B <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_B))==1 ,
                                                "ZM_1", paste0("ZM_",input$CompareZoomID_B))) })
 
+  get_Zoom_DIA_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$DiaCompareMapInputID))==1 ,
+                                                 "ZM_1", paste0("ZM_",input$DiaCompareZoomID))) })
+
   get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
@@ -365,7 +368,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
   #  NGRAM  display #
   output$nGramBarchart = renderPlotly({
-    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
+    ng_bar_chart(threadedEventsViz(), "threadNum", zoomColumn(input$VisualizeTabZoomID), input$nGramLengthID, input$nGramDisplayThresholdID)
   })
 
 # Whole sequence display
@@ -400,10 +403,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
 
   ##################### 5. COMPARE  tab ################################
-  # Leave this out for now
-  # output$Comparison_Tab_Controls_2 <- renderUI({
-  #   radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
-  # })
+
 
   # Make two parallel sets of input and data. Different mapping on each side
 
@@ -422,7 +422,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
                  1,zoom_limit,1, step = 1, ticks=FALSE) }
     })
 
-  # Get data for the COMPARE tab.  Need parallel functions for the other tabs.
+  # Get data for the COMPARE tab mapping A
   threadedEventsComp_A <- reactive({
     get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID_A ) })
 
@@ -446,7 +446,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
                  1,zoom_limit,1, step = 1, ticks=FALSE) }
   })
 
-  # Get data for the COMPARE tab.  Need parallel functions for the other tabs.
+  # Get data for the COMPARE tab mapping B.
   threadedEventsComp_B <- reactive({
     get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID_B ) })
 
@@ -454,6 +454,31 @@ output$Visualize_Tab_Controls_1 = renderUI({
   output$Comparison_Plots_B <- renderPlotly({
     threadMap(threadedEventsComp_B(), "threadNum", "seqNum", get_Zoom_COMP_B(), 15  )
   })
+
+  # ##########  DIACHRONIC Comparison sub-tab   ###########
+  output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
+    selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
+  })
+
+  output$Diachronic_Comparison_Tab_Controls_2 <- renderUI({
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$DiaCompareMapInputID))
+    if (zoom_limit == 1)
+    {tags$h4("Zooming not available with this mapping")}
+    else
+    {sliderInput("DiaCompareZoomID",
+                 label=h4("Zoom in and out by event similarity:"),
+                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+  })
+
+   output$Diachronic_Comparison_Tab_Controls_3 <- renderUI({
+     radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
+   })
+
+   # Get data for the Diachronic COMPARE tab  .
+   threadedEventsDiaComp <- reactive({
+     get_event_mapping_threads( GlobalEventMappings, input$DiaCompareMapInputID ) })
+
+
 
 
   ######################## 6. MOVING WINDOW TAB ##############################

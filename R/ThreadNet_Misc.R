@@ -168,12 +168,27 @@ timeRangePhrase = function(tr){
 
 # This function limits the number of rows that get used
 # SubsetOfTable <- function(df,pct) {df[1:(floor((pct/100) * nrow(df))),] }
-SubsetOfTable <- function(df,r) {df[r[1]:r[2],] }
+# SubsetOfTable <- function(df,r) {df[r[1]:r[2],] }
 
 
 # this function is used to split up the threads into n ~equal buckets
 make_subsets <- function(d,n){
   return(split(d, ceiling(seq_along(d)/(length(d)/n))))
+}
+
+# This function takes a slider value and returns a valid column name for zooming
+# if the argument is null, then use ZM_1
+zoomColumn <- function(z){
+  print(paste("In zoomColumn z=",z))
+
+  if (is.null(z))
+    {r="ZM_1"}
+  else
+    {r=paste0("ZM_",z)}
+
+  print(paste("In zoomColumn r=",r))
+
+  return(r)
 }
 
 ######### Functions that return column names #######
@@ -245,18 +260,18 @@ newColName <- function(CF_list){
   return(paste0(CF_list,collapse="_")) }
 
 
-# These are used on the occ-to-event tab to configure the slider
-threshold_slider_min <- function(o){
-     return(floor(min(o$timeGap)))
- }
-
- threshold_slider_max <- function(o){
-     return(ceiling(max(o$timeGap)))
- }
-
- threshold_slider_selected <- function(o){
-     return(min(o$timeGap))
- }
+# These were used on the occ-to-event tab to configure the slider
+# threshold_slider_min <- function(o){
+#      return(floor(min(o$timeGap)))
+#  }
+#
+#  threshold_slider_max <- function(o){
+#      return(ceiling(max(o$timeGap)))
+#  }
+#
+#  threshold_slider_selected <- function(o){
+#      return(min(o$timeGap))
+#  }
 
 
 
@@ -527,13 +542,7 @@ make_nice_event_DT <- function(e){
   return(e)
 }
 
-comparison_DT <- function(e,cf){
 
-  # keep only the columns that are not in the CF list
-  comp_e = e[,cf]
-
-  return(comp_e)
-}
 
 
 # find the biggest column with ZM_, and then get the number that goes with that.

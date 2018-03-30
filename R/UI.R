@@ -120,17 +120,26 @@ ui <- fluidPage(
                        tabsetPanel(type = "tabs",
                          tabPanel("Compare Mappings (synchronic)",
                        fluidRow(
-                         column(6,"Subset A",
+                         column(6, tags$h3("Mapping A"),
                                 uiOutput("Comparison_Tab_Controls_A1"),
                                 uiOutput("Comparison_Tab_Controls_A2"),
                                 plotlyOutput("Comparison_Plots_A")),
-                         column(6,"Subset B",
+                         column(6,tags$h3("Mapping B"),
                                 uiOutput("Comparison_Tab_Controls_B1"),
                                 uiOutput("Comparison_Tab_Controls_B2"),
                                 plotlyOutput("Comparison_Plots_B"))
                                 )),
                        tabPanel("Compare time periods (diachronic)",
-                                tags$h4("Put diachronic comparison panel here")))
+                                fluidRow(
+                                  column(3,
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_1")),
+                                  column(4,
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_2"))
+                                ),
+                                uiOutput("Diachronic_Comparison_Tab_Controls_3")
+                                )
+
+                                )
                ),
 
               tabPanel("Moving Window",
