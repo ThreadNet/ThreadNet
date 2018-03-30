@@ -479,6 +479,15 @@ output$Visualize_Tab_Controls_1 = renderUI({
      get_event_mapping_threads( GlobalEventMappings, input$DiaCompareMapInputID ) })
 
 
+   # Get subsets of threadedEvents and create sub-plots for them
+
+   output$DiachronicComparisonPlots <- renderPlotly(
+     Comparison_Plots(threadedEventsDiaComp(),
+                      input$selectComparisonID,
+                      input$selectComparisonGroupsID,
+                      input$DiaCompareTimeSubsetID,
+                      2,   #input$nGramLengthCompID,
+                      get_Zoom_DIA_COMP()) )
 
 
   ######################## 6. MOVING WINDOW TAB ##############################
@@ -581,15 +590,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
 
 
-  # Get subsets of threadedEvents and create sub-plots for them
-
-  output$Comparison_Plots <- renderPlotly(
-    Comparison_Plots(threadedEvents(),
-                     input$selectComparisonID,
-                     input$selectComparisonGroupsID,
-                     input$NumTimePeriodsToCompare,
-                     input$nGramLengthCompID,
-                     get_Zoom_COMP()) )
 
 
   output$test <- renderDataTable({
