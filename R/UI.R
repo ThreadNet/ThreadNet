@@ -117,30 +117,31 @@ ui <- fluidPage(
               ),
 
               tabPanel("Comparisons",
-                       fluidRow(
-                         column(3,
-                                uiOutput("Comparison_Tab_Controls_1")),
-                         column(4,
-                                uiOutput("Comparison_Tab_Controls_3"))
-                         ),
+                       tabsetPanel(type = "tabs",
+                         tabPanel("Compare Mappings (synchronic)",
                        fluidRow(
                          column(6,"Subset A",
-                                DT::dataTableOutput("CompareSubSample_A"),
-                                plotlyOutput("Comparison_Plots_A")
-                                ),
+                                uiOutput("Comparison_Tab_Controls_A1"),
+                                uiOutput("Comparison_Tab_Controls_A2"),
+                                plotlyOutput("Comparison_Plots_A")),
                          column(6,"Subset B",
-                                DT::dataTableOutput("CompareSubSample_B"),
-                                plotlyOutput("Comparison_Plots_B")
-                                )
-                                )
+                                uiOutput("Comparison_Tab_Controls_B1"),
+                                uiOutput("Comparison_Tab_Controls_B2"),
+                                plotlyOutput("Comparison_Plots_B"))
+                                )),
+                       tabPanel("Compare time periods (diachronic)",
+                                tags$h4("Put diachronic comparison panel here")))
                ),
 
               tabPanel("Moving Window",
-                       uiOutput("Moving_Window_Tab_Controls_1"),
-                       uiOutput("Moving_Window_Tab_Controls_2"),
+                       fluidRow(
+                         column(3,
+                              uiOutput("Moving_Window_Tab_Controls_1")),
+                         column(4,
+                                uiOutput("Moving_Window_Tab_Controls_2"))
+                       ),
                        uiOutput("Moving_Window_Tab_Controls_3"),
                        uiOutput("Moving_Window_Tab_Controls_4"),
-                       uiOutput("Moving_Window_Tab_Controls_5"),
                        fluidRow(
                          column(6,"SubsetA",
                                 plotlyOutput("MovingWindow_Plot_A")

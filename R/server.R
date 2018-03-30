@@ -95,8 +95,13 @@ server <- shinyServer(function(input, output, session) {
   # These sliders controls the zoom level for zooming in-out
   get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
-  get_Zoom_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID))==1 ,
-                                               "ZM_1", paste0("ZM_",input$ComparisonZoomID))) })
+
+  get_Zoom_COMP_A <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_A))==1 ,
+                                               "ZM_1", paste0("ZM_",input$CompareZoomID_A))) })
+
+  get_Zoom_COMP_B <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_B))==1 ,
+                                               "ZM_1", paste0("ZM_",input$CompareZoomID_B))) })
+
   get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
@@ -253,7 +258,9 @@ server <- shinyServer(function(input, output, session) {
 
                      selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ),
 
-                     radioButtons("ClusterMethodID", "Cluster based on:", choices = c("Sequential similarity", "Contextual Similarity"), selected="Sequential similarity", inline=TRUE),
+                     radioButtons("ClusterMethodID", "Cluster based on:",
+                                  choices = c("Sequential similarity", "Contextual Similarity (NIY)", "Network Structure (NIY)"),
+                                  selected="Sequential similarity", inline=TRUE),
 
                      actionButton("EventButton6", "Cluster Events")  )
 
@@ -393,49 +400,59 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
 
   ##################### 5. COMPARE  tab ################################
-
-  output$Comparison_Tab_Controls_1 <- renderUI({
-    selectizeInput("CompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
-    })
-
   # Leave this out for now
   # output$Comparison_Tab_Controls_2 <- renderUI({
   #   radioButtons("CompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
   # })
 
-  output$Comparison_Tab_Controls_3 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID))
+  # Make two parallel sets of input and data. Different mapping on each side
+
+  # ####### SUBSET A   ##########
+  output$Comparison_Tab_Controls_A1 <- renderUI({
+    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
+    })
+
+  output$Comparison_Tab_Controls_A2 <- renderUI({
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_A))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
-    {sliderInput("CompareZoomID",
+    {sliderInput("CompareZoomID_A",
                  label=h4("Zoom in and out by event similarity:"),
                  1,zoom_limit,1, step = 1, ticks=FALSE) }
     })
 
   # Get data for the COMPARE tab.  Need parallel functions for the other tabs.
-  threadedEventsComp <- reactive({
-    get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID ) })
+  threadedEventsComp_A <- reactive({
+    get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID_A ) })
 
-
-  #  There will be two parallel plots, each with it's own DT (for input) and it's own output
-  # ####### SUBSET A   ##########
-  output$CompareSubSample_A  = DT::renderDataTable({
-    comparison_DT(threadedEventsComp(),  intersect(colnames(threadedEventsComp()), cfnames(selectOccFilter())) )
-  }, filter = "top")
-
+  # just one type of plot for now -- need to select different plot types
   output$Comparison_Plots_A <- renderPlotly({
-    threadMap(threadedEventsComp(), "threadNum", "seqNum", get_Zoom_COMP(), 15  )
+    threadMap(threadedEventsComp_A(), "threadNum", "seqNum", get_Zoom_COMP_A(), 15  )
   })
 
-  #  There will be two parallel plots, each with it's own DT (for input) and it's own output
-  # ####### SUBSET B   ##########
-  output$CompareSubSample_B  = DT::renderDataTable({
-    comparison_DT(threadedEventsComp(),  intersect(colnames(threadedEventsComp()), cfnames(selectOccFilter())) )
-  }, filter = "top")
+   # ####### SUBSET B   ##########
+  output$Comparison_Tab_Controls_B1 <- renderUI({
+    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
+  })
 
+  output$Comparison_Tab_Controls_B2 <- renderUI({
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_B))
+    if (zoom_limit == 1)
+    {tags$h4("Zooming not available with this mapping")}
+    else
+    {sliderInput("CompareZoomID_B",
+                 label=h4("Zoom in and out by event similarity:"),
+                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+  })
+
+  # Get data for the COMPARE tab.  Need parallel functions for the other tabs.
+  threadedEventsComp_B <- reactive({
+    get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID_B ) })
+
+  # just one type of plot for now -- need to select different plot types
   output$Comparison_Plots_B <- renderPlotly({
-    threadMap(threadedEventsComp(), "threadNum", "seqNum", get_Zoom_COMP(), 15  )
+    threadMap(threadedEventsComp_B(), "threadNum", "seqNum", get_Zoom_COMP_B(), 15  )
   })
 
 
@@ -458,13 +475,16 @@ output$Visualize_Tab_Controls_1 = renderUI({
   output$Moving_Window_Tab_Controls_3 <- renderUI({
     sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
   })
+
   output$Moving_Window_Tab_Controls_4 <- renderUI({
     sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
-  output$Moving_Tab_Controls_5 <- renderUI({
-    radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE)
-  })
+  # "Timesplit" appears to be used for the custom network plotly layout
+  # output$Moving_Tab_Controls_5 <- renderUI({
+  #   tags$div(align="center",
+  #   radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE))
+  # })
 
   # Get data for the Moving Window tab.
   threadedEventsMove <- reactive({
