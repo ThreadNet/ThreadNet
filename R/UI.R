@@ -137,6 +137,8 @@ ui <- fluidPage(
                                          uiOutput("Diachronic_Comparison_Tab_Controls_2"))
                                 ),
                                 uiOutput("Diachronic_Comparison_Tab_Controls_3"),
+                                uiOutput("Diachronic_Comparison_Tab_Controls_4"),
+                                uiOutput("Diachronic_Comparison_Tab_Controls_5"),
                                 plotlyOutput("DiachronicComparisonPlots")
                                 )
 

@@ -474,19 +474,41 @@ output$Visualize_Tab_Controls_1 = renderUI({
      radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
    })
 
+
+
    # Get data for the Diachronic COMPARE tab  .
    threadedEventsDiaComp <- reactive({
      get_event_mapping_threads( GlobalEventMappings, input$DiaCompareMapInputID ) })
 
 
-   # Get subsets of threadedEvents and create sub-plots for them
+   # controls for the comparison input panels
+   # Use all of the column names here...
+   output$Diachronic_Comparison_Tab_Controls_4 <- renderUI({
+     selectizeInput("selectComparisonID","Compare by:", colnames(threadedEventsDiaComp()))
+   })
+   CF_levels = reactive( get_CF_levels( threadedEventsDiaComp(),input$selectComparisonID) )
+
+
+   output$Diachronic_Comparison_Tab_Controls_5 <- renderUI({
+     tagList(
+       selectizeInput("selectComparisonGroupsID","Compare specific groups:",
+                      CF_levels(), multiple=TRUE),
+
+       sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE )
+
+     )
+   })
+
+
+
+   # Get subsets of events and create sub-plots for them
 
    output$DiachronicComparisonPlots <- renderPlotly(
      Comparison_Plots(threadedEventsDiaComp(),
                       input$selectComparisonID,
                       input$selectComparisonGroupsID,
                       input$DiaCompareTimeSubsetID,
-                      2,   #input$nGramLengthCompID,
+                      input$nGramLengthCompID,
                       get_Zoom_DIA_COMP()) )
 
 
