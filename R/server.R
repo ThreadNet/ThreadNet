@@ -208,7 +208,7 @@ server <- shinyServer(function(input, output, session) {
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
-               tags$p(paste0("Start new event when ALL of these change:", get_EVENT_CF())),
+               tags$p(paste0("Start new event when ALL of these change:", paste(get_EVENT_CF(),","))),
 
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks_"),
 

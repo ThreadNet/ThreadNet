@@ -273,7 +273,7 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
     #  these are just equal to the row numbers -- one occurrence per event
     e["occurrences"] =   1:nrow(e)
 
-    # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)ss
+    # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
       for (cf in EVENT_CF){
         #make a new column for each CF
         VCF = paste0("V_",cf)
