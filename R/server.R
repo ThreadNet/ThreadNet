@@ -368,7 +368,7 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
   #  NGRAM  display #
   output$nGramBarchart = renderPlotly({
-    ng_bar_chart(threadedEventsViz(), "threadNum", zoomColumn(input$VisualizeTabZoomID), input$nGramLengthID, input$nGramDisplayThresholdID)
+    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
   })
 
 # Whole sequence display
