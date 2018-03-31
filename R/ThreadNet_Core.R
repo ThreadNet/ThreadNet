@@ -381,7 +381,11 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
     # fill in data for each of the context factors
     for (cf in compare_CF){
       e[chunkNo,cf] = o[start_idx,cf]
+     }
 
+    for (cf in EVENT_CF){
+      VCF = paste0("V_",cf)
+      e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
     }
 
     # Advance or reset the seq counters
@@ -511,4 +515,74 @@ convert_CF_to_vector <- function(o,CF,r){
   return(as.integer((levels(o[[CF]]) ==o[[r,CF]])*1))
 
 }
+
+
+# take a list of events and aggregate the VCF (CF vector) for that CF
+# There are two layers to this.
+# 1) Within an single event, aggregate the VCF for the occurrences that make up that event
+# 2) Within a cluster level, aggregate the events at that cluster level (e.g., ZM_n)
+#
+# o is a dataframe of occurrences with the V_ filled in.
+# occlist is the list of occurrences of that event (e$occurrences)
+# cf is the name of the contextual factor
+
+aggregate_VCF_for_event <- function(o, occList, cf){
+
+  # get the column name for the VCF
+  VCF = paste0("V_",cf)
+
+  # start with the first one so the dimension of the vector is correct
+  aggCF = convert_CF_to_vector(o, cf, unlist(occList)[1])
+
+   print( aggCF)
+
+  # now add the rest, if there are any
+  if (length(unlist(occList)) > 1){
+    for (idx in seq(2,length(unlist(occList)),1)){
+       print( aggCF)
+      aggCF = aggCF + convert_CF_to_vector(o, cf, unlist(occList)[idx])
+    }}
+  return(aggCF)
+}
+
+# this version incorrectly assumes that the VCF is already computed.
+# Might come in handy, but it's not correct...
+# aggregate_VCF_for_event_oops <- function(o, occList, cf){
+#
+#   # get the column name for the VCF
+#   VCF = paste0("V_",cf)
+#
+#   # start with the first one so the dimension of the vector is correct
+#   aggCF = unlist(o[unlist(occList)[1],VCF])
+#
+#    # print( aggCF)
+#
+#   # now add the rest, if there are any
+#    if (length(unlist(occList)) > 1){
+#   for (idx in seq(2,length(unlist(occList)),1)){
+#     # print( aggCF)
+#     aggCF = aggCF+unlist(o[[unlist(occList)[idx],VCF]])
+#   }}
+#   return(aggCF)
+# }
+
+
+# Same basic idea, but works on a set of events within a cluster, rather than a set of occurrences within an event
+# so you get get a subset of rows, convert to a matrix and add them up
+aggregate_VCF_for_cluster <- function(e, cf, zoom_col, z){
+
+  # get the column name for the VCF
+  VCF = paste0("V_",cf)
+
+  # get the subset of events for that cluster  -- just the VCF column
+  s =  e[ which(e[[zoom_col]]==z), VCF]
+
+   # print (s)
+   # print(paste("length(s)",length(s)))
+  if ( is.null(unlist(s) ))
+    return(NULL)
+  else
+    return( colSums( matrix( unlist(s), nrow = length(s), byrow = TRUE) ))
+}
+
 

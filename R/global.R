@@ -11,8 +11,7 @@
 
 library(shiny)
 library(plotly)
-library(tidyr)
-library(tibble)
+library(tidyverse)
 library(ngram)
 library(stringr)
 library(stringdist)
@@ -21,7 +20,7 @@ library(networkD3)
 library(xesreadR)
 library(colorspace)
 library(igraph)
-library(TraMineR)
+library(DT)
 library(RColorBrewer)
 library(lubridate)
 
