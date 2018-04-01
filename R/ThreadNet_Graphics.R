@@ -109,12 +109,10 @@ CF_multi_pie <- function(oc,CF){
 #  Call this for one CF at a time
 # o is the raw occurrences.  This is where we get the labels.
 # e is the events.  This is where we get the frequencies
+# cf is the column name for one CF (e.g., "actor")
+# r is one row (or cluster ID)
+# zm is the zoom column number.
 make_df_for_one_pie <- function(o,e,cf,r,zm){
-
-  # make the vcf column name
-  vcf = paste0("V_",cf)
-
- # zm=paste0("ZM_",cf)
 
   # get the labels from the occurrences (o), get the frequencies from events
   cfdf = data.frame(Freq = aggregate_VCF_for_cluster(e,cf,r,zm), Label= levels(o[[cf]]) )
@@ -123,8 +121,13 @@ make_df_for_one_pie <- function(o,e,cf,r,zm){
 }
 
 
-#
-CF_multi_pie_event <- function(e,CF,r){
+# e = events
+# o = occurrences
+# CF = list of the event_CF
+# zoom level as an integer (so you can grab it from the slider)
+# r = row number or cluster number.  Should be the number on the event
+# z = integer for zoom column
+CF_multi_pie_event <- function(o, e,CF,r, zm){
 
   # avoid unpleasant error messages
   if (length(CF)==0) {return(plotly_empty())}
@@ -133,7 +136,7 @@ CF_multi_pie_event <- function(e,CF,r){
   nPlots = length(CF)
 
   # paste "V_" onto the contextual factor names
-  CF = paste0("V_",CF)
+  # CF = paste0("V_",CF)
 
   ### compute layout information
 
@@ -156,23 +159,18 @@ CF_multi_pie_event <- function(e,CF,r){
   for (i in 1:nPlots) {
 
     # make table information for each plot
-    cfData = data.frame(Freq=as.matrix(unlist(e[r,CF[i]])),Var1= letters[seq( from = 1, to = length(unlist(e[r,CF[i]])) )])
+    # cfData = data.frame(Freq=as.matrix(unlist(e[r,CF[i]])),Var1= letters[seq( from = 1, to = length(unlist(e[r,CF[i]])) )])
+      cfData = make_df_for_one_pie(o,e,CF[i],r,zm)
 
-    # take out rows with zero frequency
+        # take out rows with zero frequency
     cfData = cfData[(cfData[,"Freq"]>0),]
 
     #N levels
     CFlevels = length(cfData[,"Freq"])
 
-    # keep track of max possible combinations
-    max_combos =  max_combos*CFlevels
-
-    #compute entropy for each plot
-    CFentropy =1 # compute_entropy(cfData[,"Freq"])
-
-    # Add the new plots
+  # Add the new plots
     pies = pies  %>%
-      add_pie(data = cfData, labels = ~Var1, values = ~Freq,
+      add_pie(data = cfData, labels = ~Label, values = ~Freq,
               textinfo='label',textposition='none', name=as.character(CF[i]),
               domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
       add_annotations(text=paste0(CF[i],"<br>N=",CFlevels),showarrow=FALSE,xanchor="center",
