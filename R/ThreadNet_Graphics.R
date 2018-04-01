@@ -109,13 +109,15 @@ CF_multi_pie <- function(oc,CF){
 #  Call this for one CF at a time
 # o is the raw occurrences.  This is where we get the labels.
 # e is the events.  This is where we get the frequencies
-make_df_for_one_pie <- function(o,e,cf,r){
+make_df_for_one_pie <- function(o,e,cf,r,zm){
 
   # make the vcf column name
   vcf = paste0("V_",cf)
 
+ # zm=paste0("ZM_",cf)
+
   # get the labels from the occurrences (o), get the frequencies from events
-  cfdf = data.frame(Freq = as.matrix(unlist(e[r,cf])), Label= levels(o[[cf]]) )
+  cfdf = data.frame(Freq = aggregate_VCF_for_cluster(e,cf,r,zm), Label= levels(o[[cf]]) )
 
   return(cfdf)
 }

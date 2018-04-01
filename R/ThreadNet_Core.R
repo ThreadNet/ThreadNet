@@ -576,14 +576,14 @@ aggregate_VCF_for_event <- function(o, occList, cf){
 # e holds the events
 # cf holds a single contextual factor, so you need to call this in a loop
 # zoom_col and z are used to subset the data.  They could actually be anything.
-aggregate_VCF_for_cluster <- function(e, cf, zoom_col, z){
+aggregate_VCF_for_cluster <- function(e, cf, eclust, zoom_col){
 
   # get the column name for the VCF
   VCF = paste0("V_",cf)
 
   # get the subset of events for that cluster  -- just the VCF column
- # s =  e[ which(e[[zoom_col]]==z), VCF]   This version uses the
-  s =  e[ which(as.integer(e[[zoom_col]])==z), VCF]
+ # s =  e[ which(e[[zoom_col]]==eclust), VCF]   This version uses the
+  s =  e[ which(as.integer(e[[zoom_col]])==eclust), VCF]
 
    # print (s)
    # print(paste("length(s)",length(s)))
