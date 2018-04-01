@@ -94,6 +94,101 @@ CF_multi_pie <- function(oc,CF){
   return(pies)
 }
 
+####################################################
+# use the same general layout, but just for one event
+# need to pass in the levels for each CF to use as the column names
+# e is a data.frame with events (created by OccToEvents1 or OccToEvents2)
+# CF = list of context factor names used to define events
+# r is the row name for the event being examined
+#
+# KNOWN ISSUES:
+#  * Need to pass in the factor levels as labels for the pie slices
+#  * Need to compute the values differently for a node in the dendrogram or in a zoomed graph
+#  * Probably need to pass in the vector of values
+#
+#  Do this for one CF at a time
+# o is the raw occurrences.  This is where we get the labels.
+# e is the events.  This is where we get the frequencies
+make_df_for_one_pie <- function(o,e,cf,r){
+
+  # make the vcf column name
+  vcf = paste0("V_",cf)
+
+  # get the labels from the occurrences (o), get the frequencies from events
+  cfdf = data.frame(Freq = as.matrix(unlist(e[r,cf])), Label= levels(o[[cf]]) )
+
+  return(cfdf)
+}
+
+
+#
+CF_multi_pie_event <- function(e,CF,r){
+
+  # avoid unpleasant error messages
+  if (length(CF)==0) {return(plotly_empty())}
+
+  # get number of plots
+  nPlots = length(CF)
+
+  # paste "V_" onto the contextual factor names
+  CF = paste0("V_",CF)
+
+  ### compute layout information
+
+  # compute the offset = half the width of each plot
+  offset = 1/(2*nPlots)
+
+  # Locate the centers for the plots -- this is where the annotations will go
+  ctrPlot = (0:(nPlots-1))/nPlots + offset
+
+  # locate upper and lower bounds on the domains of the plots (LB & UB)
+  plotDomainLB = ctrPlot - offset
+  plotDomainUB = ctrPlot + offset
+
+  n=length
+
+  # Now loop for each CF, computing entropy and adding on the next "trace" to the plot
+  # start with blank plot object
+  pies = plot_ly()
+  max_combos = 1
+  for (i in 1:nPlots) {
+
+    # make table information for each plot, including the combined one
+    cfData = data.frame(Freq=as.matrix(unlist(e[r,CF[i]])),Var1= letters[seq( from = 1, to = length(unlist(e[r,CF[i]])) )])
+
+    # take out rows with zero frequency
+    cfData = cfData[(cfData[,"Freq"]>0),]
+
+    #N levels
+    CFlevels = length(cfData[,"Freq"])
+
+    # keep track of max possible combinations
+    max_combos =  max_combos*CFlevels
+
+    #compute entropy for each plot
+    CFentropy =1 # compute_entropy(cfData[,"Freq"])
+
+    # Add the new plots
+    pies = pies  %>%
+      add_pie(data = cfData, labels = ~Var1, values = ~Freq,
+              textinfo='label',textposition='none', name=as.character(CF[i]),
+              domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
+      add_annotations(text=paste0(CF[i],"<br>N=",CFlevels),showarrow=FALSE,xanchor="center",
+                      font=list(size="14",color="white"),
+                      xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+  }
+
+  pies = pies %>%
+    layout(showlegend=FALSE,
+           xaxis = list(showgrid = FALSE,zeroline = FALSE, showticklabels = FALSE),
+           yaxis = list(showgrid = FALSE, zeroline = FALSE,showticklabels = FALSE)
+           # ,
+           # autosize = F, width = "100%", height = "100px")
+    )
+  return(pies)
+}
+
+
 ######################################################################
 # ThreadMap shows the threads in a horizongal layout
 #' Shows threads in a horizontal layout
