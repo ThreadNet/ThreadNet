@@ -569,6 +569,9 @@ aggregate_VCF_for_event <- function(o, occList, cf){
 
 # Same basic idea, but works on a set of events within a cluster, rather than a set of occurrences within an event
 # so you get get a subset of rows, convert to a matrix and add them up
+# e holds the events
+# cf holds a single contextual factor, so you need to call this in a loop
+# zoom_col and z are used to subset the data.  They could actually be anything.
 aggregate_VCF_for_cluster <- function(e, cf, zoom_col, z){
 
   # get the column name for the VCF

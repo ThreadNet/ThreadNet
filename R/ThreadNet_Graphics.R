@@ -106,7 +106,7 @@ CF_multi_pie <- function(oc,CF){
 #  * Need to compute the values differently for a node in the dendrogram or in a zoomed graph
 #  * Probably need to pass in the vector of values
 #
-#  Do this for one CF at a time
+#  Call this for one CF at a time
 # o is the raw occurrences.  This is where we get the labels.
 # e is the events.  This is where we get the frequencies
 make_df_for_one_pie <- function(o,e,cf,r){
@@ -153,7 +153,7 @@ CF_multi_pie_event <- function(e,CF,r){
   max_combos = 1
   for (i in 1:nPlots) {
 
-    # make table information for each plot, including the combined one
+    # make table information for each plot
     cfData = data.frame(Freq=as.matrix(unlist(e[r,CF[i]])),Var1= letters[seq( from = 1, to = length(unlist(e[r,CF[i]])) )])
 
     # take out rows with zero frequency
