@@ -517,14 +517,18 @@ convert_CF_to_vector <- function(o,CF,r){
 }
 
 
-# take a list of events and aggregate the VCF (CF vector) for that CF
+# Aggregate the VCF (CF vector) for that CF
 # There are two layers to this.
-# 1) Within an single event, aggregate the VCF for the occurrences that make up that event
-# 2) Within a cluster level, aggregate the events at that cluster level (e.g., ZM_n)
+# 1) aggregate_VCF_for_event
+#   Within an single event, aggregate the VCF for the occurrences that make up that event.
+#   This function will only get used when creating from the fuctions that convert occurrences to events
+# 2) aggregate_VCF_for_cluster
+#   For a cluster level, aggregate the events at that cluster level (e.g., ZM_n)
+#   This function will work on any event, even the one_to_one mapping.
 #
-# o is a dataframe of occurrences with the V_ filled in.
+# o is a dataframe of occurrences.  The values of V_ (the VCF) does not have to be filled in.  It gets re-computed here for each occurrence.
 # occlist is the list of occurrences of that event (e$occurrences)
-# cf is the name of the contextual factor
+# cf is the name of the contextual factor to create the VCF
 
 aggregate_VCF_for_event <- function(o, occList, cf){
 
@@ -578,7 +582,8 @@ aggregate_VCF_for_cluster <- function(e, cf, zoom_col, z){
   VCF = paste0("V_",cf)
 
   # get the subset of events for that cluster  -- just the VCF column
-  s =  e[ which(e[[zoom_col]]==z), VCF]
+ # s =  e[ which(e[[zoom_col]]==z), VCF]   This version uses the
+  s =  e[ which(as.integer(e[[zoom_col]])==z), VCF]
 
    # print (s)
    # print(paste("length(s)",length(s)))
