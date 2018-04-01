@@ -153,12 +153,15 @@ ui <- fluidPage(
                                 uiOutput("Moving_Window_Tab_Controls_2"))
                        ),
                        uiOutput("Moving_Window_Tab_Controls_3"),
-                       uiOutput("Moving_Window_Tab_Controls_4"),
+
+
                        fluidRow(
                          column(6,"SubsetA",
+                                uiOutput("Moving_Window_Tab_Controls_4_A"),
                                 plotlyOutput("MovingWindow_Plot_A")
                          ),
                          column(6,"SubsetB",
+                                uiOutput("Moving_Window_Tab_Controls_4_B"),
                                 plotlyOutput("MovingWindow_Plot_B")
                          )
                        )

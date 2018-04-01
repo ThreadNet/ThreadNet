@@ -529,11 +529,15 @@ output$Visualize_Tab_Controls_1 = renderUI({
   })
 
   output$Moving_Window_Tab_Controls_3 <- renderUI({
-    sliderInput("MovingWindowSizeID","Window Size", 1,20,1,step=1,ticks=FALSE )
+    sliderInput("MovingWindowSizeID","Window Size", 1, numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
-  output$Moving_Window_Tab_Controls_4 <- renderUI({
-    sliderInput("WindowLocationID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
+  output$Moving_Window_Tab_Controls_4_A <- renderUI({
+    sliderInput("WindowLocation_A_ID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
+  })
+
+  output$Moving_Window_Tab_Controls_4_B <- renderUI({
+    sliderInput("WindowLocation_B_ID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
   # "Timesplit" appears to be used for the custom network plotly layout
@@ -548,12 +552,12 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
 
    output$MovingWindow_Plot_A <- renderPlotly({
-     w = get_moving_window(threadedEventsMove(), -input$MovingWindowSizeID, input$WindowLocationID )
+     w = get_moving_window(threadedEventsMove(), input$MovingWindowSizeID, input$WindowLocation_A_ID )
      threadMap(w, "threadNum", "seqNum", get_Zoom_MOVE(), 15  )
    })
 
    output$MovingWindow_Plot_B <- renderPlotly({
-     w = get_moving_window(threadedEventsMove(), input$MovingWindowSizeID, input$WindowLocationID )
+     w = get_moving_window(threadedEventsMove(), input$MovingWindowSizeID, input$WindowLocation_B_ID )
      threadMap(w, "threadNum", "seqNum", get_Zoom_MOVE(), 15  )
    })
 
