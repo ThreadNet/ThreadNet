@@ -74,8 +74,9 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Cluster Events",
-                                            uiOutput("Cluster_Event_controls"),
-                                            plotlyOutput("clusterResult")
+                                            uiOutput("Cluster_Event_controls_1"),
+                                            uiOutput("Cluster_Event_controls_2"),
+                                            dendroNetworkOutput("dendroClusterResult")
                                    ),
 
                                    tabPanel("Manage Event Maps",

@@ -255,28 +255,33 @@ server <- shinyServer(function(input, output, session) {
 
           })
 
-          output$Cluster_Event_controls = renderUI({
+          output$Cluster_Event_controls_1 = renderUI({
             tags$div(align="left",
                      tags$h4("Cluster Events: Group similar events to together to allow zooming"),
 
-                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ),
+                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ))
+          })
+            output$Cluster_Event_controls_2 = renderUI({
+              tags$div(align="left",
+                     textInput("EventMapName6", label = h4("Enter new label for this mapping + clustering"), value =""),
 
                      radioButtons("ClusterMethodID", "Cluster based on:",
-                                  choices = c("Sequential similarity", "Contextual Similarity (NIY)", "Network Structure (NIY)"),
+                                  choices = c("Sequential similarity", "Contextual Similarity", "Network Structure"),
                                   selected="Sequential similarity", inline=TRUE),
 
                      actionButton("EventButton6", "Cluster Events")  )
-
           })
 
 
-          output$clusterResult <- renderDendroNetwork({
-            input$EventButton6
-            dendroNetwork(clusterEvents( get_event_mapping_threads( GlobalEventMappings,
+          output$dendroClusterResult <- renderDendroNetwork({
+             input$EventButton6
+            isolate( dendroNetwork(clusterEvents( get_event_mapping_threads( GlobalEventMappings,
                                                                     input$ClusterEventsInputID),
-                                         ClusterEventsInputID,
-                                         input$ClusterMethodID ),
-                          treeOrientation = "vertical", textColour = "black")
+                                         input$ClusterEventsInputID,
+                                         input$EventMapName6,
+                                         input$ClusterMethodID,
+                                         get_EVENT_CF()),
+                          treeOrientation = "vertical", textColour = "black"))
           })
 
 
@@ -313,10 +318,10 @@ server <- shinyServer(function(input, output, session) {
               threadedEvents2()
             }, filter = "top")
 
-            output$Event_Tab_Output_4  = renderDendroNetwork({
-              #plot(threadedCluster())
-              dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
-            })
+            # output$Event_Tab_Output_4  = renderDendroNetwork({
+            #   #plot(threadedCluster())
+            #   dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
+            # })
 
             output$dendro_test = renderPlot({
               plot(threadedCluster())

@@ -298,15 +298,18 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
     # just add the one column with the combined values
     e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
 
-    # Add the mapping to the global list of mappings.  No loneger storing the cluster solution here.
-    map = list(name = paste(EventMapName), threads = e)
+    # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
+    # map = list(name = paste(EventMapName), threads = e)
+    #
+    # GlobalEventMappings <<- append(list(map), GlobalEventMappings )
 
-    GlobalEventMappings <<- append(list(map), GlobalEventMappings )
+    # store the event map in the GlobalEventMappings
+    eventMap = store_event_mapping(EventMapName, e)
 
-    print( get_event_mapping_names( GlobalEventMappings ) )
-    save(GlobalEventMappings, file="eventMappings.RData")
+    # print( get_event_mapping_names( GlobalEventMappings ) )
+    # save(GlobalEventMappings, file="eventMappings.RData")
 
-    return(map)
+    return(eventMap)
 
 }
 
@@ -415,31 +418,41 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
 
       } # for cluster_level
 
-
-
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E.rdata")
 
-  # Add the mapping to the global list of mappings
-  map = list(name = paste(EventMapName), threads = e)
+  # store the event map in the GlobalEventMappings
+  eventMap = store_event_mapping(EventMapName, e)
 
-  GlobalEventMappings <<- append(list(map), GlobalEventMappings )
-
-  print( get_event_mapping_names( GlobalEventMappings ) )
-  save(GlobalEventMappings, file="eventMappings.RData")
+ # print( get_event_mapping_names( GlobalEventMappings ) )
+ # save(GlobalEventMappings, file="eventMappings.RData")
 
   #  need return the threads and also the cluster solution for display
-  return(map)
+  return(eventMap)
 }
 
 # new function for new tab
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
 # cluster_method is either "Sequential similarity" or "Contextual Similarity"
-clusterEvents <- function(e, EventMapName, cluster_method){
+clusterEvents <- function(e, EventMapName, NewMapName, cluster_method, event_CF){
+
+  # only run if something is filled in
+  if (is.null(NewMapName) | NewMapName=="") return(NULL)
+
+  if (cluster_method=="Sequential similarity")
+    { dd = dist_matrix_seq(e) }
+  else if (cluster_method=="Contextual Similarity")
+    { dd = dist_matrix_context(e,event_CF) }
+  else if (cluster_method=="Network Structure")
+    { dd = dist_matrix_network(e) }
 
   ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
-  clust = hclust( dist_matrix(e),  method="ward.D2" )
+  clust = hclust( dd,  method="ward.D2" )
+
+  ######## need to delete the old ZM_ columns and append the new ones.  ###########
+  e[grep("ZM_",colnames(e))]<-NULL
+
 
   # number of chunks is the number of rows (the number of events to be clustered)
   nChunks = nrow(e)
@@ -455,14 +468,18 @@ clusterEvents <- function(e, EventMapName, cluster_method){
 
   } # for cluster_level
 
-  # now append this onto the global mapping
+  # append this onto the events to allow zooming
+  newmap=cbind(e, zm)
 
+  # store the event map in the GlobalEventMappings
+   eventMap = store_event_mapping( NewMapName, newmap )
 
+   # return the cluster solution for display
   return(clust)
 }
 
 # this function pulls computes their similarity of chunks based on sequence
-dist_matrix <- function(e){
+dist_matrix_seq <- function(e){
 
   nChunks = nrow(e)
   evector=vector(mode="list", length = nChunks)
@@ -471,6 +488,32 @@ dist_matrix <- function(e){
   }
   return( stringdistmatrix( evector, method="osa") )
 }
+
+# this function pulls computes their similarity of chunks based on context
+# e = events, with V_columns
+# CF = event CFs
+# w = weights (0-1)
+#
+dist_matrix_context <- function( e, CF ){
+
+  nChunks = nrow(e)
+  evector= VCF_matrix( e, paste0( "V_",CF ))
+
+  return( dist( evector, method="euclidean") )
+}
+
+# this function pulls computes their similarity of chunks based on network
+dist_matrix_network <- function(e){
+
+  nChunks = nrow(e)
+  evector=vector(mode="list", length = nChunks)
+  for (i in 1:nChunks){
+    evector[i]=unique(as.integer(unlist(e$occurrences[[i]])))
+  }
+  return( stringdistmatrix( evector, method="osa") )
+}
+
+
 
 net_adj_matrix <- function(edges){
 
@@ -571,6 +614,7 @@ aggregate_VCF_for_event <- function(o, occList, cf){
 # }
 
 
+
 # Same basic idea, but works on a set of events within a cluster, rather than a set of occurrences within an event
 # so you get get a subset of rows, convert to a matrix and add them up
 # e holds the events
@@ -580,6 +624,8 @@ aggregate_VCF_for_cluster <- function(e, cf, eclust, zoom_col){
 
   # get the column name for the VCF
   VCF = paste0("V_",cf)
+
+  # get the matrix for each
 
   # get the subset of events for that cluster  -- just the VCF column
  # s =  e[ which(e[[zoom_col]]==eclust), VCF]   This version uses the
@@ -593,4 +639,22 @@ aggregate_VCF_for_cluster <- function(e, cf, eclust, zoom_col){
     return( colSums( matrix( unlist(s), nrow = length(s), byrow = TRUE) ))
 }
 
+
+
+# this one takes the whole list
+VCF_matrix <- function(e, vcf ){
+
+  m = one_vcf_matrix(e, vcf[1] )
+
+  if (length(vcf)>1){
+      for (idx in seq(2,length(vcf),1)){
+         m = cbind( m, one_vcf_matrix(e, vcf[idx] ) )
+      }}
+  return(m)
+}
+
+# this one takes a single column as an argument
+one_vcf_matrix <- function(e, vcf){
+  return(  matrix( unlist( e[[vcf]] ), nrow = length( e[[vcf]] ), byrow = TRUE)  )
+}
 

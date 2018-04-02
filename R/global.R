@@ -32,5 +32,7 @@ source("ThreadNet_Graphics.R")
 source("ThreadNet_Metrics.R")
 
 # Global variables, config settings, etc. can be defined here
+
+# This is where we store the list of event mappings.  Reactive bindings are added in server.R
 GlobalEventMappings <<-list()
-GlobalEventClusters <<-list()
+
