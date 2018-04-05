@@ -201,9 +201,21 @@ server <- shinyServer(function(input, output, session) {
              tags$h4("One-to-One: Each occurrence in the raw data is interpreted as an event (INPUT = Occurrences)."),
              tags$p(" "),
              textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
-             actionButton("EventButton1", "Create New Mapping")  )
+             actionButton("EventButton1", "Create New Mapping"),
+             hr(),
+             radioButtons("One_to_One_Output_Button", label = h4("Display results:"),
+                          choices = c("None", "Data table (display only)", "Thread Map"),
+                          inline=TRUE)
+             )
 
   })
+  output$One_to_one_Tab_Output_1  = DT::renderDataTable({
+    threadedEvents()
+  }, filter = "top")
+
+  output$One_to_one_Tab_Output_2  = renderPlotly({
+    threadMap(threadedEvents(), "threadNum", "seqNum", 'ZM_1', 15  ) })
+
 
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
@@ -212,9 +224,19 @@ server <- shinyServer(function(input, output, session) {
 
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks_"),
 
-               actionButton("EventButton2", "Create New Mapping")  )
-
+               actionButton("EventButton2", "Create New Mapping"),
+               hr(),
+               radioButtons("Chunks_Output_Button", label = h4("Display results:"),
+                            choices = c("None", "Data table (display only)", "Thread Map"),
+                            inline=TRUE))
     })
+
+    output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
+      threadedEvents2()
+    }, filter = "top")
+
+    output$Contextual_Chunks_Tab_Output_2  = renderPlotly({
+      threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
 
       output$Regular_Expression_controls = renderUI({
         tags$div(align="left",
@@ -310,13 +332,7 @@ server <- shinyServer(function(input, output, session) {
             })
 
 
-            output$One_to_one_Tab_Output_1  = DT::renderDataTable({
-              threadedEvents()
-            }, filter = "top")
 
-            output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
-              threadedEvents2()
-            }, filter = "top")
 
             # output$Event_Tab_Output_4  = renderDendroNetwork({
             #   #plot(threadedCluster())

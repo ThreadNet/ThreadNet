@@ -408,7 +408,7 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
   }
 
   ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
-  clust = hclust( dist_matrix(e),  method="ward.D2" )
+  clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
 
   ## Create a new column for each cluster solution -- would be faster with data.table
   for (cluster_level in 1:nChunks){

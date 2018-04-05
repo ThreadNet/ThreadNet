@@ -42,7 +42,7 @@ ui <- fluidPage(
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
                                             plotlyOutput("rawOccurrenceThreadMap_2")
                                    ),
-
+                                   # Maybe take this out -- it's confusing
                                    tabPanel("Intermediate Data",
                                             tags$h4("This table shows the data threaded from your chosen POV"),
                                             DT::dataTableOutput("Thread_Tab_Output_1")
@@ -54,11 +54,23 @@ ui <- fluidPage(
                        tabsetPanel(type = "tabs",
                                    tabPanel("One-to-One",
                                             uiOutput("One_to_One_controls"),
-                                            DT::dataTableOutput("One_to_one_Tab_Output_1")
+                                            conditionalPanel(
+                                              condition = "input.One_to_One_Output_Button == 'Data table (display only)'",
+                                                          DT::dataTableOutput("One_to_one_Tab_Output_1")),
+                                            conditionalPanel(
+                                              condition = "input.One_to_One_Output_Button == 'Thread Map'",
+                                                          plotlyOutput("One_to_one_Tab_Output_2"))
+
                                    ),
                                    tabPanel("Contextual Chunks",
                                             uiOutput("Contextual_Chunk_controls"),
-                                            DT::dataTableOutput("Contextual_Chunks_Tab_Output_1")
+                                            conditionalPanel(
+                                              condition = "input.Chunks_Output_Button == 'Data table (display only)'",
+                                              DT::dataTableOutput("Contextual_Chunks_Tab_Output_1") ),
+                                            conditionalPanel(
+                                              condition = "input.Chunks_Output_Button == 'Thread Map'",
+                                              plotlyOutput("Contextual_Chunks_Tab_Output_2"))
+
                                    ),
 
                                    tabPanel("Regular Expressions",

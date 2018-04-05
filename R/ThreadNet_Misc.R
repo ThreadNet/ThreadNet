@@ -590,3 +590,19 @@ rr_grams <- function(o,TN, CF, N, R) {
 
 
 }
+
+# Ideas for regex work
+# https://stackoverflow.com/questions/35704369/identify-repetitive-pattern-in-numeric-vector-in-r-with-fuzzy-search
+
+# sapply(1:(length(x)/2), function(m) sum(rep(x[1:m], length = length(x)) != x))
+
+# x <- rep(c(1, 4, 2), 10)
+# for(k in seq_len(length(x)/2)) {
+#   pat <- x[1:k]
+#   if (identical(rep(pat, length = length(x)), x)) {
+#     print(pat)
+#     break
+#   }
+# }
+## [1] 1 4 2
+
