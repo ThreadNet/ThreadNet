@@ -40,7 +40,7 @@ ui <- fluidPage(
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
-                                            plotlyOutput("rawOccurrenceThreadMap_2")
+                                            plotlyOutput("previewThreadMap")
                                    ),
                                    # Maybe take this out -- it's confusing
                                    tabPanel("Intermediate Data",
@@ -74,16 +74,24 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Regular Expressions",
-                                            uiOutput("Regular_Expression_controls")
+                                            fluidRow(
+                                              column(3, uiOutput("Regular_Expression_controls_1")),
+                                              column(4, uiOutput("Regular_Expression_controls_2"))
+                                              ),
+                                            uiOutput("Regular_Expression_controls_3"),
+                                            verbatimTextOutput("Regular_Expression_controls_4"),
+                                            uiOutput("Regular_Expression_controls_5"),  # how many regex?
+                                            uiOutput("Regular_Expression_controls_6"),
+                                            uiOutput("Regular_Expression_controls_7")
                                    ),
 
                                    tabPanel("Frequent Ngrams",
                                             uiOutput("Frequent_Ngram_controls")
                                    ),
 
-                                   tabPanel("Maximal Patterns",
-                                            uiOutput("Maximal_Pattern_controls")
-                                   ),
+                                   # tabPanel("Maximal Patterns",
+                                   #          uiOutput("Maximal_Pattern_controls")
+                                   # ),
 
                                    tabPanel("Cluster Events",
                                             uiOutput("Cluster_Event_controls_1"),
@@ -107,6 +115,11 @@ ui <- fluidPage(
                        ),
 
                        tabsetPanel(type = "tabs",
+                          tabPanel("Select Subset",
+                                            uiOutput("SelectSubsetControls"),
+                                            DT::dataTableOutput("SelectSubsetDataTable")
+                                   ),
+
                           tabPanel("Repetitive Sub-sequences",
                                   uiOutput("nGramControls"),
                                   plotlyOutput("nGramBarchart")

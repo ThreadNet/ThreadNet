@@ -19,56 +19,6 @@ server <- shinyServer(function(input, output, session) {
      observe( makeReactiveBinding("GlobalEventClusters", env=.GlobalEnv) )
 
 
-  ###  Some basic functions that are used to structure the data as it moves through the pipeline
-
-  # make dataframe of occurrences that depends only file1
-  occ <- eventReactive(input$file1,read_occurrences(input$file1))
-
-
-  #selected columns from the raw data, and the subset of the table
-  selectOcc = reactive(occ()[c("tStamp", input$CFcolumnsID)] )
-
-  selectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
-
-  # # recode the occurrences for the thresholds...
-  # filterOcc = reactive({recodeThreshold(selectOcc(),get_CF(), cfthresh())})
-  #
-  # Sort and add columns for threadNum and seqNum for the selected POV
-  threadedOcc = reactive({
-    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
-
-
-  ######  From here on down, we are working with events, not occurrences   #######
-  threadedEventCluster <- reactive({
-    input$EventButton1
-    isolate(OccToEvents1(threadedOcc(),
-                        input$EventMapName1,
-                        get_EVENT_CF(),
-                        get_COMPARISON_CF()
-                        ) )})
-
-  # These go on the occ to event page.They suppress some columns
-  threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
- # threadedCluster <- reactive({threadedEventCluster()[["cluster"]]})
-
-  # this is for the chunks
-  threadedEventCluster2 <- reactive({
-    input$EventButton2
-    isolate(OccToEvents2(threadedOcc(),
-                         input$EventMapName2,
-                         get_EVENT_CF(),
-                         get_COMPARISON_CF()
-    ) )})
-
-  # These go on the occ to event page
-  threadedEvents2 <- reactive({make_nice_event_DT(threadedEventCluster2()[["threads"]])})
- # threadedCluster2 <- reactive({threadedEventCluster2()[["cluster"]]})
-
-
-
-
-
-
   ##################################################
   # capture reactive values from the UI that are needed elsewhere
   # note the "<<-" assignment, which gives the function global scope
@@ -86,13 +36,12 @@ server <- shinyServer(function(input, output, session) {
   get_COMPARISON_CF <<- reactive({ return(setdiff(get_CF(), union(get_THREAD_CF(),get_EVENT_CF() ))) })
 
 
-  # get an environment here for storing/retriving the information about the events...
-  get_ENV <<- reactive({ return(input$EventMapName) })
-
   # time scale for use throughout the app
   get_timeScale <<- reactive({ return(input$timeScaleID) })
 
+
   # These sliders controls the zoom level for zooming in-out
+  # they are grouoped here because hopefully they can be replaced by a single function... except that reactive functions don't take parameters
   get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
 
@@ -108,8 +57,13 @@ server <- shinyServer(function(input, output, session) {
   get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
+  get_Zoom_REGEX <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID))==1 ,
+                                               "ZM_1", paste0("ZM_",input$regexZoomID))) })
 
-  ################## 1.READ DATA TAB ####################
+
+  #################################################################
+  ################## 1.READ DATA TAB ##############################
+  #################################################################
 
   output$Data_Tab_Controls_1 =  renderUI({
     tags$div(align="center",
@@ -118,10 +72,8 @@ server <- shinyServer(function(input, output, session) {
                        accept = c(
                          "text/csv",
                          "text/comma-separated-values,text/plain",
-                         ".csv"))
-    )
+                        ".csv")) )
   })
-
 
   output$Data_Tab_Controls_2 =  renderUI({
     checkboxGroupInput("CFcolumnsID","Select columns to include in analysis:",
@@ -131,33 +83,69 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$Data_Tab_Output_2  = DT::renderDataTable({
-    selectOcc()
-  }, filter = "top")
+                      selectOcc() }, filter = "top")
+
+  #  dataframe for occurrences that are read in from file1
+  occ <- eventReactive(input$file1,read_occurrences(input$file1))
+
+  # selected columns from the raw data
+  selectOcc = reactive(occ()[c("tStamp", input$CFcolumnsID)] )
+
+  # select rows using the nice DT input
+  selectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
 
 
+  #################################################################
   ##################### 2.POV  tab ################################
+  #################################################################
+
+  # The POV tabs reconstruct the data into threads by sorting by tStamp and
+  # adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
+
+  threadedOcc = reactive({
+    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
 
 
-  # this paints the nice pie charts including the COMBINED column
+  ########  define threads tab  ###############
+  output$POV_Tab_Controls_2 <- renderUI({
+    checkboxGroupInput("THREAD_CF_ID","Select columns to define threads:",
+                       cfnames(selectOccFilter()),
+                       selected =  get_THREAD_CF(),
+                       inline=TRUE)
+  })
 
   output$ContextFlowers_2 = renderPlotly({
     CF_multi_pie(selectOccFilter(), get_THREAD_CF()  )
+  })
+
+  ########  define events tab  ###############
+
+  output$POV_Tab_Controls_3 <- renderUI({
+    checkboxGroupInput("EVENT_CF_ID","Select columns to mark events:",
+                       cfnames(selectOccFilter()),
+                       selected =  get_EVENT_CF(),
+                       inline=TRUE)
   })
 
   output$ContextFlowers_3 = renderPlotly({
     CF_multi_pie(selectOccFilter(), get_EVENT_CF()  )
   })
 
-  output$rawOccurrenceThreadMap <- renderPlotly({
-    threadMap(threadedOcc(), "POVthreadNum", "POVseqNum", newColName(get_EVENT_CF()), 15  )
-  })
+  ########  preview threads tab  ###############
 
-  output$rawOccurrenceThreadMap_2 <- renderPlotly({
+  # need to provide ability to toggle between views - just use tStamp for now
+  # could use conditional panel on the UI side? If so, the data table view could be included in the radio button
+
+  output$previewThreadMap <- renderPlotly({
     threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
   })
 
+  # output$previewThreadMap <- renderPlotly({
+  #   threadMap(threadedOcc(), "POVthreadNum", "POVseqNum", newColName(get_EVENT_CF()), 15  )
+  # })
 
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
+
 
   output$Preview_Network_Tab_Controls_0 <- renderUI({
     radioButtons("Timesplit", "Time Measure:", choices = c('POVseqNum','timeGap'), selected="POVseqNum", inline=TRUE)
@@ -170,31 +158,21 @@ server <- shinyServer(function(input, output, session) {
 
   output$Thread_Tab_Output_1  = DT::renderDataTable({ threadedOcc()  })
 
-  # need to create unique ID for each radiobutton based on the CF name
-  output$POV_Tab_Controls_1 <- renderUI({
-    checkboxGroupInput("COMPARISON_CF_ID","Select columns for comparison:",
-                       cfnames(selectOccFilter()),
-                       selected =  get_COMPARISON_CF(),
-                       inline=TRUE)
-  })
-
-  output$POV_Tab_Controls_2 <- renderUI({
-    checkboxGroupInput("THREAD_CF_ID","Select columns to define threads:",
-                       cfnames(selectOccFilter()),
-                       selected =  get_THREAD_CF(),
-                       inline=TRUE)
-  })
-
-  output$POV_Tab_Controls_3 <- renderUI({
-    checkboxGroupInput("EVENT_CF_ID","Select columns to mark events:",
-                       cfnames(selectOccFilter()),
-                       selected =  get_EVENT_CF(),
-                       inline=TRUE)
-  })
+  ########  Comparison  tab  ############### -- not used for now
+  # output$POV_Tab_Controls_1 <- renderUI({
+  #   checkboxGroupInput("COMPARISON_CF_ID","Select columns for comparison:",
+  #                      cfnames(selectOccFilter()),
+  #                      selected =  get_COMPARISON_CF(),
+  #                      inline=TRUE)
+  # })
 
 
 
+  ##########################################################################
   ##################### 3.OCC to EVENT  tab ################################
+  ##########################################################################
+
+  ########  one to one tab  ###############
 
   output$One_to_One_controls  = renderUI({
     tags$div(align="left",
@@ -209,6 +187,19 @@ server <- shinyServer(function(input, output, session) {
              )
 
   })
+
+  # this function runs when you push the button to create a new mapping
+  threadedEventCluster <- reactive({
+    input$EventButton1
+    isolate(OccToEvents1(threadedOcc(),
+                         input$EventMapName1,
+                         get_EVENT_CF(),
+                         get_COMPARISON_CF()
+    ) )})
+
+  # Need to suppress some columns that contain lists that do not display correctly in the DT
+  threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
+
   output$One_to_one_Tab_Output_1  = DT::renderDataTable({
     threadedEvents()
   }, filter = "top")
@@ -216,6 +207,7 @@ server <- shinyServer(function(input, output, session) {
   output$One_to_one_Tab_Output_2  = renderPlotly({
     threadMap(threadedEvents(), "threadNum", "seqNum", 'ZM_1', 15  ) })
 
+  ########  contextual chunk tab  ###############
 
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
@@ -231,6 +223,20 @@ server <- shinyServer(function(input, output, session) {
                             inline=TRUE))
     })
 
+  # this function runs when you push the button to create a new mapping
+  # this is for the chunks
+  threadedEventCluster2 <- reactive({
+    input$EventButton2
+    isolate(OccToEvents2(threadedOcc(),
+                         input$EventMapName2,
+                         get_EVENT_CF(),
+                         get_COMPARISON_CF()
+    ) )})
+
+  # Need to suppress some columns that contain lists that do not display correctly in the DT
+  threadedEvents2 <- reactive({make_nice_event_DT(threadedEventCluster2()[["threads"]])})
+
+
     output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
       threadedEvents2()
     }, filter = "top")
@@ -238,12 +244,43 @@ server <- shinyServer(function(input, output, session) {
     output$Contextual_Chunks_Tab_Output_2  = renderPlotly({
       threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
 
-      output$Regular_Expression_controls = renderUI({
+    ########  regular expression tab  ###############
+
+      output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
-                 tags$h4("Regular Expressions: Use regular expressions to form events -- Not implemented yet"),
-                 tags$p(" "),
-                 selectizeInput("RegExInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ),
-                 tags$p(" "),
+                 tags$h4("Regular Expressions: Use regular expressions to form events"),
+                 selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ))
+      })
+
+      # get the mapping for this tab
+    regexInput <- reactive( get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID) )
+
+    output$Regular_Expression_controls_2 <- renderUI({
+      zoom_limit = zoom_upper_limit(regexInput())
+      if (zoom_limit == 1)
+      {tags$h4("Zooming not available with this mapping")}
+      else
+      {sliderInput("regexZoomID",
+                   label=h4("Zoom in and out by event similarity:"),
+                   1,zoom_limit,1, step = 1, ticks=FALSE) }
+    })
+
+    output$Regular_Expression_controls_3 <- renderUI({ maxrows=length(unique(regexInput()[['threadNum']]))
+                                                        sliderInput("regexVerbatimRows",
+                                                          label=h4("How many rows of threads to view:"),
+                                                          min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
+    })
+
+    # output$Regular_Expression_controls_4 =   renderText( paste(thread_text_vector(regexInput()[unlist(input$regexVerbatimRows[1]):unlist(input$regexVerbatimRows[2]),],'threadNum',get_Zoom_REGEX() ), ' \n ' )  )
+
+    output$Regular_Expression_controls_4 =   renderText( paste(thread_text_vector(regexInput(),'threadNum',get_Zoom_REGEX() ), ' \n ' )  )
+
+          # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
+      #                                                          paste(thread_text_vector(threadedEvents2(),'threadNum','ZM_20'), ' ** ' )) ))
+
+
+      output$Regular_Expression_controls_6 = renderUI({
+        tags$div(align="left",
                  textInput("RegExForEvents", label = h4("Enter regular expression(s)"), value = ""),
                  tags$p(" "),
 
@@ -253,6 +290,7 @@ server <- shinyServer(function(input, output, session) {
 
       })
 
+      ########  Frequent n-gram tab  ###############
         output$Frequent_Ngram_controls = renderUI({
           tags$div(align="left",
                    tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
@@ -265,17 +303,21 @@ server <- shinyServer(function(input, output, session) {
 
         })
 
-          output$Maximal_Pattern_controls = renderUI({
-            tags$div(align="left",
-                     tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
+      ########  maximal pattern tab  ###############
 
-                     selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
+          # output$Maximal_Pattern_controls = renderUI({
+          #   tags$div(align="left",
+          #            tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
+          #
+          #            selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
+          #
+          #            textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal_"),
+          #
+          #            actionButton("EventButton5", "Create New Mapping")  )
+          #
+          # })
 
-                     textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal_"),
-
-                     actionButton("EventButton5", "Create New Mapping")  )
-
-          })
+      ########  clustering tab  ###############
 
           output$Cluster_Event_controls_1 = renderUI({
             tags$div(align="left",
@@ -306,6 +348,7 @@ server <- shinyServer(function(input, output, session) {
                           treeOrientation = "vertical", textColour = "black"))
           })
 
+          ######## manage event mappings tab  ###############
 
             output$Manage_Event_Map_controls= renderUI({
               tags$div(align="left",
@@ -332,37 +375,14 @@ server <- shinyServer(function(input, output, session) {
             })
 
 
-
-
-            # output$Event_Tab_Output_4  = renderDendroNetwork({
-            #   #plot(threadedCluster())
-            #   dendroNetwork(threadedCluster(), treeOrientation = "vertical", textColour = "black")
-            # })
-
-            output$dendro_test = renderPlot({
-              plot(threadedCluster())
-            })
-
-
-  #
-  # # show the bar chart
-  # output$threadGapBarchart <- renderPlotly({
-  #   threadGapBarchart(threadedOcc(),input$Event_method_ID)
-  # })
-
-  # output$Event_Tab_Output_3  = renderPlot({ if (is.null(threadedCluster())) {plot(table(threadedEvents()["ZM_1"]))} else {plot(threadedCluster()) }})
-  #
-  # output$Event_Tab_Output_3  = renderPlotly({ ng_bar_chart(threadedEvents(), "threadNum", "ZM_1", 1, 1)} )
-
-
-
-
-
+  ########################################################################
   ##################### 4.VISUALIZE tab ################################
+  ########################################################################
+
   # Controls for the whole set of tabs
-output$Visualize_Tab_Controls_1 = renderUI({
-  selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ), selected='One-to-One' )
-})
+  output$Visualize_Tab_Controls_1 = renderUI({
+        selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ), selected='One-to-One' )
+  })
 
   output$Visualize_Tab_Controls_2 = renderUI({
     zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))
@@ -372,7 +392,28 @@ output$Visualize_Tab_Controls_1 = renderUI({
         {sliderInput("VisualizeTabZoomID",
                "Zoom in and out by event similarity:",
                1, zoom_limit, 1, step = 1, ticks=FALSE) }
-})
+  })
+
+  ######## create subsets tab  ###############
+
+  output$SelectSubsetControls <- renderUI({
+    tags$div(align="left",
+    textInput("SelectSubsetMapName", label = h4(paste("Enter label for this subset of the", input$VisualizeEventMapInputID," mapping")),
+                                                value = ""),
+    actionButton("SelectSubsetButton", "Save Subset") )
+  })
+
+  output$SelectSubsetDataTable  = DT::renderDataTable({
+    threadedEventsViz() }, filter = "top")
+
+  observeEvent(
+    input$SelectSubsetButton,
+    {store_event_mapping( input$SelectSubsetMapName, threadedEventsViz()[input$SelectSubsetDataTable_rows_all,] )
+    })
+
+ # just for reference selectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
+
+  ######## Repetitive Sub-sequences tab  ###############
 
   # controls for sub-sequence display
   output$nGramControls <- renderUI({
@@ -392,12 +433,22 @@ output$Visualize_Tab_Controls_1 = renderUI({
     ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
   })
 
-# Whole sequence display
+  ######## Whole sequence tab  ###############
+
+# Whole sequence display -- allow alternatives
+
   output$WholeSequenceThreadMap <- renderPlotly({
     threadMap(threadedEventsViz(), "threadNum", "seqNum", get_Zoom_VIZ(), 15  )
   })
 
-  # Force network D3  display
+
+  ######## Circular network tab  ###############
+  # output$circularLayoutNetwork = renderPlotly(
+  #
+  # )
+
+
+  ######## Force network tab  ###############
 
   # use this to select how to color the nodes in force layout
   output$Network_Tab_Controls_2 <- renderUI({
@@ -409,21 +460,20 @@ output$Visualize_Tab_Controls_1 = renderUI({
                  inline=TRUE))
   })
 
-  # output$circularLayoutNetwork = renderPlotly(
-  #
-  # )
-
   output$forceNetworkD3 <- renderForceNetwork({
     forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
   })
 
+  ######## Custom network tab  ###############
+
   output$VisualizeCustomNetwork <- renderPlotly({
-    eventNetwork(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
+    eventNetwork(threadedEventsViz(), "threadNum", 1, get_Zoom_VIZ())
   })
 
 
-
+  ######################################################################
   ##################### 5. COMPARE  tab ################################
+  ######################################################################
 
 
   # Make two parallel sets of input and data. Different mapping on each side
@@ -496,7 +546,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
    })
 
 
-
    # Get data for the Diachronic COMPARE tab  .
    threadedEventsDiaComp <- reactive({
      get_event_mapping_threads( GlobalEventMappings, input$DiaCompareMapInputID ) })
@@ -520,8 +569,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
      )
    })
 
-
-
    # Get subsets of events and create sub-plots for them
 
    output$DiachronicComparisonPlots <- renderPlotly(
@@ -533,7 +580,9 @@ output$Visualize_Tab_Controls_1 = renderUI({
                       get_Zoom_DIA_COMP()) )
 
 
+  ############################################################################
   ######################## 6. MOVING WINDOW TAB ##############################
+  ############################################################################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
     selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) )
@@ -646,9 +695,9 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
 
 
-
+  ################################################################################
   ############################  Admin, params, etc  ##############################
-
+  ################################################################################
   output$currentParameterSettings <- renderTable({
 
     # start with an empty stucture and add rows.
@@ -674,11 +723,6 @@ output$Visualize_Tab_Controls_1 = renderUI({
 
   addRow <- function(Vals, Name, Value){ return( rbind(Vals, c(as.character(Name), as.character(Value))))  }
 
-
-  ############################  Explantory tool tips ##############################
-  # requires package shinybs
-  # addTooltip(session, "PctOccToDisplayID", "For large data sets, this can be helpful", placement = "bottom", trigger = "hover",
-  #            options = NULL)
 
 
 })

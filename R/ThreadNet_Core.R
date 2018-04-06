@@ -658,3 +658,21 @@ one_vcf_matrix <- function(e, vcf){
   return(  matrix( unlist( e[[vcf]] ), nrow = length( e[[vcf]] ), byrow = TRUE)  )
 }
 
+
+thread_text_vector <- function(o, TN, CF){
+
+# Initialize text vector
+tv = vector(mode="character")
+
+# Loop through the unique thread numbers -- each
+j=0
+for (i in unique(o[[TN]])){
+    txt =o[o[[TN]]==i,CF]
+
+    j=j+1
+    tv[j] = str_replace_all(concatenate(as.integer(o[o[[TN]]==i,CF])),' ',',')
+}
+ return(tv)
+
+}
+
