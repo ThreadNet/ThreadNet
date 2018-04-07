@@ -676,3 +676,22 @@ for (i in unique(o[[TN]])){
 
 }
 
+replace_regex_list_test <- function(tv, rx, lx){
+
+lapply(1:length(tv), function(i){
+   lapply(1:length(rx),function(j){
+        str_replace_all(tv[i],rx[j],lx[j])  }
+      )  })
+}
+
+
+# use this to replace patterns for regex and ngrams
+replace_regex_list <- function(tv, rx, lx){
+
+  for (i in 1:length(tv)) {
+    for (j in 1:length(rx) ) {
+     tv[i] = str_replace_all(tv[i],rx[j],lx[j])
+      }
+    }
+  return(tv)
+}

@@ -214,7 +214,7 @@ server <- shinyServer(function(input, output, session) {
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
                tags$p(paste0("Start new event when ALL of these change:", paste(get_EVENT_CF(),","))),
 
-               textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks_"),
+               textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks"),
 
                actionButton("EventButton2", "Create New Mapping"),
                hr(),
@@ -271,13 +271,31 @@ server <- shinyServer(function(input, output, session) {
                                                           min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
     })
 
-    # output$Regular_Expression_controls_4 =   renderText( paste(thread_text_vector(regexInput()[unlist(input$regexVerbatimRows[1]):unlist(input$regexVerbatimRows[2]),],'threadNum',get_Zoom_REGEX() ), ' \n ' )  )
+     output$Regular_Expression_controls_4 =   renderText(
+       paste(thread_text_vector(regexInput(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
 
-    output$Regular_Expression_controls_4 =   renderText( paste(thread_text_vector(regexInput(),'threadNum',get_Zoom_REGEX() ), ' \n ' )  )
+    # or if you prefer HTML
+    # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
+    #                                         paste(thread_text_vector(regexInput(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
 
-          # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-      #                                                          paste(thread_text_vector(threadedEvents2(),'threadNum','ZM_20'), ' ** ' )) ))
 
+     output$Regular_Expression_controls_5 = renderUI({
+
+       # create some select inputs
+       lapply(1:5, function(i) {
+         fluidRow(
+         column(2,textInput(paste0('regex', i), paste0('Regex-', i) ), offset=1),
+         column(2,textInput(paste0('regexLabel', i), paste0('Label-', i) ))
+         )
+       })
+
+       })
+
+     # output$a_out <- renderPrint({
+     #   res <- lapply(1:5, function(i) input[[paste0('a', i)]])
+     #   str(setNames(res, paste0('a', 1:5)))
+     #
+     # })
 
       output$Regular_Expression_controls_6 = renderUI({
         tags$div(align="left",
