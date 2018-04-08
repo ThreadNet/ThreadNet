@@ -659,6 +659,9 @@ one_vcf_matrix <- function(e, vcf){
 }
 
 
+# this is used for the regex pages to show the threads.
+# similar code is used in count_ngrams and to make networks, but with different delimiters
+# and with a minimum sequence length (ngram size), but this can be filtered after this function3
 thread_text_vector <- function(o, TN, CF){
 
 # Initialize text vector
@@ -676,15 +679,6 @@ for (i in unique(o[[TN]])){
 
 }
 
-replace_regex_list_test <- function(tv, rx, lx){
-
-lapply(1:length(tv), function(i){
-   lapply(1:length(rx),function(j){
-        str_replace_all(tv[i],rx[j],lx[j])  }
-      )  })
-}
-
-
 # use this to replace patterns for regex and ngrams
 replace_regex_list <- function(tv, rx, lx){
 
@@ -694,4 +688,49 @@ replace_regex_list <- function(tv, rx, lx){
       }
     }
   return(tv)
+}
+# same function, but with lapply -- but does not work.
+replace_regex_list_lapply <- function(tv, rx, lx){
+
+  lapply(1:length(tv), function(i){
+    lapply(1:length(rx),function(j){
+      str_replace_all(tv[i],rx[j],lx[j])  }
+    )  })
+}
+
+# combined set of frequent ngrams
+frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
+
+  # initialize the output
+  f = count_ngrams(e,TN, CF,minN)
+
+  if (maxN > minN){
+      for (i in seq(minN+1,maxN,1)){
+        f = rbind(f,count_ngrams(e,TN, CF,i)) }
+  }
+  # remove the rows that happen once and only keep the columns we want
+  f=f[f$freq>threshold,c('ngrams','freq')]
+
+  # just take the maximal ones
+   f=maximal_ngrams(f)
+
+  # return the set sorted by most frequent
+  return(f[order(-f$freq),])
+}
+
+# this filters out ngrams that are contained within others ('2 2' is part of '2 2 2')
+maximal_ngrams <- function(f){
+
+  # find out if each ngram is contained in all the others
+  w = lapply(1:nrow(f), function(i){
+         grep(f$ngrams[i],f$ngrams)}
+         )
+
+  # get howMany times each one appears
+  howMany = lapply(1:length(w), function(i){
+                length(w[[i]])}
+  )
+
+  # return the ones that are unique
+  return(f[which(howMany==1),])
 }
