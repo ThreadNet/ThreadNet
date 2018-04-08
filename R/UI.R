@@ -76,13 +76,14 @@ ui <- fluidPage(
                                    tabPanel("Regular Expressions",
                                             fluidRow(
                                               column(3, uiOutput("Regular_Expression_controls_1")),
-                                              column(4, uiOutput("Regular_Expression_controls_2"))
+                                              column(3, uiOutput("Regular_Expression_controls_2")),
+                                              column(3, uiOutput("Regular_Expression_controls_7"))
                                               ),
                                             uiOutput("Regular_Expression_controls_3"),
                                             verbatimTextOutput("Regular_Expression_controls_4"),
                                             uiOutput("Regular_Expression_controls_5"),  # how many regex?
-                                            uiOutput("Regular_Expression_controls_6"),
-                                            uiOutput("Regular_Expression_controls_7")
+                                            uiOutput("Regular_Expression_controls_6")
+
                                    ),
 
                                    tabPanel("Frequent Ngrams",
@@ -126,7 +127,15 @@ ui <- fluidPage(
                                   ),
 
                           tabPanel("Whole Sequences",
-                                  plotlyOutput("WholeSequenceThreadMap")
+                                   radioButtons("ChoosePanelButton_1", label = h4("Display threads using:"),
+                                                choices = c("Event time (sequence)", "Actual time", "Relative time"),
+                                                inline=TRUE),
+                                   conditionalPanel(
+                                      condition = "input.ChoosePanelButton_1 == 'Event time (sequence)'",
+                                      plotlyOutput("WholeSequenceThreadMap_Sequence") ),
+                                   conditionalPanel(
+                                      condition = "input.ChoosePanelButton_1 == 'Actual time'",
+                                      plotlyOutput("WholeSequenceThreadMap_ActualTime") )
                                   ),
 
                           tabPanel("Circular layout",

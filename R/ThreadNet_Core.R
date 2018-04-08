@@ -431,8 +431,12 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
   return(eventMap)
 }
 
-# this one creates events based on the regular expressions
-OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF,numRegexInputs){
+# this one creates events based on frequent ngrams or regular expressions
+OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
+
+  print(rx)
+
+  print(rx$label)
 
   # put this here for now
   timescale='mins'
@@ -440,101 +444,96 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF,numRegexInp
   # Only run if eventMapName is filled in; return empty data frame otherwise
   if (EventMapName ==""){return(data.frame())}
 
-  #### First get the break points between the events
+  # get the text vector for this set of threaded occurrences
+  tv = thread_text_vector( o, TN, CF )
 
-  # whenever there is a zero handoff gap that means everything has changed
-  breakpoints = which(o$handoffGap == 0)
+ # apply regex to tv and split on the commas
+  tvrx =  replace_regex_list( tv, rx )
 
-  # Grab the breakpoints from the beginning of the threads as well
-  threadbreaks = which(o$seqNum == 1)
-  breakpoints = sort(union(threadbreaks,breakpoints))
+  tvrxs = lapply(1:length(tvrx), function(i) {unlist(strsplit(tvrx[[i]],','))})
 
+  print('tvrx')
+  print(tvrx[1:3])
+  print('tvrxs')
+  print(tvrxs[1:3])
 
-  ### Use the break points to find the chunks -- just store the index back to the raw data
-  nChunks = length(breakpoints)
-
-  print("nChunks")
-  print(nChunks)
+# count the total number of chunks
+ nChunks = length(unlist(tvrxs))
+ print(paste('nChunks=', nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
 
-  # add columns for each of the context factors used for comparison
-  # for (cf in compare_CF){
-  #   e[cf] = character(nChunks)
-  # }
 
-  #  need to create chunks WITHIN threads.  Need to respect thread boundaries
-  # take union of the breakpoints, plus thread boundaries, plus 1st and last row
+  #loop through the threads and fill in the data for each event
+  # when it's a row number in the input data array, just copy the row
+  # when it's one of the regex labels, use the numbers in the pattern to compute V_ for the new event
+  chunkNo=0
+  for (thread in 1:length(tvrxs)){
 
-  # counters for assigning thread and sequence numbers
-  thisThread=1  # just for counting in this loop
-  lastThread=0
-  seqNo=0  # resets for each new thread
+    # the events stay in sequence
+    for (sn in 1:length(tvrxs[[thread]])){
 
-  for (chunkNo in 1:nChunks){
+      # increment the current row
+      chunkNo = chunkNo+1
 
-    # Chunks start at the current breakpoint
-    start_idx=breakpoints[chunkNo]
+    # assign the thread and sequence number
+    e$threadNum[chunkNo] = thread
+    e$seqNum[chunkNo] = sn
 
-    # Chunks end at the next breakpoint, minus one
-    # for the last chunk,the stop_idx is the last row
-    if (chunkNo < nChunks){
-      stop_idx = breakpoints[chunkNo+1] - 1
-    } else if (chunkNo==nChunks){
-      stop_idx = nrow(o)
+
+    if (tvrxs[[thread]][sn] %in% rx$label ){
+
+      print(paste('thread sn = ',thread, sn))
+      print(paste('matched regex label',tvrxs[[thread]][sn]))
+
+      # Use the ZM_1 column to store the new labels
+      e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+
+      # try just sticking in the pattern -- need to pick the correct one
+      e$occurrences[[chunkNo]] = rx$pattern[which( rx$label==tvrxs[[thread]][sn])]
+
+
+
+      # assign timestamp and duration -- use first - last occurrence times
+      # e$tStamp[chunkNo] = 0
+      # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
+      #
+
+      # compute the V_ based on the occurrences
+      # for (cf in EVENT_CF){
+      #   VCF = paste0("V_",cf)
+      #   e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
+      # }
+    }
+    else if (KeepIrregularEvents=='Keep') {
+      # copy data from input structure
+      # print(paste('no match',tvrxs[[thread]][sn]))
+
+
+      # Use the ZM_1 column to store the new labels
+      e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+
     }
 
-    # assign the occurrences
-    e$occurrences[[chunkNo]] = list(start_idx:stop_idx)
-    # e$eventStop[chunkNo] = as.integer(stop_idx)
-    # e$eventStart[chunkNo] = as.integer(start_idx)
-
-    # assign timestamp and duration
-    e$tStamp[chunkNo] = o$tStamp[start_idx]
-    e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
-
-    # copy in the threadNum and assign sequence number
-    e$threadNum[chunkNo] = o$POVthreadNum[start_idx]
-    thisThread = o$POVthreadNum[start_idx]
+    } # sn loop
+    } # thread loop
 
 
-    # fill in data for each of the context factors
-    for (cf in compare_CF){
-      e[chunkNo,cf] = o[start_idx,cf]
+# take out the irregular events (empty rows) if so desired
+  if (KeepIrregularEvents=='Drop'){
+
+    # keep the subset where the event is not blank
+    e=subset(e, !ZM_1=='')
+
+    # should probably re-number the sequence numbers...
+
     }
 
-    for (cf in EVENT_CF){
-      VCF = paste0("V_",cf)
-      e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
-    }
-
-    # Advance or reset the seq counters
-    if (thisThread == lastThread){
-      seqNo = seqNo +1
-    } else if (thisThread != lastThread){
-      lastThread = thisThread
-      seqNo = 1
-    }
-    e$seqNum[chunkNo] = seqNo
-
-  }
-
-  # convert them to factors
+  # Make sure the CFs are factors
   for (cf in compare_CF){
     e[cf] = as.factor(e[,cf])
   }
-
-  ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
-  clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
-
-  ## Create a new column for each cluster solution -- would be faster with data.table
-  for (cluster_level in 1:nChunks){
-
-    clevelName = paste0("ZM_",cluster_level)
-    e[clevelName] = cutree(clust, k=cluster_level)
-
-  } # for cluster_level
 
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E.rdata")
@@ -791,30 +790,32 @@ for (i in unique(o[[TN]])){
     txt =o[o[[TN]]==i,CF]
 
     j=j+1
-    tv[j] = str_replace_all(concatenate(as.integer(o[o[[TN]]==i,CF])),' ',',')
+    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF]),' ',',')
 }
  return(tv)
 
 }
 
 # use this to replace patterns for regex and ngrams
-replace_regex_list <- function(tv, rx, lx){
+# tv is the text vector for the set of threads
+# rx is the dataframe for regexpressions ($pattern, $label)
+replace_regex_list <- function(tv, rx ){
 
   for (i in 1:length(tv)) {
-    for (j in 1:length(rx) ) {
-     tv[i] = str_replace_all(tv[i],rx[j],lx[j])
+    for (j in 1:nrow(rx) ) {
+     tv[i] = str_replace_all(tv[i],rx$pattern[j],rx$label[j])
       }
     }
   return(tv)
 }
 # same function, but with lapply -- but does not work.
-replace_regex_list_lapply <- function(tv, rx, lx){
-
-  lapply(1:length(tv), function(i){
-    lapply(1:length(rx),function(j){
-      str_replace_all(tv[i],rx[j],lx[j])  }
-    )  })
-}
+# replace_regex_list_lapply <- function(tv, rx){
+#
+#   lapply(1:length(tv), function(i){
+#     lapply(1:nrow(rx),function(j){
+#       str_replace_all(tv[i], rx$pattern[j], rx$label[j] )  }
+#     )  })
+# }
 
 # combined set of frequent ngrams
 frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
