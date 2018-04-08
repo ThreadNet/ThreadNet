@@ -248,7 +248,6 @@ server <- shinyServer(function(input, output, session) {
 
       output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
-                 tags$h4("Regular Expressions: Use regular expressions to form events"),
                  selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ))
       })
 
@@ -267,7 +266,7 @@ server <- shinyServer(function(input, output, session) {
 
     output$Regular_Expression_controls_3 <- renderUI({ maxrows=length(unique(regexInput()[['threadNum']]))
                                                         sliderInput("regexVerbatimRows",
-                                                          label=h4("How many rows of threads to view:"),
+                                                          label=h4("How many threads to view:"),
                                                           min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
     })
 
@@ -277,12 +276,16 @@ server <- shinyServer(function(input, output, session) {
     # or if you prefer HTML
     # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
     #                                         paste(thread_text_vector(regexInput(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+     output$Regular_Expression_controls_5 <- renderUI({ maxrows=length(unique(regexInput()[['threadNum']]))
+     sliderInput("numRegexInputRows",
+                 label=h4("How many expressions/labels to make:"),
+                 min=1,max=10, 3, step = 1, ticks=FALSE)
 
 
-     output$Regular_Expression_controls_5 = renderUI({
+     output$Regular_Expression_controls_6 = renderUI({
 
        # create some select inputs
-       lapply(1:5, function(i) {
+       lapply(1:input$numRegexInputRows, function(i) {
          fluidRow(
          column(2,textInput(paste0('regex', i), paste0('Regex-', i) ), offset=1),
          column(2,textInput(paste0('regexLabel', i), paste0('Label-', i) ))
@@ -297,16 +300,25 @@ server <- shinyServer(function(input, output, session) {
      #
      # })
 
-      output$Regular_Expression_controls_6 = renderUI({
+      output$Regular_Expression_controls_7 = renderUI({
         tags$div(align="left",
-                 textInput("RegExForEvents", label = h4("Enter regular expression(s)"), value = ""),
-                 tags$p(" "),
-
                  textInput("EventMapName3", label = h4("Enter label for this mapping"), value = "RegEx_"),
 
                  actionButton("EventButton3", "Create New Mapping")  )
 
       })
+
+      # this function runs when you push the button to create a new mapping
+      threadedEventsRegEx <- reactive({
+        input$EventButton3
+        isolate(OccToEvents3(regexInput(),
+                             input$EventMapName3,
+                             get_EVENT_CF(),
+                             get_COMPARISON_CF(),
+                             'threadNum',
+                             get_Zoom_REGEX(),
+                             input$numRegexInputRows))
+        })
 
       ########  Frequent n-gram tab  ###############
         output$Frequent_Ngram_controls = renderUI({
