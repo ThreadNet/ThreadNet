@@ -182,10 +182,7 @@ server <- shinyServer(function(input, output, session) {
              tags$p(" "),
              textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
              actionButton("EventButton1", "Create New Mapping"),
-             hr(),
-             radioButtons("One_to_One_Output_Button", label = h4("Display results:"),
-                          choices = c("None", "Data table (display only)", "Thread Map"),
-                          inline=TRUE)
+             hr()
              )
 
   })
@@ -219,10 +216,7 @@ server <- shinyServer(function(input, output, session) {
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks"),
 
                actionButton("EventButton2", "Create New Mapping"),
-               hr(),
-               radioButtons("Chunks_Output_Button", label = h4("Display results:"),
-                            choices = c("None", "Data table (display only)", "Thread Map"),
-                            inline=TRUE))
+               hr() )
     })
 
   # this function runs when you push the button to create a new mapping
