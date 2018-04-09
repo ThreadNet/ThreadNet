@@ -75,20 +75,29 @@ ui <- fluidPage(
 
                                    tabPanel("Frequent Ngrams",
                                             fluidRow(
-                                              column(3, uiOutput("Regular_Expression_controls_1")),
-                                              column(3, uiOutput("Regular_Expression_controls_2")),
-                                              column(3, uiOutput("Regular_Expression_controls_7"))
+                                              column(3, uiOutput("Frequent_Ngram_controls_1")),
+                                              column(3, uiOutput("Frequent_Ngram_controls_2"),
+                                                     uiOutput("Frequent_Ngram_controls_21")),
+                                              column(3, uiOutput("Frequent_Ngram_controls_7"))
                                               ),
-                                            uiOutput("Regular_Expression_controls_3"),
-                                            verbatimTextOutput("Regular_Expression_controls_4"),
-                                            uiOutput("Regular_Expression_controls_5"),  # how many regex?
-                                            uiOutput("Regular_Expression_controls_6")
+                                            uiOutput("Frequent_Ngram_controls_3"),
+                                            verbatimTextOutput("Frequent_Ngram_controls_4"),
+                                            uiOutput("Frequent_Ngram_controls_5"),  # how many rows?
+                                            uiOutput("Frequent_Ngram_controls_6")
 
                                    ),
 
-                                   # tabPanel("Regular Expressions",
-                                   #          uiOutput("Frequent_Ngram_controls")
-                                   # ),
+                                   tabPanel("Regular Expressions",
+                                            fluidRow(
+                                              column(3, uiOutput("Regular_Expression_controls_1")),
+                                              column(3, uiOutput("Regular_Expression_controls_2")),
+                                              column(3, uiOutput("Regular_Expression_controls_7"))
+                                            ),
+                                            uiOutput("Regular_Expression_controls_3"),
+                                            verbatimTextOutput("Regular_Expression_controls_4"),
+                                            uiOutput("Regular_Expression_controls_5"),  # how many rows?
+                                            uiOutput("Regular_Expression_controls_6")
+                                   ),
 
                                    # tabPanel("Maximal Patterns",
                                    #          uiOutput("Maximal_Pattern_controls")

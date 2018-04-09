@@ -60,6 +60,8 @@ server <- shinyServer(function(input, output, session) {
   get_Zoom_REGEX <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID))==1 ,
                                                "ZM_1", paste0("ZM_",input$regexZoomID))) })
 
+  get_Zoom_freqNgram <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$freqNgramInputMapID))==1 ,
+                                                    "ZM_1", paste0("ZM_",input$freqNgramZoomID))) })
 
   #################################################################
   ################## 1.READ DATA TAB ##############################
@@ -245,6 +247,8 @@ server <- shinyServer(function(input, output, session) {
       threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
 
     ########  regular expression tab  ###############
+    # Thiscode is ALMOST identical to the regex tab.
+    # If there is a bug here, it is probably there as well.
 
       output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
@@ -308,12 +312,6 @@ server <- shinyServer(function(input, output, session) {
                                  function(i){input[[paste0('regexLabel', i)]]}
                     )), stringsAsFactors=FALSE )
       })
-    # example to look at...
-     # output$a_out <- renderPrint({
-     #   res <- lapply(1:5, function(i) input[[paste0('a', i)]])
-     #   str(setNames(res, paste0('a', 1:5)))
-     #
-     # })
 
       output$Regular_Expression_controls_7 = renderUI({
         tags$div(align="left",
@@ -336,18 +334,109 @@ server <- shinyServer(function(input, output, session) {
                              input$KeepIrregularEvents))
         })
 
+
       ########  Frequent n-gram tab  ###############
-        # output$Frequent_Ngram_controls = renderUI({
-        #   tags$div(align="left",
-        #            tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
-        #            tags$p(" "),
-        #            selectizeInput("NGramInputID","INPUT:", get_event_mapping_names( GlobalEventMappings ) ),
-        #
-        #            textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams_"),
-        #
-        #            actionButton("EventButton4", "Create New Mapping")  )
-        #
-        # })
+      # Thiscode is ALMOST identical to the regex tab.
+      # If there is a bug here, it is probably there as well.
+
+      output$Frequent_Ngram_controls_1 = renderUI({
+        tags$div(align="left",
+                 selectizeInput("freqNgramInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ))
+      })
+
+      # get the data that will be the input for this tab
+      freqNgramInputEvents <- reactive( get_event_mapping_threads( GlobalEventMappings , input$freqNgramInputMapID) )
+
+
+      output$Frequent_Ngram_controls_2 <- renderUI({
+        zoom_limit = zoom_upper_limit(freqNgramInputEvents())
+        if (zoom_limit == 1)
+        {tags$h4("Zooming not available with this mapping")}
+        else
+        {sliderInput("freqNgramZoomID",
+                     label=h4("Zoom in and out by event similarity:"),
+                     1,zoom_limit,1, step = 1, ticks=FALSE) }
+      })
+      output$Frequent_Ngram_controls_21 <- renderUI({
+        tags$div(align="left",
+        sliderInput("freqNgramRange",
+                    label=h4("Size of nGrams between:"),
+                    min=2,max=10, c(2,5), step = 1, ticks=FALSE),
+        sliderInput("freqNgramThreshold",
+                    label=h4("Frequency Threshold:"),
+                    min=2,max=20, 2, step = 1, ticks=FALSE)
+        )
+      })
+
+      output$Frequent_Ngram_controls_3 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
+      sliderInput("freqNgramVerbatimRows",
+                  label=h4("How many threads to view:"),
+                  min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
+      })
+
+      output$Frequent_Ngram_controls_4 =   renderText(
+        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram())[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
+
+      # or if you prefer HTML
+      # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
+      #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+
+    output$Frequent_Ngram_controls_5 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
+      sliderInput("numfreqNgramInputRows",
+                  label=h4("How many ngrams/labels to make:"),
+                  min=1,max=10, 3, step = 1, ticks=FALSE) })
+
+      # create several rows of inputs
+      output$Frequent_Ngram_controls_6 = renderUI({
+
+        # create some select inputs
+        lapply(1:input$numfreqNgramInputRows, function(i) {
+          fluidRow(
+            column(2, selectizeInput(paste0('freqNgram', i), label=paste0('Choose ngram-', i), freqNgramSelections() ), offset=1),
+            column(2,textInput(paste0('freqNgramLabel', i), label=paste0('Label-', i) ))
+          ) })
+      })
+
+      # need to add slider for upper/lower bound and threshold
+      freqNgramSelections <- reactive({ selectize_frequent_ngrams(freqNgramInputEvents() , 'threadNum',
+                                                                  get_Zoom_freqNgram(),
+                                                                  input$freqNgramRange[1],
+                                                                  input$freqNgramRange[2],
+                                                                  input$freqNgramThreshold )  })
+
+      # get the input values and return data frame with regex & label
+      freqNgramInput = reactive({
+        data.frame(pattern=unlist(lapply(1:input$numfreqNgramInputRows,
+                                         function(i){input[[paste0('freqNgram', i)]]}
+        )),
+        label=unlist(lapply(1:input$numfreqNgramInputRows,
+                            function(i){input[[paste0('freqNgramLabel', i)]]}
+        )), stringsAsFactors=FALSE )
+      })
+
+
+      output$Frequent_Ngram_controls_7 = renderUI({
+        tags$div(align="left",
+                 textInput("EventMapName4", label = h4("Enter label for result"), value = "freqNgram_"),
+                 radioButtons("KeepIrregularEvents_2",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
+                 actionButton("EventButton4", "Create New Mapping")  )
+
+      })
+
+      # this function runs when you push the button to create a new mapping
+      threadedEventsfreqNgram <- observeEvent(
+        input$EventButton4,
+        {isolate(OccToEvents3(freqNgramInputEvents(),
+                              input$EventMapName4,
+                              get_EVENT_CF(),
+                              get_COMPARISON_CF(),
+                              'threadNum',
+                              get_Zoom_freqNgram(),
+                              freqNgramInput(),
+                              input$KeepIrregularEvents_2))
+        })
+
+
 
       ########  maximal pattern tab  ###############
 
