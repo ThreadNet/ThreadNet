@@ -70,7 +70,7 @@ ui <- fluidPage(
                                             uiOutput("Contextual_Chunk_controls"),
                                             radioButtons("Chunks_Output_Button", label = h4("Display results:"),
                                                          choices = c("None", "Data table (display only)", "Thread Map"),
-                                                         inline=TRUE))
+                                                         inline=TRUE),
                                             conditionalPanel(
                                               condition = "input.Chunks_Output_Button == 'Data table (display only)'",
                                               DT::dataTableOutput("Contextual_Chunks_Tab_Output_1") ),
