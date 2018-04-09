@@ -853,28 +853,29 @@ selectize_frequent_ngrams<- function(e, TN, CF, minN, maxN, threshold){
 frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
 
   # initialize the output
-  f = count_ngrams(e,TN, CF,minN)
+  ng = count_ngrams(e,TN, CF,minN)
 
   if (maxN > minN){
       for (i in seq(minN+1,maxN,1)){
-        f = rbind(f,count_ngrams(e,TN, CF,i)) }
+        ng = rbind(ng,count_ngrams(e,TN, CF,i)) }
   }
   # remove the rows that happen once and only keep the columns we want
-  f=f[f$freq>threshold,c('ngrams','freq')]
+  ng=ng[ng$freq>threshold,c('ngrams','freq')]
 
   # just take the maximal ones
-   f=maximal_ngrams(f)
+   ng=maximal_ngrams(ng)
 
   # return the set sorted by most frequent
-  return(f[order(-f$freq),])
+  return(ng[order(-ng$freq),])
 }
 
 # this filters out ngrams that are contained within others ('2 2' is part of '2 2 2')
-maximal_ngrams <- function(f){
+
+maximal_ngrams <- function(ng){
 
   # find out if each ngram is contained in all the others
-  w = lapply(1:nrow(f), function(i){
-         grep(f$ngrams[i],f$ngrams)}
+  w = lapply(1:nrow(ng), function(i){
+         grep(ng$ngrams[i],ng$ngrams)}
          )
 
   # get howMany times each one appears
@@ -883,7 +884,7 @@ maximal_ngrams <- function(f){
   )
 
   # return the ones that are unique
-  return(f[which(howMany==1),])
+  return(ng[which(howMany==1),])
 }
 
 # compute support level for each ngram
@@ -891,6 +892,14 @@ maximal_ngrams <- function(f){
 # ng = frequent ngrams data frame
 support_level <- function(tv, ng) {
 
+  # create a support matrix where rows are threads and columns are the ngrams
+  s = matrix(nrow=length(tv), ncol=nrow(ng),0)
+  print(s)
 
+  # find out how many times each ngram is contained in each TV
+  w = lapply(1:nrow(ng), function(i){
+    grep(ng$ngrams[i],tv)}
+
+  )
 
 }

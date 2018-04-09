@@ -580,16 +580,18 @@ server <- shinyServer(function(input, output, session) {
 
 
   #  frequent NGRAM  displays #
+  # just compute this data once -- not sure of the best way to display it... Table?  Bar chart?
 
-  output$freqnGramTable <- renderTable(frequent_ngrams(threadedEventsViz() , 'threadNum',
-                                                       get_Zoom_VIZ(),
-                                                       input$freqnGramLengthID[1],
-                                                       input$freqnGramLengthID[2],
-                                                       input$freqnGramDisplayThresholdID ) )
+  fng <-reactive(frequent_ngrams(threadedEventsViz() , 'threadNum',
+                                 get_Zoom_VIZ(),
+                                 input$freqnGramLengthID[1],
+                                 input$freqnGramLengthID[2],
+                                 input$freqnGramDisplayThresholdID ))
 
-  output$freqnGramBarchart = renderPlotly({
-    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$freqnGramLengthID[2], input$freqnGramDisplayThresholdID)
-  })
+  output$freqnGramTable <- renderTable( fng() )
+
+  output$freqnGramBarchart = renderPlotly({ ng_bar_chart_freq(fng() )})
+
 
   ######## Whole sequence tab  ###############
 

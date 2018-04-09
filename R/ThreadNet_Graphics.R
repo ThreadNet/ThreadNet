@@ -261,6 +261,18 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
   return(ngp)
 }
 
+# this version we pass in the ngram data frame already sorted
+ng_bar_chart_freq <- function(ngdf){
+
+  # put them in descending order -- tricky (http://stackoverflow.com/questions/40224892/r-plotly-barplot-sort-by-value)
+    ngdf$ngrams = factor(ngdf$ngrams, levels =unique(ngdf$ngrams)[order(ngdf$freq, decreasing = FALSE)])
+
+  ngp <- plot_ly( ngdf, y = ~ngrams, x = ~freq, type = "bar",showlegend=FALSE) %>%
+    layout(xaxis= list(showticklabels = TRUE, title='Frequency'))  %>%
+    layout(yaxis= list(showticklabels = FALSE, title=''))
+
+  return(ngp)
+}
 
 
 #############################################################################
@@ -546,25 +558,25 @@ Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_le
 #'
 #' @return standard R plot
 #' @export
-traminer_threadMap <- function(df,TN, CF){
-
-  # setting color palettes
-  # first find the number of distinct colors
-  nColors = length(unique(df[,CF]))
-  pal <- diverge_hcl(nColors)
-
-  #  reformat the data for traminerR
-  df = convert_TN_to_TramineR(df, TN, CF)
-
-
-  #plot sequence - also try seqfplot?
-  # add grouping variable?
-  return(seqiplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
-
-  #  return(seqfplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
-
-
-}
+# traminer_threadMap <- function(df,TN, CF){
+#
+#   # setting color palettes
+#   # first find the number of distinct colors
+#   nColors = length(unique(df[,CF]))
+#   pal <- diverge_hcl(nColors)
+#
+#   #  reformat the data for traminerR
+#   df = convert_TN_to_TramineR(df, TN, CF)
+#
+#
+#   #plot sequence - also try seqfplot?
+#   # add grouping variable?
+#   return(seqiplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
+#
+#   #  return(seqfplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
+#
+#
+# }
 
 # This one is not currently used.
 threadLengthBarchart <- function(o, TN){
