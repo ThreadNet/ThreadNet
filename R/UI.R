@@ -73,7 +73,7 @@ ui <- fluidPage(
 
                                    ),
 
-                                   tabPanel("Regular Expressions",
+                                   tabPanel("Frequent Ngrams",
                                             fluidRow(
                                               column(3, uiOutput("Regular_Expression_controls_1")),
                                               column(3, uiOutput("Regular_Expression_controls_2")),
@@ -86,9 +86,9 @@ ui <- fluidPage(
 
                                    ),
 
-                                   tabPanel("Frequent Ngrams",
-                                            uiOutput("Frequent_Ngram_controls")
-                                   ),
+                                   # tabPanel("Regular Expressions",
+                                   #          uiOutput("Frequent_Ngram_controls")
+                                   # ),
 
                                    # tabPanel("Maximal Patterns",
                                    #          uiOutput("Maximal_Pattern_controls")

@@ -254,6 +254,8 @@ server <- shinyServer(function(input, output, session) {
       # get the data that will be the input for this tab
     regexInputEvents <- reactive( get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID) )
 
+
+
     output$Regular_Expression_controls_2 <- renderUI({
       zoom_limit = zoom_upper_limit(regexInputEvents())
       if (zoom_limit == 1)
@@ -278,7 +280,7 @@ server <- shinyServer(function(input, output, session) {
     #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
      output$Regular_Expression_controls_5 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
      sliderInput("numRegexInputRows",
-                 label=h4("How many expressions/labels to make:"),
+                 label=h4("How many ngrams/labels to make:"),
                  min=1,max=10, 3, step = 1, ticks=FALSE) })
 
     # create several rows of inputs
@@ -287,10 +289,15 @@ server <- shinyServer(function(input, output, session) {
        # create some select inputs
        lapply(1:input$numRegexInputRows, function(i) {
          fluidRow(
-         column(2,textInput(paste0('regex', i), paste0('Regex-', i) ), offset=1),
+         column(2,textInput(paste0('regex', i), paste0('Ngram-', i) ), offset=1),
          column(2,textInput(paste0('regexLabel', i), paste0('Label-', i) ))
+         # ,
+         # column(2,selectizeInput(paste0('regex', i), label=paste0('Label-', i), freqNgramSelections() ))
          ) })
        })
+
+    # need to add commas and probably add slider for upper/lower bound and threshold
+    freqNgramSelections <- reactive({ selectize_frequent_ngrams(regexInputEvents() , 'threadNum', get_Zoom_REGEX(), 2, 5, 3)  })
 
      # get the input values and return data frame with regex & label
     regexInput = reactive({
@@ -330,17 +337,17 @@ server <- shinyServer(function(input, output, session) {
         })
 
       ########  Frequent n-gram tab  ###############
-        output$Frequent_Ngram_controls = renderUI({
-          tags$div(align="left",
-                   tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
-                   tags$p(" "),
-                   selectizeInput("NGramInputID","INPUT:", get_event_mapping_names( GlobalEventMappings ) ),
-
-                   textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams_"),
-
-                   actionButton("EventButton4", "Create New Mapping")  )
-
-        })
+        # output$Frequent_Ngram_controls = renderUI({
+        #   tags$div(align="left",
+        #            tags$h4("Frequent ngrams: Select ngrams to use in forming events -- Not implemented yet"),
+        #            tags$p(" "),
+        #            selectizeInput("NGramInputID","INPUT:", get_event_mapping_names( GlobalEventMappings ) ),
+        #
+        #            textInput("EventMapName4", label = h4("Enter label for this mapping"), value = "Ngrams_"),
+        #
+        #            actionButton("EventButton4", "Create New Mapping")  )
+        #
+        # })
 
       ########  maximal pattern tab  ###############
 

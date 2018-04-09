@@ -431,11 +431,16 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
   return(eventMap)
 }
 
+
 # this one creates events based on frequent ngrams or regular expressions
 OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
-  print(rx)
+  # keep track of the length of each pattern
+  for (i in 1:nrow(rx))
+  {rx$patLength[i] = length(unlist(strsplit(rx$pattern[i], ',')))
+  }
 
+  print(rx)
   print(rx$label)
 
   # put this here for now
@@ -469,17 +474,24 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # when it's a row number in the input data array, just copy the row
   # when it's one of the regex labels, use the numbers in the pattern to compute V_ for the new event
   chunkNo=0
+  original_row=0
   for (thread in 1:length(tvrxs)){
 
     # the events stay in sequence
     for (sn in 1:length(tvrxs[[thread]])){
 
-      # increment the current row
+      # increment the current row numbers
       chunkNo = chunkNo+1
+      original_row=original_row+1
 
     # assign the thread and sequence number
     e$threadNum[chunkNo] = thread
     e$seqNum[chunkNo] = sn
+
+    # Make sure the CFs are factors
+    for (cf in compare_CF){
+      e[[chunkNo, cf]] =  o[[original_row, cf]]
+    }
 
 
     if (tvrxs[[thread]][sn] %in% rx$label ){
@@ -490,21 +502,24 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
 
-      # try just sticking in the pattern -- need to pick the correct one
-      e$occurrences[[chunkNo]] = rx$pattern[which( rx$label==tvrxs[[thread]][sn])]
+      # try just sticking in the pattern -- need to pick the correct one & convert to list of integers
+      # INCORRECT: e$occurrences[[chunkNo]] = list(as.integer(unlist(strsplit( rx$pattern[which( rx$label==tvrxs[[thread]][sn])], ','))))
+    # need to locate the unique for from the o dataframe and aggregate those V_cf values.
+      rxLen = rx$patLength[which( rx$label==tvrxs[[thread]][sn])]
+      e$occurrences[[chunkNo]] = list(seq(original_row,original_row+rxLen-1,1))
 
-
+      original_row = original_row + rxLen-1
+      # compute the V_ based on the occurrences
+       for (cf in EVENT_CF){
+         VCF = paste0("V_",cf)
+         e[[chunkNo, VCF]] = list(aggregate_VCF_for_regex(o,e$occurrences[chunkNo],cf ))
+       }
 
       # assign timestamp and duration -- use first - last occurrence times
-      # e$tStamp[chunkNo] = 0
       # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
       #
 
-      # compute the V_ based on the occurrences
-      # for (cf in EVENT_CF){
-      #   VCF = paste0("V_",cf)
-      #   e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
-      # }
+
     }
     else if (KeepIrregularEvents=='Keep') {
       # copy data from input structure
@@ -513,6 +528,17 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+      e$occurrences[[chunkNo]] = original_row
+
+      # copy the rest of the data
+      for (cf in EVENT_CF){
+      VCF = paste0("V_",cf)
+      e[[chunkNo, VCF]] =  o[[original_row, VCF]]
+      }
+
+      e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
+      e[[chunkNo,'eventDuration']] = o[[original_row,'eventDuration']]
+
 
     }
 
@@ -530,13 +556,10 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
     }
 
-  # Make sure the CFs are factors
-  for (cf in compare_CF){
-    e[cf] = as.factor(e[,cf])
-  }
+
 
   # for debugging, this is really handy
-  #  save(o,e,file="O_and_E.rdata")
+    save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping(EventMapName, e)
@@ -709,26 +732,27 @@ aggregate_VCF_for_event <- function(o, occList, cf){
   return(aggCF)
 }
 
-# this version incorrectly assumes that the VCF is already computed.
+
+# this version  assumes that the VCF is already computed.
 # Might come in handy, but it's not correct...
-# aggregate_VCF_for_event_oops <- function(o, occList, cf){
-#
-#   # get the column name for the VCF
-#   VCF = paste0("V_",cf)
-#
-#   # start with the first one so the dimension of the vector is correct
-#   aggCF = unlist(o[unlist(occList)[1],VCF])
-#
-#    # print( aggCF)
-#
-#   # now add the rest, if there are any
-#    if (length(unlist(occList)) > 1){
-#   for (idx in seq(2,length(unlist(occList)),1)){
-#     # print( aggCF)
-#     aggCF = aggCF+unlist(o[[unlist(occList)[idx],VCF]])
-#   }}
-#   return(aggCF)
-# }
+aggregate_VCF_for_regex <- function(o, occList, cf){
+
+  # get the column name for the VCF
+  VCF = paste0("V_",cf)
+
+  # start with the first one so the dimension of the vector is correct
+  aggCF = unlist(o[unlist(occList)[1],VCF])
+
+   # print( aggCF)
+
+  # now add the rest, if there are any
+   if (length(unlist(occList)) > 1){
+  for (idx in seq(2,length(unlist(occList)),1)){
+    # print( aggCF)
+    aggCF = aggCF+unlist(o[[unlist(occList)[idx],VCF]])
+  }}
+  return(aggCF)
+}
 
 
 
@@ -816,6 +840,14 @@ replace_regex_list <- function(tv, rx ){
 #       str_replace_all(tv[i], rx$pattern[j], rx$label[j] )  }
 #     )  })
 # }
+
+selectize_frequent_ngrams<- function(e, TN, CF, minN, maxN, threshold){
+
+  f=str_replace_all(trimws(frequent_ngrams(e, TN, CF, minN, maxN, threshold)[,'ngrams'], which=c('right')), ' ',',')
+  return(f)
+}
+
+
 
 # combined set of frequent ngrams
 frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
