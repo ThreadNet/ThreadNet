@@ -477,6 +477,32 @@ server <- shinyServer(function(input, output, session) {
                           treeOrientation = "vertical", textColour = "black"))
           })
 
+          ######## create subsets tab  ###############
+
+          # Controls for the whole set of tabs
+          output$SelectSubsetControls_1 = renderUI({
+            selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),  get_event_mapping_names( GlobalEventMappings )  )
+          })
+
+          output$SelectSubsetControls_2 <- renderUI({
+            tags$div(align="left",
+                     textInput("SelectSubsetMapName", label = h4(paste("Enter label for this subset of the", input$SelectSubsetMapInputID," mapping")),
+                               value = ""),
+                     actionButton("SelectSubsetButton", "Save Subset") )
+          })
+
+          # Get data for the Visualize tab.  Need parallel functions for the other tabs.
+          subsetEventsViz <- reactive({  get_event_mapping_threads( GlobalEventMappings, input$SelectSubsetMapInputID ) })
+
+          output$SelectSubsetDataTable  = DT::renderDataTable({
+            subsetEventsViz() }, filter = "top")
+
+          observeEvent(
+            input$SelectSubsetButton,
+            {store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
+            })
+
+
           ######## manage event mappings tab  ###############
 
             output$Manage_Event_Map_controls= renderUI({
@@ -523,28 +549,13 @@ server <- shinyServer(function(input, output, session) {
                1, zoom_limit, 1, step = 1, ticks=FALSE) }
   })
 
-  ######## create subsets tab  ###############
+  # Get data for the Visualize tab.  Need parallel functions for the other tabs.
+  threadedEventsViz <- reactive({  get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
 
-  output$SelectSubsetControls <- renderUI({
-    tags$div(align="left",
-    textInput("SelectSubsetMapName", label = h4(paste("Enter label for this subset of the", input$VisualizeEventMapInputID," mapping")),
-                                                value = ""),
-    actionButton("SelectSubsetButton", "Save Subset") )
-  })
 
-  output$SelectSubsetDataTable  = DT::renderDataTable({
-    threadedEventsViz() }, filter = "top")
+  ######## Basic ngrams tab  ###############
 
-  observeEvent(
-    input$SelectSubsetButton,
-    {store_event_mapping( input$SelectSubsetMapName, threadedEventsViz()[input$SelectSubsetDataTable_rows_all,] )
-    })
-
- # just for reference selectOccFilter = reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
-
-  ######## Repetitive Sub-sequences tab  ###############
-
-  # controls for sub-sequence display
+  # controls for ngrams display
   output$nGramControls <- renderUI({
     tagList(
       sliderInput("nGramLengthID","nGram Size", 1,10,2,step=1,ticks=FALSE ),
@@ -552,14 +563,32 @@ server <- shinyServer(function(input, output, session) {
     )
   })
 
-  # Get data for the Visualize tab.  Need parallel functions for the other tabs.
-  threadedEventsViz <- reactive({ print(paste0('reactive inputID', input$VisualizeEventMapInputID))
-    get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
-
-
   #  NGRAM  display #
   output$nGramBarchart = renderPlotly({
     ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
+  })
+
+  ######## Repetitive Sub-sequences tab  ###############
+
+  # controls for sub-sequence display
+  output$freqnGramControls <- renderUI({
+    tagList(
+      sliderInput("freqnGramLengthID","nGram Size range", 1,10, c(2,5),step=1,ticks=FALSE ),
+      sliderInput("freqnGramDisplayThresholdID","Display threshold", 1,50,1,step=1,ticks=FALSE )
+    )
+  })
+
+
+  #  frequent NGRAM  displays #
+
+  output$freqnGramTable <- renderTable(frequent_ngrams(threadedEventsViz() , 'threadNum',
+                                                       get_Zoom_VIZ(),
+                                                       input$freqnGramLengthID[1],
+                                                       input$freqnGramLengthID[2],
+                                                       input$freqnGramDisplayThresholdID ) )
+
+  output$freqnGramBarchart = renderPlotly({
+    ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$freqnGramLengthID[2], input$freqnGramDisplayThresholdID)
   })
 
   ######## Whole sequence tab  ###############

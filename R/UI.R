@@ -94,7 +94,7 @@ ui <- fluidPage(
 
                                    ),
 
-                                   tabPanel("Regular Expressions",
+                                   tabPanel("Input your pattern",
                                             fluidRow(
                                               column(3, uiOutput("Regular_Expression_controls_1")),
                                               column(3, uiOutput("Regular_Expression_controls_2")),
@@ -104,22 +104,33 @@ ui <- fluidPage(
                                             verbatimTextOutput("Regular_Expression_controls_4"),
                                             uiOutput("Regular_Expression_controls_5"),  # how many rows?
                                             uiOutput("Regular_Expression_controls_6")
-                                   ),
+                                          ),
 
                                    # tabPanel("Maximal Patterns",
                                    #          uiOutput("Maximal_Pattern_controls")
                                    # ),
 
-                                   tabPanel("Cluster Events",
+                                   tabPanel("Cluster for Zooming",
+                                            tags$h4("Note: Only mappings with sequential chunks can be clustered by sequence."),
                                             uiOutput("Cluster_Event_controls_1"),
                                             uiOutput("Cluster_Event_controls_2"),
                                             dendroNetworkOutput("dendroClusterResult")
-                                   ),
+                                            ),
+
+
+                                    tabPanel("Select Subset",
+                                             tags$h4("Select and save a subset of any mapping for visualization and comparison."),
+                                             fluidRow(
+                                             column(3, uiOutput("SelectSubsetControls_1")),
+                                             column(3, uiOutput("SelectSubsetControls_2")) ),
+                                             DT::dataTableOutput("SelectSubsetDataTable")
+                                            ),
+
 
                                    tabPanel("Manage Event Maps",
                                             uiOutput("Manage_Event_Map_controls"),
                                             verbatimTextOutput("delete_confirm")
-                                   )
+                                            )
                        )
 
               ),
@@ -129,17 +140,18 @@ ui <- fluidPage(
                                 uiOutput("Visualize_Tab_Controls_1")),
                        column(4,
                               uiOutput("Visualize_Tab_Controls_2"))
-                       ),
+                          ),
 
                        tabsetPanel(type = "tabs",
-                          tabPanel("Select Subset",
-                                            uiOutput("SelectSubsetControls"),
-                                            DT::dataTableOutput("SelectSubsetDataTable")
-                                   ),
-
-                          tabPanel("Repetitive Sub-sequences",
+                          tabPanel("Basic ngrams",
                                   uiOutput("nGramControls"),
                                   plotlyOutput("nGramBarchart")
+                                  ),
+
+                          tabPanel("Frequent ngrams",
+                                   uiOutput("freqnGramControls"),
+                                   tableOutput("freqnGramTable"),
+                                   plotlyOutput("freqnGramBarchart")
                                   ),
 
                           tabPanel("Whole Sequences",
