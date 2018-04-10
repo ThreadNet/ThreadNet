@@ -271,11 +271,11 @@ server <- shinyServer(function(input, output, session) {
     })
 
      output$Regular_Expression_controls_4 =   renderText(
-       paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
+       paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
 
     # or if you prefer HTML
     # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-    #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+    #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
      output$Regular_Expression_controls_5 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
      sliderInput("numRegexInputRows",
                  label=h4("How many ngrams/labels to make:"),
@@ -369,11 +369,11 @@ server <- shinyServer(function(input, output, session) {
       })
 
       output$Frequent_Ngram_controls_4 =   renderText(
-        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram())[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
+        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram(),',')[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
 
       # or if you prefer HTML
       # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-      #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+      #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
 
     output$Frequent_Ngram_controls_5 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
       sliderInput("numfreqNgramInputRows",
@@ -582,11 +582,15 @@ server <- shinyServer(function(input, output, session) {
   #  frequent NGRAM  displays #
   # just compute this data once -- not sure of the best way to display it... Table?  Bar chart?
 
-  fng <-reactive(frequent_ngrams(threadedEventsViz() , 'threadNum',
+  fng <-reactive(support_level(thread_text_vector(threadedEventsViz(),
+                                                  'threadNum',
+                                                  get_Zoom_VIZ(),' ' ),
+                              frequent_ngrams(threadedEventsViz() ,
+                                  'threadNum',
                                  get_Zoom_VIZ(),
                                  input$freqnGramLengthID[1],
                                  input$freqnGramLengthID[2],
-                                 input$freqnGramDisplayThresholdID ))
+                                 input$freqnGramDisplayThresholdID )))
 
   output$freqnGramTable <- renderTable( fng() )
 

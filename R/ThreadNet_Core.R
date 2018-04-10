@@ -101,36 +101,23 @@ threads_to_network <- function(et,TN,CF,timesplit){
 #' @export
 count_ngrams <- function(o,TN,CF,n){
 
-  # print("TN")
-  # print(TN)
-  # print("CF")
-  # print(CF)
-  # print("o")
-  # print(o)
 
-  # Cannot put all the values in one long string.  Need a vector of strings, one for each thread
-  text_vector = vector(mode="character")
-
-  # Only count in threads where length is adequate
-  j=0
-  for (i in unique(o[[TN]])){
-    txt =o[o[[TN]]==i,CF]
-    # length needs to be longer than n
-    if (length(txt)>n){
-      j=j+1
-      text_vector[j] = concatenate(o[o[[TN]]==i,CF])
-    }
-  }
+  # Cannot put all the values in one long string.  Need a vector of strings, one for each thread, delimited by a space
+  text_vector = thread_text_vector(o,TN,CF,' ')
 
    # print("text_vector")
    # print(text_vector)
 
-  # return a data frame that includes the ngrams
+  # get a data frame that includes the ngrams
   #    col 1 = ngrams
   #    col 2 = freq
   #    col 3 = prop (proportion that matches)
+  ng = get.phrasetable(ngram(text_vector,n))
 
-  return(get.phrasetable(ngram(text_vector,n)))
+  # add a column here for the length of the ngram -- useful later!
+  ng$len = n
+
+  return(ng)
 }
 
 
@@ -449,22 +436,22 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # Only run if eventMapName is filled in; return empty data frame otherwise
   if (EventMapName ==""){return(data.frame())}
 
-  # get the text vector for this set of threaded occurrences
-  tv = thread_text_vector( o, TN, CF )
+  # get the text vector for this set of threaded occurrences, delimited by commas
+  tv = thread_text_vector( o, TN, CF, ',' )
 
  # apply regex to tv and split on the commas
   tvrx =  replace_regex_list( tv, rx )
 
   tvrxs = lapply(1:length(tvrx), function(i) {unlist(strsplit(tvrx[[i]],','))})
 
-  print('tvrx')
-  print(tvrx[1:3])
-  print('tvrxs')
-  print(tvrxs[1:3])
+  # print('tvrx')
+  # print(tvrx[1:3])
+  # print('tvrxs')
+  # print(tvrxs[1:3])
 
 # count the total number of chunks
  nChunks = length(unlist(tvrxs))
- print(paste('nChunks=', nChunks))
+ # print(paste('nChunks=', nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
@@ -803,18 +790,18 @@ one_vcf_matrix <- function(e, vcf){
 # this is used for the regex pages to show the threads.
 # similar code is used in count_ngrams and to make networks, but with different delimiters
 # and with a minimum sequence length (ngram size), but this can be filtered after this function3
-thread_text_vector <- function(o, TN, CF){
+thread_text_vector <- function(o, TN, CF, delimiter){
 
 # Initialize text vector
 tv = vector(mode="character")
 
-# Loop through the unique thread numbers -- each
+# Loop through the unique thread numbers
 j=0
 for (i in unique(o[[TN]])){
     txt =o[o[[TN]]==i,CF]
 
     j=j+1
-    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF]),' ',',')
+    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF]),' ',delimiter)
 }
  return(tv)
 
@@ -855,12 +842,13 @@ frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
   # initialize the output
   ng = count_ngrams(e,TN, CF,minN)
 
+
   if (maxN > minN){
       for (i in seq(minN+1,maxN,1)){
         ng = rbind(ng,count_ngrams(e,TN, CF,i)) }
   }
   # remove the rows that happen once and only keep the columns we want
-  ng=ng[ng$freq>threshold,c('ngrams','freq')]
+  ng=ng[ng$freq>threshold,c('ngrams','freq', 'len')]
 
   # just take the maximal ones
    ng=maximal_ngrams(ng)
@@ -890,16 +878,27 @@ maximal_ngrams <- function(ng){
 # compute support level for each ngram
 # tv = text vectors for the threads
 # ng = frequent ngrams data frame
+# returns ng data frame with support level added
 support_level <- function(tv, ng) {
 
-  # create a support matrix where rows are threads and columns are the ngrams
-  s = matrix(nrow=length(tv), ncol=nrow(ng),0)
-  print(s)
+  # change the commas back to spaces
+  tv=str_replace_all(tv, ',' , ' ')
+
+  totalN = length(tv)
+
+  # need to remove whitespace from the trailing edge of the ngrams
+  ng$ngrams = trimws(ng$ngrams)
 
   # find out how many times each ngram is contained in each TV
-  w = lapply(1:nrow(ng), function(i){
-    grep(ng$ngrams[i],tv)}
+  ng$support = unlist(lapply(1:nrow(ng), function(i){
+    length(grep(ng$ngrams[i],tv)) })
+        )/totalN
+  return(ng)
+}
 
-  )
+generativity_level<- function(tv, ng){
+
+
 
 }
+
