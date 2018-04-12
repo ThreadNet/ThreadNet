@@ -84,8 +84,7 @@ server <- shinyServer(function(input, output, session) {
                        inline=TRUE)
   })
 
-  output$Data_Tab_Output_2  = DT::renderDataTable({
-                      selectOcc() }, filter = "top")
+  output$Data_Tab_Output_2  = DT::renderDataTable({ selectOcc() }, filter = "top")
 
   #  dataframe for occurrences that are read in from file1
   occ <- eventReactive(input$file1,read_occurrences(input$file1))
@@ -199,9 +198,7 @@ server <- shinyServer(function(input, output, session) {
   # Need to suppress some columns that contain lists that do not display correctly in the DT
   threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
 
-  output$One_to_one_Tab_Output_1  = DT::renderDataTable({
-    threadedEvents()
-  }, filter = "top")
+  output$One_to_one_Tab_Output_1  = DT::renderDataTable( threadedEvents() )
 
   output$One_to_one_Tab_Output_2  = renderPlotly({
     threadMap(threadedEvents(), "threadNum", "seqNum", 'ZM_1', 15  ) })
@@ -233,9 +230,7 @@ server <- shinyServer(function(input, output, session) {
   threadedEvents2 <- reactive({make_nice_event_DT(threadedEventCluster2()[["threads"]])})
 
 
-    output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
-      threadedEvents2()
-    }, filter = "top")
+    output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable( threadedEvents2() )
 
     output$Contextual_Chunks_Tab_Output_2  = renderPlotly({
       threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
@@ -494,8 +489,7 @@ server <- shinyServer(function(input, output, session) {
           # Get data for the Visualize tab.  Need parallel functions for the other tabs.
           subsetEventsViz <- reactive({  get_event_mapping_threads( GlobalEventMappings, input$SelectSubsetMapInputID ) })
 
-          output$SelectSubsetDataTable  = DT::renderDataTable({
-            subsetEventsViz() }, filter = "top")
+          output$SelectSubsetDataTable  = DT::renderDataTable({ subsetEventsViz() }, filter = "top")
 
           observeEvent(
             input$SelectSubsetButton,
@@ -592,7 +586,7 @@ server <- shinyServer(function(input, output, session) {
                                  input$freqnGramLengthID[2],
                                  input$freqnGramDisplayThresholdID )))
 
-  output$freqnGramTable <- renderTable( fng() )
+  output$freqnGramTable <- DT::renderDataTable( fng() , filter = "top")
 
   output$freqnGramBarchart = renderPlotly({ ng_bar_chart_freq(fng() )})
 
@@ -851,15 +845,6 @@ server <- shinyServer(function(input, output, session) {
     #event.data()
   })
 
-
-
-
-
-
-  output$test <- renderDataTable({
-    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
-    w
-  })
 
 
 

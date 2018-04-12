@@ -150,10 +150,7 @@ ui <- fluidPage(
 
                           tabPanel("Frequent ngrams",
                                    uiOutput("freqnGramControls"),
-                                   fluidRow(
-                                     column(2, tableOutput("freqnGramTable")),
-                                     column(10,plotlyOutput("freqnGramBarchart"))
-                                   )
+                                   DT::dataTableOutput("freqnGramTable")
                                   ),
 
                           tabPanel("Whole Sequences",
