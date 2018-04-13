@@ -385,10 +385,18 @@ server <- shinyServer(function(input, output, session) {
 
     output$freqnGramTable <- DT::renderDataTable( fng_select() , filter = "top")
 
-    selected_ngrams <-reactive({ data.frame(pattern=input$freqnGramTable_rows_selected[['ngrams']],
-                                            label= str_replace_all(input$freqnGramTable_rows_selected[['ngrams']],' ','_'),
-                                            stringsAsFactors=FALSE)
 
+    # The bottom example shows a server-side table. Make sure you have included row names in the table (as the first column of the table).
+    # In the case of server-side processing, the row names of the selected rows are available in input$x3_rows_selected as a character vector.
+    #
+    selected_ngrams <-reactive({s=as.integer(input$freqnGramTable_rows_selected)
+                              data.frame(pattern=unlist(lapply(1:length(s),
+                                                                  function(i){ str_replace_all(fng_select()[i,'ngrams'],' ',',') })),
+                                            label=unlist(lapply(1:length(s),
+                                                                  function(i){
+                                                                    str_replace_all(fng_select()[i,'ngrams'],' ','_')
+                                                                  })),
+                                            stringsAsFactors=FALSE)
       })
 
       # REPLACED BY renderDataTable -- create several rows of inputs
