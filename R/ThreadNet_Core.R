@@ -425,6 +425,8 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
 # this one creates events based on frequent ngrams or regular expressions
 OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
+  print(rx)
+
   # keep track of the length of each pattern
   for (i in 1:nrow(rx))
   {rx$patLength[i] = length(unlist(strsplit(rx$pattern[i], ',')))
@@ -771,7 +773,6 @@ aggregate_VCF_for_cluster <- function(e, cf, eclust, zoom_col){
 }
 
 
-
 # this one takes the whole list
 VCF_matrix <- function(e, vcf ){
 
@@ -804,7 +805,7 @@ for (i in unique(o[[TN]])){
     txt =o[o[[TN]]==i,CF]
 
     j=j+1
-    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF]),' ',delimiter)
+    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF] ),' ',delimiter)
 }
  return(tv)
 
@@ -954,15 +955,15 @@ generativity_level<- function(tv, ng){
   }
 
   # compute the in and out degree
-  ng$out_degree = unlist( lapply(1:nrow(ng), function(i){
-    zm=z[[i]]
-    length( zm[zm[,1]==1,1] )  } ))
-
   ng$in_degree = unlist(lapply(1:nrow(ng), function(i){
     zm=z[[i]]
     length( zm[zm[,1]>1,1] )  } ))
 
-  ng$generativity = lapply(1:nrow(ng), function(i) {ng$out_degree[i] * ng$in_degree[i]})
+  ng$out_degree = unlist( lapply(1:nrow(ng), function(i){
+    zm=z[[i]]
+    length( zm[zm[,1]==1,1] )  } ))
+
+  # ng$generativity = lapply(1:nrow(ng), function(i) {ng$out_degree[i] * ng$in_degree[i]})
 
   return(ng)
 }

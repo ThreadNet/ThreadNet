@@ -89,9 +89,7 @@ ui <- fluidPage(
                                               ),
                                             uiOutput("Frequent_Ngram_controls_3"),
                                             verbatimTextOutput("Frequent_Ngram_controls_4"),
-                                            uiOutput("Frequent_Ngram_controls_5"),  # how many rows?
-                                            uiOutput("Frequent_Ngram_controls_6")
-
+                                            DT::dataTableOutput("freqnGramTable")
                                    ),
 
                                    tabPanel("Input your pattern",
@@ -150,7 +148,7 @@ ui <- fluidPage(
 
                           tabPanel("Frequent ngrams",
                                    uiOutput("freqnGramControls"),
-                                   DT::dataTableOutput("freqnGramTable")
+                                   plotlyOutput("freqnGramBarchart")
                                   ),
 
                           tabPanel("Whole Sequences",
