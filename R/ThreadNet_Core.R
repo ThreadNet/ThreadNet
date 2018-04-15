@@ -101,24 +101,13 @@ threads_to_network <- function(et,TN,CF,timesplit){
 #' @export
 count_ngrams <- function(o,TN,CF,n){
 
-
-  # Cannot put all the values in one long string.  Need a vector of strings, one for each thread, delimited by a space
+  # Need a vector of strings, one for each thread, delimited by spaces
   # the function long_enough filters out the threads that are shorter than n
   # use space for the delimiter here
-  print(CF)
-  print(n)
+  text_vector = long_enough( thread_text_vector(o,TN,CF,' '), n, ' ')
 
-  tv =thread_text_vector(o,TN,CF,' ')
-  print(tv)
-  text_vector = long_enough( tv, n, ' ')
-
-    print("text_vector")
-    print(text_vector)
-
-  # get a data frame that includes the ngrams
-  #    col 1 = ngrams
-  #    col 2 = freq
-  #    col 3 = prop (proportion that matches)
+    # print("text_vector")
+    # print(text_vector)
 
   ng = get.phrasetable(ngram(text_vector,n))
 
@@ -259,7 +248,7 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
   e=o
 
    # occurrences have no duration
-   o["eventDuration"] = 0
+   e$eventDuration = 0
 
     # rename the threadNum and seqNum columns
     names(e)[names(e)=="POVthreadNum"] <- "threadNum"
@@ -279,19 +268,10 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
         }
       }
 
-    # I am not sure if we need to do these factors-- and they add a lot of processing time
-  #     for (cf in compare_CF){
-  #       #make a new column for each CF
-  #       VCF = paste0("V_",cf)
-  #       e[[VCF]]=vector(mode = "integer",length=nrow(e))
-  #
-  #       for (r in 1:nrow(e)){
-  #         e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
-  #     }
-  # }
 
     # just add the one column with the combined values
-    e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
+  #  e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
+     e["ZM_1"] = as.integer(e[,newColName(EVENT_CF)])
 
     # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
     # map = list(name = paste(EventMapName), threads = e)
@@ -330,16 +310,10 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
   ### Use the break points to find the chunks -- just store the index back to the raw data
   nChunks = length(breakpoints)
 
-  print("nChunks")
-  print(nChunks)
+  # print(paste("nChunks=",nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
-
-  # add columns for each of the context factors used for comparison
-  # for (cf in compare_CF){
-  #   e[cf] = character(nChunks)
-  # }
 
   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
@@ -378,7 +352,7 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
 
     # fill in data for each of the context factors
     for (cf in compare_CF){
-      e[chunkNo,cf] = o[start_idx,cf]
+      e[chunkNo,cf] = as.character(o[start_idx,cf])
      }
 
     for (cf in EVENT_CF){
@@ -430,15 +404,15 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
 # this one creates events based on frequent ngrams or regular expressions
 OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
-  print(rx)
+  # print(rx)
 
   # keep track of the length of each pattern
   for (i in 1:nrow(rx))
   {rx$patLength[i] = length(unlist(strsplit(rx$pattern[i], ',')))
   }
 
-  print(rx)
-  print(rx$label)
+  # print(rx)
+  # print(rx$label)
 
   # put this here for now
   timescale='mins'
@@ -461,10 +435,12 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
 # count the total number of chunks
  nChunks = length(unlist(tvrxs))
- # print(paste('nChunks=', nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
+
+  # # for debugging, this is really handy
+  # save(o,rx,tvrxs, file="O_and_E_3.rdata")
 
 
   #loop through the threads and fill in the data for each event
@@ -481,6 +457,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       chunkNo = chunkNo+1
       original_row=original_row+1
 
+      print(paste("original_row=",original_row))
+
     # assign the thread and sequence number
     e$threadNum[chunkNo] = thread
     e$seqNum[chunkNo] = sn
@@ -493,8 +471,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
     if (tvrxs[[thread]][sn] %in% rx$label ){
 
-      print(paste('thread sn = ',thread, sn))
-      print(paste('matched regex label',tvrxs[[thread]][sn]))
+      # print(paste('thread sn = ',thread, sn))
+      # print(paste('matched regex label',tvrxs[[thread]][sn]))
 
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
@@ -536,7 +514,6 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
       e[[chunkNo,'eventDuration']] = o[[original_row,'eventDuration']]
 
-
     }
 
     } # sn loop
@@ -552,7 +529,6 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
     # should probably re-number the sequence numbers...
 
     }
-
 
 
   # for debugging, this is really handy
@@ -837,28 +813,27 @@ replace_regex_list <- function(tv, rx ){
 #     )  })
 # }
 
-selectize_frequent_ngrams<- function(e, TN, CF, minN, maxN, threshold){
-
-  f=str_replace_all(trimws(frequent_ngrams(e, TN, CF, minN, maxN, threshold)[,'ngrams'], which=c('right')), ' ',',')
-  return(f)
-}
-
+# No longer needed?
+# selectize_frequent_ngrams<- function(e, TN, CF, minN, maxN, threshold){
+#
+#   f=str_replace_all(trimws(frequent_ngrams(e, TN, CF, minN, maxN, threshold,TRUE)[,'ngrams'], which=c('right')), ' ',',')
+#   return(f)
+# }
 
 
 # combined set of frequent ngrams
 # add parameter to make maximal a choice
-frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold, onlyMaximal=FALSE){
+frequent_ngrams <- function(e, TN, CF, minN, maxN, onlyMaximal=TRUE){
 
   # initialize the output
   ng = count_ngrams(e,TN, CF,minN)
-
 
   if (maxN > minN){
       for (i in seq(minN+1,maxN,1)){
         ng = rbind(ng,count_ngrams(e,TN, CF,i)) }
   }
   # remove the rows that happen once and only keep the columns we want
-  ng=ng[ng$freq>threshold,c('ngrams','freq', 'len')]
+   ng=ng[ng$freq>1,c('ngrams','freq', 'len')]
 
   # just take the maximal ones if so desired
   if (onlyMaximal) { ng=maximal_ngrams(ng)  }
