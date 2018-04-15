@@ -105,10 +105,15 @@ count_ngrams <- function(o,TN,CF,n){
   # Cannot put all the values in one long string.  Need a vector of strings, one for each thread, delimited by a space
   # the function long_enough filters out the threads that are shorter than n
   # use space for the delimiter here
-  text_vector = long_enough( thread_text_vector(o,TN,CF,' '), n, ' ')
+  print(CF)
+  print(n)
 
-   # print("text_vector")
-   # print(text_vector)
+  tv =thread_text_vector(o,TN,CF,' ')
+  print(tv)
+  text_vector = long_enough( tv, n, ' ')
+
+    print("text_vector")
+    print(text_vector)
 
   # get a data frame that includes the ngrams
   #    col 1 = ngrams
