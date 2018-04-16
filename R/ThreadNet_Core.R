@@ -495,7 +495,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
       # assign timestamp and duration -- use first - last occurrence times
       # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
-      #
+      e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
 
 
     }
