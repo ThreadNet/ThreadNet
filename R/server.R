@@ -85,7 +85,9 @@ server <- shinyServer(function(input, output, session) {
                        inline=TRUE)
   })
 
-  output$Data_Tab_Output_2  = DT::renderDataTable({ selectOcc() }, filter = "top")
+
+  output$Data_Tab_Output_2  = DT::renderDataTable({
+                      selectOcc() }, filter = "top", options=list(autoWidth = TRUE))
 
   #  dataframe for occurrences that are read in from file1
   occ <- eventReactive(input$file1,read_occurrences(input$file1))
@@ -603,6 +605,9 @@ server <- shinyServer(function(input, output, session) {
     threadMap(threadedEventsViz(), "threadNum", "tStamp", get_Zoom_VIZ(), 15  )
   })
 
+  output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({
+    threadMap(threadedEventsViz(), "threadNum", "relativeTime", get_Zoom_VIZ(), 15  )
+  })
 
   ######## Circular network tab  ###############
   # output$circularLayoutNetwork = renderPlotly(
