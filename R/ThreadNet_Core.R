@@ -101,36 +101,20 @@ threads_to_network <- function(et,TN,CF,timesplit){
 #' @export
 count_ngrams <- function(o,TN,CF,n){
 
-  # print("TN")
-  # print(TN)
-  # print("CF")
-  # print(CF)
-  # print("o")
-  # print(o)
+  # Need a vector of strings, one for each thread, delimited by spaces
+  # the function long_enough filters out the threads that are shorter than n
+  # use space for the delimiter here
+  text_vector = long_enough( thread_text_vector(o,TN,CF,' '), n, ' ')
 
-  # Cannot put all the values in one long string.  Need a vector of strings, one for each thread
-  text_vector = vector(mode="character")
+    # print("text_vector")
+    # print(text_vector)
 
-  # Only count in threads where length is adequate
-  j=0
-  for (i in unique(o[[TN]])){
-    txt =o[o[[TN]]==i,CF]
-    # length needs to be longer than n
-    if (length(txt)>n){
-      j=j+1
-      text_vector[j] = concatenate(o[o[[TN]]==i,CF])
-    }
-  }
+  ng = get.phrasetable(ngram(text_vector,n))
 
-   # print("text_vector")
-   # print(text_vector)
+  # add a column here for the length of the ngram -- useful later!
+  ng$len = n
 
-  # return a data frame that includes the ngrams
-  #    col 1 = ngrams
-  #    col 2 = freq
-  #    col 3 = prop (proportion that matches)
-
-  return(get.phrasetable(ngram(text_vector,n)))
+  return(ng)
 }
 
 
@@ -260,7 +244,7 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
   e=o
 
    # occurrences have no duration
-   o["eventDuration"] = 0
+   e$eventDuration = 0
 
     # rename the threadNum and seqNum columns
     names(e)[names(e)=="POVthreadNum"] <- "threadNum"
@@ -280,19 +264,10 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
         }
       }
 
-    # I am not sure if we need to do these factors-- and they add a lot of processing time
-  #     for (cf in compare_CF){
-  #       #make a new column for each CF
-  #       VCF = paste0("V_",cf)
-  #       e[[VCF]]=vector(mode = "integer",length=nrow(e))
-  #
-  #       for (r in 1:nrow(e)){
-  #         e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
-  #     }
-  # }
 
     # just add the one column with the combined values
-    e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
+  #  e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
+     e["ZM_1"] = as.integer(e[,newColName(EVENT_CF)])
 
     # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
     # map = list(name = paste(EventMapName), threads = e)
@@ -304,6 +279,9 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
 
     # print( get_event_mapping_names( GlobalEventMappings ) )
     # save(GlobalEventMappings, file="eventMappings.RData")
+
+    # for debugging, this is really handy
+    # save(o,e,file="O_and_E_1.rdata")
 
     return(eventMap)
 
@@ -331,16 +309,10 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
   ### Use the break points to find the chunks -- just store the index back to the raw data
   nChunks = length(breakpoints)
 
-  print("nChunks")
-  print(nChunks)
+  # print(paste("nChunks=",nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
-
-  # add columns for each of the context factors used for comparison
-  # for (cf in compare_CF){
-  #   e[cf] = character(nChunks)
-  # }
 
   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
@@ -379,7 +351,7 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
 
     # fill in data for each of the context factors
     for (cf in compare_CF){
-      e[chunkNo,cf] = o[start_idx,cf]
+      e[chunkNo,cf] = as.character(o[start_idx,cf])
      }
 
     for (cf in EVENT_CF){
@@ -415,7 +387,7 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
       } # for cluster_level
 
   # for debugging, this is really handy
-  #  save(o,e,file="O_and_E.rdata")
+  #  save(o,e,file="O_and_E_2.rdata")
 
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping(EventMapName, e)
@@ -431,13 +403,15 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
 # this one creates events based on frequent ngrams or regular expressions
 OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
+  # print(rx)
+
   # keep track of the length of each pattern
   for (i in 1:nrow(rx))
   {rx$patLength[i] = length(unlist(strsplit(rx$pattern[i], ',')))
   }
 
-  print(rx)
-  print(rx$label)
+  # print(rx)
+  # print(rx$label)
 
   # put this here for now
   timescale='mins'
@@ -445,25 +419,27 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # Only run if eventMapName is filled in; return empty data frame otherwise
   if (EventMapName ==""){return(data.frame())}
 
-  # get the text vector for this set of threaded occurrences
-  tv = thread_text_vector( o, TN, CF )
+  # get the text vector for this set of threaded occurrences, delimited by commas
+  tv = thread_text_vector( o, TN, CF, ',' )
 
  # apply regex to tv and split on the commas
   tvrx =  replace_regex_list( tv, rx )
 
   tvrxs = lapply(1:length(tvrx), function(i) {unlist(strsplit(tvrx[[i]],','))})
 
-  print('tvrx')
-  print(tvrx[1:3])
-  print('tvrxs')
-  print(tvrxs[1:3])
+  # print('tvrx')
+  # print(tvrx[1:3])
+  # print('tvrxs')
+  # print(tvrxs[1:3])
 
 # count the total number of chunks
  nChunks = length(unlist(tvrxs))
- print(paste('nChunks=', nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
+
+  # # for debugging, this is really handy
+  # save(o,rx,tvrxs, file="O_and_E_3.rdata")
 
 
   #loop through the threads and fill in the data for each event
@@ -480,6 +456,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       chunkNo = chunkNo+1
       original_row=original_row+1
 
+      print(paste("original_row=",original_row))
+
     # assign the thread and sequence number
     e$threadNum[chunkNo] = thread
     e$seqNum[chunkNo] = sn
@@ -492,8 +470,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
     if (tvrxs[[thread]][sn] %in% rx$label ){
 
-      print(paste('thread sn = ',thread, sn))
-      print(paste('matched regex label',tvrxs[[thread]][sn]))
+      # print(paste('thread sn = ',thread, sn))
+      # print(paste('matched regex label',tvrxs[[thread]][sn]))
 
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
@@ -513,7 +491,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
       # assign timestamp and duration -- use first - last occurrence times
       # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
-      #
+      e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
 
 
     }
@@ -535,7 +513,6 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
       e[[chunkNo,'eventDuration']] = o[[original_row,'eventDuration']]
 
-
     }
 
     } # sn loop
@@ -553,9 +530,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
     }
 
 
-
-  # for debugging, this is really handy
-    save(o,e,rx,tvrxs, file="O_and_E.rdata")
+  # # for debugging, this is really handy
+  #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping(EventMapName, e)
@@ -777,7 +753,6 @@ aggregate_VCF_for_cluster <- function(e, cf, eclust, zoom_col){
 }
 
 
-
 # this one takes the whole list
 VCF_matrix <- function(e, vcf ){
 
@@ -799,18 +774,18 @@ one_vcf_matrix <- function(e, vcf){
 # this is used for the regex pages to show the threads.
 # similar code is used in count_ngrams and to make networks, but with different delimiters
 # and with a minimum sequence length (ngram size), but this can be filtered after this function3
-thread_text_vector <- function(o, TN, CF){
+thread_text_vector <- function(o, TN, CF, delimiter){
 
 # Initialize text vector
 tv = vector(mode="character")
 
-# Loop through the unique thread numbers -- each
+# Loop through the unique thread numbers
 j=0
 for (i in unique(o[[TN]])){
     txt =o[o[[TN]]==i,CF]
 
     j=j+1
-    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF]),' ',',')
+    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF] ),' ',delimiter)
 }
  return(tv)
 
@@ -837,16 +812,17 @@ replace_regex_list <- function(tv, rx ){
 #     )  })
 # }
 
-selectize_frequent_ngrams<- function(e, TN, CF, minN, maxN, threshold){
-
-  f=str_replace_all(trimws(frequent_ngrams(e, TN, CF, minN, maxN, threshold)[,'ngrams'], which=c('right')), ' ',',')
-  return(f)
-}
-
+# No longer needed?
+# selectize_frequent_ngrams<- function(e, TN, CF, minN, maxN, threshold){
+#
+#   f=str_replace_all(trimws(frequent_ngrams(e, TN, CF, minN, maxN, threshold,TRUE)[,'ngrams'], which=c('right')), ' ',',')
+#   return(f)
+# }
 
 
 # combined set of frequent ngrams
-frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
+# add parameter to make maximal a choice
+frequent_ngrams <- function(e, TN, CF, minN, maxN, onlyMaximal=TRUE){
 
   # initialize the output
   ng = count_ngrams(e,TN, CF,minN)
@@ -856,10 +832,10 @@ frequent_ngrams <- function(e, TN, CF, minN, maxN, threshold){
         ng = rbind(ng,count_ngrams(e,TN, CF,i)) }
   }
   # remove the rows that happen once and only keep the columns we want
-  ng=ng[ng$freq>threshold,c('ngrams','freq')]
+   ng=ng[ng$freq>1,c('ngrams','freq', 'len')]
 
-  # just take the maximal ones
-   ng=maximal_ngrams(ng)
+  # just take the maximal ones if so desired
+  if (onlyMaximal) { ng=maximal_ngrams(ng)  }
 
   # return the set sorted by most frequent
   return(ng[order(-ng$freq),])
@@ -886,16 +862,95 @@ maximal_ngrams <- function(ng){
 # compute support level for each ngram
 # tv = text vectors for the threads
 # ng = frequent ngrams data frame
+# returns ng data frame with support level added
 support_level <- function(tv, ng) {
 
-  # create a support matrix where rows are threads and columns are the ngrams
-  s = matrix(nrow=length(tv), ncol=nrow(ng),0)
-  print(s)
+  # change the commas back to spaces
+  tv=str_replace_all(tv, ',' , ' ')
+
+  totalN = length(tv)
+
+  # need to remove whitespace from the trailing edge of the ngrams
+  ng$ngrams = trimws(ng$ngrams)
 
   # find out how many times each ngram is contained in each TV
-  w = lapply(1:nrow(ng), function(i){
-    grep(ng$ngrams[i],tv)}
+  ng$support = unlist(lapply(1:nrow(ng), function(i){
+    length(grep(ng$ngrams[i],tv)) })
+        )/totalN
 
-  )
+  # toss in the generativity level
+  ng = generativity_level(tv,ng)
+
+  return(ng)
+}
+
+# compute the generativity = in-degree and out-degree
+generativity_level<- function(tv, ng){
+
+  # for each ngram, look at the next longer size
+  # Find the n+1-grams that match (as in the code for maximal ngrams).
+  # There are two possibilities -- matching in the first or second position
+  # The number of matches in the first position =  the out-degree
+  # The number of matches in the second position =  the in-degree
+  # if so desired, it should be possible to keep a list.
+
+  # problem is that the tokens can be 1-3 characters long, and there are spaces...
+
+  # Big Idea for frequent n-grams: use the DT:: and let people sort, select and apply all the ngrams they want.
+  # Name them using the tokens but with a different delimiter to avoid confusion.  Go Crazy!
+
+  # convert to spaces
+  tv=str_replace_all(tv, ',',' ')
+
+  # first get the range we are looking for
+  nList = unique(ng$len)
+
+  z=list()
+
+  # loop through them
+  for (n in nList){
+
+    # print(paste('n = ',n))
+    #pick the ngrams of length n from the list given
+    ngn= ng[ng$len==n,]
+
+
+    # get ngrams of length n+1 -- make sure the threads are long enough
+    ngplus = get.phrasetable(ngram( long_enough(tv,n+1, ' '), n+1))
+
+    # this picks out the ones that match
+  w = lapply(1:nrow(ngn), function(i){
+    grep(ngn$ngrams[i],ngplus$ngrams)} )
+
+  #print(w)
+  # print('z = ')
+  zplus = lapply(1:nrow(ngn), function(i){
+    str_locate(ngplus$ngrams[w[[i]]],ngn$ngrams[i])  } )
+
+  # print(z)
+
+  z = c(z,zplus)
+
+  }
+
+  # compute the in and out degree
+  ng$in_degree = unlist(lapply(1:nrow(ng), function(i){
+    zm=z[[i]]
+    length( zm[zm[,1]>1,1] )  } ))
+
+  ng$out_degree = unlist( lapply(1:nrow(ng), function(i){
+    zm=z[[i]]
+    length( zm[zm[,1]==1,1] )  } ))
+
+  # ng$generativity = lapply(1:nrow(ng), function(i) {ng$out_degree[i] * ng$in_degree[i]})
+
+  return(ng)
+}
+
+# to avoid errors in count_ngrams, make sure the length of each thread in the text_vector tv is longer than the n-gram size, n
+# this gets used in various places so need to pass in the delimiter
+long_enough = function(tv,n,delimiter){
+
+return(tv[ unlist(lapply(1:length(tv), function(i) {length(unlist(strsplit(tv[[i]],delimiter)))>=n})) ])
 
 }

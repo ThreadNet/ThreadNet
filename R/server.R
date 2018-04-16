@@ -63,6 +63,7 @@ server <- shinyServer(function(input, output, session) {
   get_Zoom_freqNgram <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$freqNgramInputMapID))==1 ,
                                                     "ZM_1", paste0("ZM_",input$freqNgramZoomID))) })
 
+
   #################################################################
   ################## 1.READ DATA TAB ##############################
   #################################################################
@@ -83,6 +84,7 @@ server <- shinyServer(function(input, output, session) {
                        selected=cfnames(occ()),
                        inline=TRUE)
   })
+
 
   output$Data_Tab_Output_2  = DT::renderDataTable({
                       selectOcc() }, filter = "top", options=list(autoWidth = TRUE))
@@ -178,18 +180,18 @@ server <- shinyServer(function(input, output, session) {
 
   output$One_to_One_controls  = renderUI({
     tags$div(align="left",
-             tags$h4("One-to-One: Each occurrence in the raw data is interpreted as an event (INPUT = Occurrences)."),
+             tags$h4("One-to-One: Each occurrence in the raw data is interpreted as event."),
              tags$p(" "),
              textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
-             actionButton("EventButton1", "Create New Mapping"),
+             # actionButton("EventButton1", "Create New Mapping"),
              hr()
-             )
+    )
 
   })
 
   # this function runs when you push the button to create a new mapping
   threadedEventCluster <- reactive({
-    input$EventButton1
+    # input$EventButton1
     isolate(OccToEvents1(threadedOcc(),
                          input$EventMapName1,
                          get_EVENT_CF(),
@@ -199,9 +201,14 @@ server <- shinyServer(function(input, output, session) {
   # Need to suppress some columns that contain lists that do not display correctly in the DT
   threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
 
-  output$One_to_one_Tab_Output_1  = DT::renderDataTable({
-    threadedEvents()
-  }, filter = "top")
+  # threadedEvents <- reactive(make_nice_event_DT(OccToEvents1(threadedOcc(),
+  #                                                           'One_to_One',
+  #                                                           get_EVENT_CF(),
+  #                                                           get_COMPARISON_CF())[["threads"]] )
+  #                           )
+
+
+  output$One_to_one_Tab_Output_1  = DT::renderDataTable( threadedEvents() )
 
   output$One_to_one_Tab_Output_2  = renderPlotly({
     threadMap(threadedEvents(), "threadNum", "seqNum", 'ZM_1', 15  ) })
@@ -211,7 +218,7 @@ server <- shinyServer(function(input, output, session) {
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
-               tags$p(paste0("Start new event when ALL of these change:", paste(get_EVENT_CF(),","))),
+               tags$p(paste0("Start new event when ALL of these change: ", knitr::combine_words(get_EVENT_CF(), sep = ", "))),
 
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks"),
 
@@ -233,16 +240,12 @@ server <- shinyServer(function(input, output, session) {
   threadedEvents2 <- reactive({make_nice_event_DT(threadedEventCluster2()[["threads"]])})
 
 
-    output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable({
-      threadedEvents2()
-    }, filter = "top")
+    output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable( threadedEvents2() )
 
     output$Contextual_Chunks_Tab_Output_2  = renderPlotly({
       threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
 
     ########  regular expression tab  ###############
-    # Thiscode is ALMOST identical to the regex tab.
-    # If there is a bug here, it is probably there as well.
 
       output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
@@ -251,7 +254,6 @@ server <- shinyServer(function(input, output, session) {
 
       # get the data that will be the input for this tab
     regexInputEvents <- reactive( get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID) )
-
 
 
     output$Regular_Expression_controls_2 <- renderUI({
@@ -271,11 +273,11 @@ server <- shinyServer(function(input, output, session) {
     })
 
      output$Regular_Expression_controls_4 =   renderText(
-       paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
+       paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
 
     # or if you prefer HTML
     # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-    #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+    #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
      output$Regular_Expression_controls_5 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
      sliderInput("numRegexInputRows",
                  label=h4("How many ngrams/labels to make:"),
@@ -289,13 +291,12 @@ server <- shinyServer(function(input, output, session) {
          fluidRow(
          column(2,textInput(paste0('regex', i), paste0('Ngram-', i) ), offset=1),
          column(2,textInput(paste0('regexLabel', i), paste0('Label-', i) ))
-         # ,
-         # column(2,selectizeInput(paste0('regex', i), label=paste0('Label-', i), freqNgramSelections() ))
+
          ) })
        })
 
     # need to add commas and probably add slider for upper/lower bound and threshold
-    freqNgramSelections <- reactive({ selectize_frequent_ngrams(regexInputEvents() , 'threadNum', get_Zoom_REGEX(), 2, 5, 3)  })
+    # freqNgramSelections <- reactive({ selectize_frequent_ngrams(regexInputEvents() , 'threadNum', get_Zoom_REGEX(), 2, 5, 3)  })
 
      # get the input values and return data frame with regex & label
     regexInput = reactive({
@@ -330,8 +331,7 @@ server <- shinyServer(function(input, output, session) {
 
 
       ########  Frequent n-gram tab  ###############
-      # Thiscode is ALMOST identical to the regex tab.
-      # If there is a bug here, it is probably there as well.
+      # This code is similar to the regex tab except for the data table
 
       output$Frequent_Ngram_controls_1 = renderUI({
         tags$div(align="left",
@@ -355,10 +355,7 @@ server <- shinyServer(function(input, output, session) {
         tags$div(align="left",
         sliderInput("freqNgramRange",
                     label=h4("Size of nGrams between:"),
-                    min=2,max=10, c(2,5), step = 1, ticks=FALSE),
-        sliderInput("freqNgramThreshold",
-                    label=h4("Frequency Threshold:"),
-                    min=2,max=20, 2, step = 1, ticks=FALSE)
+                    min=2,max=10, c(2,5), step = 1, ticks=FALSE)
         )
       })
 
@@ -369,43 +366,43 @@ server <- shinyServer(function(input, output, session) {
       })
 
       output$Frequent_Ngram_controls_4 =   renderText(
-        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram())[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
+        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram(),',')[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
 
       # or if you prefer HTML
       # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-      #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX())[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+      #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
 
     output$Frequent_Ngram_controls_5 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
       sliderInput("numfreqNgramInputRows",
                   label=h4("How many ngrams/labels to make:"),
                   min=1,max=10, 3, step = 1, ticks=FALSE) })
 
-      # create several rows of inputs
-      output$Frequent_Ngram_controls_6 = renderUI({
+    fng_select <-reactive(support_level(thread_text_vector(freqNgramInputEvents(),
+                                                    'threadNum',
+                                                    get_Zoom_freqNgram(),' ' ),
+                                 frequent_ngrams(freqNgramInputEvents() ,
+                                                 'threadNum',
+                                                 get_Zoom_freqNgram(),
+                                                 input$freqNgramRange[1],
+                                                 input$freqNgramRange[2],
+                                                 TRUE)))
 
-        # create some select inputs
-        lapply(1:input$numfreqNgramInputRows, function(i) {
-          fluidRow(
-            column(2, selectizeInput(paste0('freqNgram', i), label=paste0('Choose ngram-', i), freqNgramSelections() ), offset=1),
-            column(2,textInput(paste0('freqNgramLabel', i), label=paste0('Label-', i) ))
-          ) })
-      })
 
-      # need to add slider for upper/lower bound and threshold
-      freqNgramSelections <- reactive({ selectize_frequent_ngrams(freqNgramInputEvents() , 'threadNum',
-                                                                  get_Zoom_freqNgram(),
-                                                                  input$freqNgramRange[1],
-                                                                  input$freqNgramRange[2],
-                                                                  input$freqNgramThreshold )  })
+    output$freqnGramTable <- DT::renderDataTable( fng_select() , filter = "top")
 
-      # get the input values and return data frame with regex & label
-      freqNgramInput = reactive({
-        data.frame(pattern=unlist(lapply(1:input$numfreqNgramInputRows,
-                                         function(i){input[[paste0('freqNgram', i)]]}
-        )),
-        label=unlist(lapply(1:input$numfreqNgramInputRows,
-                            function(i){input[[paste0('freqNgramLabel', i)]]}
-        )), stringsAsFactors=FALSE )
+
+    # The bottom example shows a server-side table. Make sure you have included row names in the table (as the first column of the table).
+    # In the case of server-side processing, the row names of the selected rows are available in input$x3_rows_selected as a character vector.
+    #
+    selected_ngrams <-reactive({s=as.integer(input$freqnGramTable_rows_selected)
+                              data.frame(pattern=unlist(lapply(1:length(s),
+                                                                  function(i){ str_replace_all(fng_select()[i,'ngrams'],' ',',') })),
+                                            label=unlist(lapply(1:length(s),
+                                                                  function(i){paste0("<",
+                                                                    str_replace_all(fng_select()[i,'ngrams'],' ','_'),
+                                                                    ">")
+                                                                  })),
+                                            stringsAsFactors=FALSE)
       })
 
 
@@ -426,7 +423,7 @@ server <- shinyServer(function(input, output, session) {
                               get_COMPARISON_CF(),
                               'threadNum',
                               get_Zoom_freqNgram(),
-                              freqNgramInput(),
+                              selected_ngrams(),
                               input$KeepIrregularEvents_2))
         })
 
@@ -494,8 +491,7 @@ server <- shinyServer(function(input, output, session) {
           # Get data for the Visualize tab.  Need parallel functions for the other tabs.
           subsetEventsViz <- reactive({  get_event_mapping_threads( GlobalEventMappings, input$SelectSubsetMapInputID ) })
 
-          output$SelectSubsetDataTable  = DT::renderDataTable({
-            subsetEventsViz() }, filter = "top")
+          output$SelectSubsetDataTable  = DT::renderDataTable({ subsetEventsViz() }, filter = "top")
 
           observeEvent(
             input$SelectSubsetButton,
@@ -571,26 +567,30 @@ server <- shinyServer(function(input, output, session) {
   ######## Repetitive Sub-sequences tab  ###############
 
   # controls for sub-sequence display
-  output$freqnGramControls <- renderUI({
-    tagList(
-      sliderInput("freqnGramLengthID","nGram Size range", 1,10, c(2,5),step=1,ticks=FALSE ),
-      sliderInput("freqnGramDisplayThresholdID","Display threshold", 1,50,1,step=1,ticks=FALSE )
-    )
-  })
+  # output$freqnGramControls <- renderUI({
+  #   tagList(
+  #     sliderInput("freqnGramLengthID","nGram Size range", 1,10, c(2,5),step=1,ticks=FALSE ),
+  #     sliderInput("freqnGramDisplayThresholdID","Display threshold", 1,50,1,step=1,ticks=FALSE )
+  #   )
+  # })
 
 
   #  frequent NGRAM  displays #
   # just compute this data once -- not sure of the best way to display it... Table?  Bar chart?
 
-  fng <-reactive(frequent_ngrams(threadedEventsViz() , 'threadNum',
-                                 get_Zoom_VIZ(),
-                                 input$freqnGramLengthID[1],
-                                 input$freqnGramLengthID[2],
-                                 input$freqnGramDisplayThresholdID ))
+  # fng <-reactive(support_level(thread_text_vector(threadedEventsViz(),
+  #                                                 'threadNum',
+  #                                                 get_Zoom_VIZ(),' ' ),
+  #                             frequent_ngrams(threadedEventsViz() ,
+  #                                 'threadNum',
+  #                                get_Zoom_VIZ(),
+  #                                input$freqnGramLengthID[1],
+  #                                input$freqnGramLengthID[2],
+  #                                TRUE)))
 
-  output$freqnGramTable <- renderTable( fng() )
+  # output$freqnGramTable <- DT::renderDataTable( fng() , filter = "top")
 
-  output$freqnGramBarchart = renderPlotly({ ng_bar_chart_freq(fng() )})
+  # output$freqnGramBarchart = renderPlotly({ ng_bar_chart_freq(fng() )})
 
 
   ######## Whole sequence tab  ###############
@@ -850,15 +850,6 @@ server <- shinyServer(function(input, output, session) {
     #event.data()
   })
 
-
-
-
-
-
-  output$test <- renderDataTable({
-    w = get_moving_window(threadedEvents(),input$MovingWindowSizeID, input$WindowLocationID )
-    w
-  })
 
 
 

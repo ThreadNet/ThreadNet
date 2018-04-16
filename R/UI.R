@@ -80,7 +80,7 @@ ui <- fluidPage(
 
                                    ),
 
-                                   tabPanel("Frequent Ngrams",
+                                   tabPanel("Find/replace patterns",
                                             fluidRow(
                                               column(3, uiOutput("Frequent_Ngram_controls_1")),
                                               column(3, uiOutput("Frequent_Ngram_controls_2"),
@@ -89,9 +89,8 @@ ui <- fluidPage(
                                               ),
                                             uiOutput("Frequent_Ngram_controls_3"),
                                             verbatimTextOutput("Frequent_Ngram_controls_4"),
-                                            uiOutput("Frequent_Ngram_controls_5"),  # how many rows?
-                                            uiOutput("Frequent_Ngram_controls_6")
-
+                                            tags$h4("Select patterns by clicking on the table:"),
+                                            DT::dataTableOutput("freqnGramTable")
                                    ),
 
                                    tabPanel("Input your pattern",
@@ -148,13 +147,10 @@ ui <- fluidPage(
                                   plotlyOutput("nGramBarchart")
                                   ),
 
-                          tabPanel("Frequent ngrams",
-                                   uiOutput("freqnGramControls"),
-                                   fluidRow(
-                                     column(2, tableOutput("freqnGramTable")),
-                                     column(10,plotlyOutput("freqnGramBarchart"))
-                                   )
-                                  ),
+                          # tabPanel("Frequent ngrams",
+                          #          uiOutput("freqnGramControls"),
+                          #          plotlyOutput("freqnGramBarchart")
+                          #         ),
 
                           tabPanel("Whole Sequences",
                                    radioButtons("ChoosePanelButton_1", label = h4("Display threads using:"),
