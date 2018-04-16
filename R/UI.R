@@ -162,10 +162,13 @@ ui <- fluidPage(
                                                 inline=TRUE),
                                    conditionalPanel(
                                       condition = "input.ChoosePanelButton_1 == 'Event time (sequence)'",
-                                      plotlyOutput("WholeSequenceThreadMap_Sequence") ),
+                                      plotlyOutput("WholeSequenceThreadMap_Sequence")),
                                    conditionalPanel(
                                       condition = "input.ChoosePanelButton_1 == 'Actual time'",
-                                      plotlyOutput("WholeSequenceThreadMap_ActualTime") )
+                                      plotlyOutput("WholeSequenceThreadMap_ActualTime")),
+                                   conditionalPanel(
+                                      condition = "input.ChoosePanelButton_1 == 'Relative time'",
+                                      plotlyOutput("WholeSequenceThreadMap_RelativeTime"))
                                   ),
 
                           tabPanel("Circular layout",
