@@ -213,7 +213,7 @@ threadMap <- function(or,TN, timescale, CF, shape){
   nColors = length(unique(or[,CF]))
   pal <- diverge_hcl(nColors)
 
-  return( plot_ly(or, x = ~or[[timescale]], y = ~or[[TN]], color= ~or[,CF],
+  return( plot_ly(or, x = ~as.integer(or[[timescale]]), y = ~or[[TN]], color= ~as.character(or[,CF]),
              colors=pal,
              name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
              symbol= "line-ew", symbols=shape, showlegend=FALSE)
@@ -544,39 +544,7 @@ Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_le
 }
 
 
-###################################################################
 
-#' Use TraMiner plotting function to produce threadmap
-#'
-#' Would like to re-implement in plotly for mouse-over and for better interactivity and speed
-#'
-#' @family ThreadNet_Graphics
-#'
-#' @param df
-#' @param TN
-#' @param CF
-#'
-#' @return standard R plot
-#' @export
-# traminer_threadMap <- function(df,TN, CF){
-#
-#   # setting color palettes
-#   # first find the number of distinct colors
-#   nColors = length(unique(df[,CF]))
-#   pal <- diverge_hcl(nColors)
-#
-#   #  reformat the data for traminerR
-#   df = convert_TN_to_TramineR(df, TN, CF)
-#
-#
-#   #plot sequence - also try seqfplot?
-#   # add grouping variable?
-#   return(seqiplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
-#
-#   #  return(seqfplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
-#
-#
-# }
 
 # This one is not currently used.
 threadLengthBarchart <- function(o, TN){

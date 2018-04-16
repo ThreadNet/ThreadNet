@@ -284,6 +284,9 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
     # print( get_event_mapping_names( GlobalEventMappings ) )
     # save(GlobalEventMappings, file="eventMappings.RData")
 
+    # for debugging, this is really handy
+    # save(o,e,file="O_and_E_1.rdata")
+
     return(eventMap)
 
 }
@@ -388,7 +391,7 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
       } # for cluster_level
 
   # for debugging, this is really handy
-  #  save(o,e,file="O_and_E.rdata")
+  #  save(o,e,file="O_and_E_2.rdata")
 
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping(EventMapName, e)
@@ -531,8 +534,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
     }
 
 
-  # for debugging, this is really handy
-    save(o,e,rx,tvrxs, file="O_and_E.rdata")
+  # # for debugging, this is really handy
+  #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping(EventMapName, e)

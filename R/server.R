@@ -178,18 +178,18 @@ server <- shinyServer(function(input, output, session) {
 
   output$One_to_One_controls  = renderUI({
     tags$div(align="left",
-             tags$h4("One-to-One: Each occurrence in the raw data is interpreted as an event (INPUT = Occurrences)."),
+             tags$h4("One-to-One: Each occurrence in the raw data is interpreted as event."),
              tags$p(" "),
              textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
-             actionButton("EventButton1", "Create New Mapping"),
+             # actionButton("EventButton1", "Create New Mapping"),
              hr()
-             )
+    )
 
   })
 
   # this function runs when you push the button to create a new mapping
   threadedEventCluster <- reactive({
-    input$EventButton1
+    # input$EventButton1
     isolate(OccToEvents1(threadedOcc(),
                          input$EventMapName1,
                          get_EVENT_CF(),
@@ -198,6 +198,13 @@ server <- shinyServer(function(input, output, session) {
 
   # Need to suppress some columns that contain lists that do not display correctly in the DT
   threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
+
+  # threadedEvents <- reactive(make_nice_event_DT(OccToEvents1(threadedOcc(),
+  #                                                           'One_to_One',
+  #                                                           get_EVENT_CF(),
+  #                                                           get_COMPARISON_CF())[["threads"]] )
+  #                           )
+
 
   output$One_to_one_Tab_Output_1  = DT::renderDataTable( threadedEvents() )
 
