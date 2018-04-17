@@ -454,7 +454,7 @@ forceNetworkD3 <- function(et,TN, grp, zoom_level){
   # print(edges)
 
   return( forceNetwork(Links = edges, Nodes = nodes, Source = "from",
-                       Target = "to", Value = "Value", NodeID = "label",
+                       Target = "to", Value = "Value", NodeID = "Group",
                        Group = "Group", opacity = 1, zoom = T, bounded = FALSE))
 }
 
