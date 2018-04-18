@@ -24,11 +24,11 @@
 #' @export
 
 
-threads_to_network <- function(et,TN,CF,timesplit){
-  et$time = et[[timesplit]]
+threads_to_network <- function(et,TN,CF){
+  #et$time = et[[timesplit]]
   #et$time = et$POVseqNum
 
-  #et$time<-as.numeric(et$tStamp)
+  et$time<-as.numeric(et$tStamp)
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
   node_label=str_replace_all(node_label," ","_")

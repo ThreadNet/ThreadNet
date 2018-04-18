@@ -310,7 +310,8 @@ ng_bar_chart_freq <- function(ngdf){
 #' @export
 
 eventNetwork <- function(et, TN, CF, timesplit){
-  n <- threads_to_network(et, TN, CF, timesplit)
+  #n <- threads_to_network(et, TN, CF, timesplit)
+  n <- threads_to_network(et, TN, CF)
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
   edge_shapes <- list()
@@ -384,7 +385,6 @@ forceNetworkD3 <- function(et,TN, grp, zoom_level){
 #   print(paste("TN =", TN))
 #   print(paste("grp =", grp))
 #   print(paste("zoom_level =", zoom_level))
-
 
   # First get the node names & remove the spaces
   node_label = levels(factor(et[[zoom_level]]))  # unique(et[[zoom_level]])

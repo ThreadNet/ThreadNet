@@ -688,7 +688,7 @@ server <- shinyServer(function(input, output, session) {
   ######## Custom network tab  ###############
 
   output$VisualizeCustomNetwork <- renderPlotly({
-    eventNetwork(threadedEventsViz(), "threadNum", 1, get_Zoom_VIZ())
+    eventNetwork(threadedEventsViz(), "threadNum", get_THREAD_CF(), get_Zoom_VIZ())
   })
 
 
