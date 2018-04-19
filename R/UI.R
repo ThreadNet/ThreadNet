@@ -165,7 +165,7 @@ ui <- fluidPage(
                                   ),
 
                           tabPanel("Circular layout",
-                                   tags$p("Put plotly circular layout here")),
+                                   visNetworkOutput("circleVisNetwork", width = "100%", height = "1200px")),
 
                           tabPanel("Force layout",
                                    uiOutput("Network_Tab_Controls_2"),

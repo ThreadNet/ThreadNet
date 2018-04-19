@@ -465,7 +465,6 @@ server <- shinyServer(function(input, output, session) {
              input$EventButton6
             isolate( dendroNetwork(clusterEvents( get_event_mapping_threads( GlobalEventMappings,
                                                                     input$ClusterEventsInputID),
-                                         input$ClusterEventsInputID,
                                          input$EventMapName6,
                                          input$ClusterMethodID,
                                          get_EVENT_CF()),
@@ -605,9 +604,11 @@ server <- shinyServer(function(input, output, session) {
 
 
   ######## Circular network tab  ###############
-  # output$circularLayoutNetwork = renderPlotly(
-  #
-  # )
+  # use this to select how to color the nodes in force layout
+
+  output$circleVisNetwork <- renderVisNetwork({
+    circleVisNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ() )
+  })
 
 
   ######## Force network tab  ###############
@@ -623,7 +624,7 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$forceNetworkD3 <- renderForceNetwork({
-    forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
+    forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ() )
   })
 
   ######## Custom network tab  ###############

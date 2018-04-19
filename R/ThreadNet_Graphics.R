@@ -342,11 +342,9 @@ eventNetwork <- function(et, TN, CF, timesplit){
 ################################################################
 ##  Here is the networkD3 version of the same thing.
 # it has a bunch of extra code because of the groups...
-# needs to be re-written to use the network function
+# needs to be re-written to separate computation of the network from the layout...
 
-#' NetworkD3 force layout for event network
-#'
-#' Should be replaced with a more expressive layout in plotly
+#' NetworkD3 layout for event network
 #'
 #' @family ThreadNet_Graphics
 #'
@@ -451,9 +449,9 @@ forceNetworkD3 <- function(et,TN, grp, zoom_level){
   # print("edges")
   # print(edges)
 
-  return( forceNetwork(Links = edges, Nodes = nodes, Source = "from",
-                       Target = "to", Value = "Value", NodeID = "label",
-                       Group = "Group", opacity = 1, zoom = T, bounded = FALSE))
+    return( forceNetwork(Links = edges, Nodes = nodes, Source = "from",
+                          Target = "to", Value = "Value", NodeID = "label",
+                          Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE))
 }
 
 
@@ -557,4 +555,38 @@ threadLengthBarchart <- function(o, TN){
 
   return(tgbc)
 }
+
+
+
+# Basic Network layout - back from the dead
+#       et is a dataframe with the list of events to be graphed
+#       TN is the field with the thread ID
+#       CF is the coded event -- typically a factor with levels
+circleVisNetwork <- function(et,TN, CF){
+
+  # first convert the threads to the network
+  n = threads_to_network_original(et,TN, CF)
+
+  title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
+
+  # print("nodes")
+  # print(n$nodeDF)
+  #
+  # print("edges")
+  # print(n$edgeDF)
+
+  return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
+           visEdges(arrows ="to",
+                    color = list(color = "black", highlight = "red")) %>%
+           visLayout(randomSeed = 12 ) %>%  # to have always the same network
+           visIgraphLayout(layout = "layout_in_circle") %>%
+           #      visIgraphLayout(layout = "layout_as_tree") %>%
+           visNodes(size = 10) %>%
+           visOptions(highlightNearest = list(enabled = T, hover = T),
+                      nodesIdSelection = T)
+
+  )
+
+}
+
 

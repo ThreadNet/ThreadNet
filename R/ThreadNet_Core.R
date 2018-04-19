@@ -87,6 +87,10 @@ threads_to_network <- function(et,TN,CF,timesplit){
 
 threads_to_network_original <- function(et,TN,CF){
 
+  # print(head(et))
+  # print(TN)
+  # print(CF)
+
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
   node_label=str_replace_all(node_label," ","_")
@@ -248,7 +252,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
       # find the earliest time value for this thread
       start_time = min(lubridate::mdy_hms(occ$tStamp[start_row:end_row]))
-      print(start_time)
+      # print(start_time)
 
       # subtract that from all of the time stamps -- I can't get this to work...
       # for (t in start_row:end_row){
@@ -508,7 +512,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       chunkNo = chunkNo+1
       original_row=original_row+1
 
-      print(paste("original_row=",original_row))
+      # print(paste("original_row=",original_row))
 
     # assign the thread and sequence number
     e$threadNum[chunkNo] = thread
@@ -599,7 +603,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
 # cluster_method is either "Sequential similarity" or "Contextual Similarity"
-clusterEvents <- function(e, EventMapName, NewMapName, cluster_method, event_CF){
+clusterEvents <- function(e, NewMapName, cluster_method, event_CF){
 
   # only run if something is filled in
   if (is.null(NewMapName) | NewMapName=="") return(NULL)
@@ -609,19 +613,20 @@ clusterEvents <- function(e, EventMapName, NewMapName, cluster_method, event_CF)
   else if (cluster_method=="Contextual Similarity")
     { dd = dist_matrix_context(e,event_CF) }
   else if (cluster_method=="Network Structure")
-    { dd = dist_matrix_network(e,,event_CF) }
+    { dd = dist_matrix_network(e,newColName(event_CF)) }
 
-  ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
+  ### cluster the elements
   clust = hclust( dd,  method="ward.D2" )
 
   ######## need to delete the old ZM_ columns and append the new ones.  ###########
   e[grep("ZM_",colnames(e))]<-NULL
 
+  # number of chunks is the number of rows in the distance matrix
+  nChunks = attr(dd,'Size')
 
-  # number of chunks is the number of rows (the number of events to be clustered)
-  nChunks = nrow(e)
+  # print(paste('nChunks = ', nChunks))
 
-  # make new data frame with columns for cluster level
+  # make new data frame with column names for each cluster level
   zm = setNames(data.frame(matrix(ncol = nChunks, nrow = nChunks)), paste0("ZM_", 1:nChunks))
 
   ## Create a new column for each cluster solution
@@ -633,7 +638,17 @@ clusterEvents <- function(e, EventMapName, NewMapName, cluster_method, event_CF)
   } # for cluster_level
 
   # append this onto the events to allow zooming
-  newmap=cbind(e, zm)
+  # need to handle differently for network clusters
+  # we are relying on "unique" returning values in the same order whenever it is called on the same data
+  if (cluster_method=="Network Structure")
+    {merge_col_name = newColName(event_CF)
+    zm[[merge_col_name]]=unique(e[[merge_col_name]])
+    newmap = merge(e, zm, by=merge_col_name)
+  }
+  else
+  {newmap=cbind(e, zm)}
+
+  save(newmap,e,zm, file='O_and_E_zoom.rdata')
 
   # store the event map in the GlobalEventMappings
    eventMap = store_event_mapping( NewMapName, newmap )
@@ -748,12 +763,11 @@ aggregate_VCF_for_event <- function(o, occList, cf){
   # start with the first one so the dimension of the vector is correct
   aggCF = convert_CF_to_vector(o, cf, unlist(occList)[1])
 
-   print( aggCF)
+   # print( aggCF)
 
   # now add the rest, if there are any
   if (length(unlist(occList)) > 1){
     for (idx in seq(2,length(unlist(occList)),1)){
-       print( aggCF)
       aggCF = aggCF + convert_CF_to_vector(o, cf, unlist(occList)[idx])
     }}
   return(aggCF)

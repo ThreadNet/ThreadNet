@@ -471,8 +471,8 @@ get_event_mapping_names <- function(gem){
 
 store_event_mapping <- function(EventMapName, e){
 
-  # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
-  em = list(name = paste(EventMapName), threads = e)
+  # Add the mapping to the global list of mappings. Sort by threadNum and seqNum
+  em = list(name = paste(EventMapName), threads = e[order(e[['threadNum']],e[['seqNum']]),])
 
   GlobalEventMappings <<- append(list(em), GlobalEventMappings )
 
