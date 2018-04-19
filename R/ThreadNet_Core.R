@@ -648,7 +648,7 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF){
   else
   {newmap=cbind(e, zm)}
 
-  save(newmap,e,zm, file='O_and_E_zoom.rdata')
+  # save(newmap,e,zm, file='O_and_E_zoom.rdata')
 
   # store the event map in the GlobalEventMappings
    eventMap = store_event_mapping( NewMapName, newmap )

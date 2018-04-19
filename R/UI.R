@@ -80,6 +80,22 @@ ui <- fluidPage(
 
                                    ),
 
+                                   tabPanel("Cluster for Zooming",
+                                            tags$h4("Note: Only mappings with sequential chunks can be clustered by sequence."),
+                                            uiOutput("Cluster_Event_controls_1"),
+                                            uiOutput("Cluster_Event_controls_2"),
+                                            dendroNetworkOutput("dendroClusterResult")
+                                   ),
+
+
+                                   tabPanel("Select Subset",
+                                            tags$h4("Select and save a subset of any mapping for visualization and comparison."),
+                                            fluidRow(
+                                              column(3, uiOutput("SelectSubsetControls_1")),
+                                              column(3, uiOutput("SelectSubsetControls_2")) ),
+                                            DT::dataTableOutput("SelectSubsetDataTable")
+                                   ),
+
                                    tabPanel("Find/replace patterns",
                                             fluidRow(
                                               column(3, uiOutput("Frequent_Ngram_controls_1")),
@@ -108,22 +124,6 @@ ui <- fluidPage(
                                    # tabPanel("Maximal Patterns",
                                    #          uiOutput("Maximal_Pattern_controls")
                                    # ),
-
-                                   tabPanel("Cluster for Zooming",
-                                            tags$h4("Note: Only mappings with sequential chunks can be clustered by sequence."),
-                                            uiOutput("Cluster_Event_controls_1"),
-                                            uiOutput("Cluster_Event_controls_2"),
-                                            dendroNetworkOutput("dendroClusterResult")
-                                            ),
-
-
-                                    tabPanel("Select Subset",
-                                             tags$h4("Select and save a subset of any mapping for visualization and comparison."),
-                                             fluidRow(
-                                             column(3, uiOutput("SelectSubsetControls_1")),
-                                             column(3, uiOutput("SelectSubsetControls_2")) ),
-                                             DT::dataTableOutput("SelectSubsetDataTable")
-                                            ),
 
 
                                    tabPanel("Manage Event Maps",
