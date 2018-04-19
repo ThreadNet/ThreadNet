@@ -85,6 +85,54 @@ threads_to_network <- function(et,TN,CF,timesplit){
   return(list(nodeDF = nodes, edgeDF = edges))
 }
 
+threads_to_network_original <- function(et,TN,CF){
+
+  # First get the node names & remove the spaces
+  node_label = unique(et[[CF]])
+  node_label=str_replace_all(node_label," ","_")
+
+  # print("node_label")
+  # print(node_label)
+
+  # set up the data frames we need to draw the network
+  nodes = data.frame(
+    id = 1:length(node_label),
+    label = node_label,
+    title=node_label)
+
+  # get the 2 grams for the edges
+  ngdf = count_ngrams(et,TN, CF, 2)
+
+
+  # need to split 2-grams into from and to
+  from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
+
+  # need to find a better way to do this...
+  nEdges = length(from_to_str)
+  from_labels=matrix(data="", nrow=nEdges,ncol=1)
+  to_labels =matrix(data="", nrow=nEdges,ncol=1)
+  from=integer(nEdges)
+  to=integer(nEdges)
+  for (i in 1:length(from_to_str)){
+
+    # Get from and to by spliting the 2-gram
+    from_labels[i] = str_split(from_to_str[[i]]," ")[1]
+    to_labels[i] = str_split(from_to_str[[i]]," ")[2]
+
+    # use match to lookup the nodeID from the label...
+    from[i] = match(from_labels[i], nodes$label)
+    to[i] = match(to_labels[i], nodes$label)
+  }
+
+  edges = data.frame(
+    from,
+    to,
+    label = paste(ngdf$freq)
+  ) %>% filter(!from==to)
+
+  return(list(nodeDF = nodes, edgeDF = edges))
+}
+
 # Counting ngrams is essential to several ThreadNet functions
 #' Counts ngrams in a set of threads
 #'
@@ -561,7 +609,7 @@ clusterEvents <- function(e, EventMapName, NewMapName, cluster_method, event_CF)
   else if (cluster_method=="Contextual Similarity")
     { dd = dist_matrix_context(e,event_CF) }
   else if (cluster_method=="Network Structure")
-    { dd = dist_matrix_network(e) }
+    { dd = dist_matrix_network(e,,event_CF) }
 
   ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
   clust = hclust( dd,  method="ward.D2" )
@@ -619,14 +667,17 @@ dist_matrix_context <- function( e, CF ){
 }
 
 # this function pulls computes their similarity of chunks based on network
-dist_matrix_network <- function(e){
+dist_matrix_network <- function(e,CF){
 
-  nChunks = nrow(e)
-  evector=vector(mode="list", length = nChunks)
-  for (i in 1:nChunks){
-    evector[i]=unique(as.integer(unlist(e$occurrences[[i]])))
-  }
-  return( stringdistmatrix( evector, method="osa") )
+  # first get the nodes and edges
+  n=threads_to_network_original(e,'threadNum',CF)
+
+  # now get the shortest paths between all nodes in the graph
+  d=distances(graph_from_data_frame(n$edgeDF),
+              v=n$nodeDF[['label']],
+              to=n$nodeDF[['label']])
+
+  return( as.dist(d) )
 }
 
 
@@ -958,3 +1009,6 @@ long_enough = function(tv,n,delimiter){
 return(tv[ unlist(lapply(1:length(tv), function(i) {length(unlist(strsplit(tv[[i]],delimiter)))>=n})) ])
 
 }
+
+# cluster by network path length
+
