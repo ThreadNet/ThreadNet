@@ -230,7 +230,6 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   occ[nPOV] = as.factor(occ[,nPOV])
   pov_list = levels(occ[[nPOV]])
 
-
   # now loop through the pov_list and assign values to the new columns
   start_row=1
   thrd=1
@@ -259,12 +258,20 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
       #   occ$relativeTime[t] = lubridate::mdy_hms(occ$tStamp[t]) -  start_time
       # }
 
+      # split occ data frame by POVthreadNum to find earliest time value for that thread
+      # then substract that from initiated relativeTime from above
+      occ_split = lapply(split(occ, occ$POVthreadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
+      # row bind data frame back together
+      occ_comb= do.call(rbind, occ_split)
+      occ_comb = data.frame(occ_comb)
+
+
       # increment the counters for the next thread
       start_row = end_row + 1
       thrd=thrd+1
     } # tlen>0
   }
-  return(occ)
+  return(occ_comb)
 }
 
 

@@ -216,6 +216,8 @@ threadMap <- function(or,TN, timescale, CF, shape){
   return( plot_ly(or, x = ~as.integer(or[[timescale]]), y = ~or[[TN]], color= ~as.character(or[,CF]),
              colors=pal,
              name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
+             text = ~or[[CF]],
+             hoverinfo = "x+y+text",
              symbol= "line-ew", symbols=shape, showlegend=FALSE)
         )
 }

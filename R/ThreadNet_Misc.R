@@ -545,8 +545,13 @@ make_nice_event_DT <- function(e){
 
   e$OccurrenceList = paste(e$occurrences,sep=",")
 
+  # move occurences directly after tstamp
+  col_occ = which(colnames(e)=="OccurrenceList")
+  e = e[, c(1, col_occ, (2:ncol(e))[-col_occ])]
+
   # Now remove the columns that have lists
   e$occurrences = NULL
+  e$OccurrenceList.1 = NULL
   e[grep("V_",colnames(e))]=NULL
 
   return(e)

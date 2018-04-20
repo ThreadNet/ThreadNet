@@ -85,7 +85,9 @@ server <- shinyServer(function(input, output, session) {
                        inline=TRUE)
   })
 
-  output$Data_Tab_Output_2  = DT::renderDataTable({ selectOcc() }, filter = "top")
+
+  output$Data_Tab_Output_2  = DT::renderDataTable({
+                      selectOcc() }, filter = "top", options=list(autoWidth = TRUE))
 
   #  dataframe for occurrences that are read in from file1
   occ <- eventReactive(input$file1,read_occurrences(input$file1))
@@ -216,7 +218,7 @@ server <- shinyServer(function(input, output, session) {
     output$Contextual_Chunk_controls = renderUI({
       tags$div(align="left",
                tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
-               tags$p(paste0("Start new event when ALL of these change:", paste(get_EVENT_CF(),","))),
+               tags$p(paste0("Start new event when ALL of these change: ", knitr::combine_words(get_EVENT_CF(), sep = ", "))),
 
                textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks"),
 
@@ -602,6 +604,9 @@ server <- shinyServer(function(input, output, session) {
     threadMap(threadedEventsViz(), "threadNum", "tStamp", get_Zoom_VIZ(), 15  )
   })
 
+  output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({
+    threadMap(threadedEventsViz(), "threadNum", "relativeTime", get_Zoom_VIZ(), 15  )
+  })
 
   ######## Circular network tab  ###############
   # use this to select how to color the nodes in force layout
