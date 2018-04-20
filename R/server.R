@@ -107,7 +107,7 @@ server <- shinyServer(function(input, output, session) {
   # adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 
   threadedOcc = reactive({
-    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
+    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF())['threads'] })
 
 
   ########  define threads tab  ###############
@@ -140,12 +140,12 @@ server <- shinyServer(function(input, output, session) {
   # need to provide ability to toggle between views - just use tStamp for now
   # could use conditional panel on the UI side? If so, the data table view could be included in the radio button
 
-  output$previewThreadMap <- renderPlotly({
-    threadMap(threadedOcc(), "POVthreadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
+  output$previewThreadMap_1 <- renderPlotly({
+    threadMap(threadedOcc(), "threadNum", "tStamp", newColName(get_EVENT_CF()), 16  )
   })
 
-  # output$previewThreadMap <- renderPlotly({
-  #   threadMap(threadedOcc(), "POVthreadNum", "POVseqNum", newColName(get_EVENT_CF()), 15  )
+  # output$previewThreadMap_2 <- renderPlotly({
+  #   threadMap(threadedOcc(), "threadNum", "seqNum", newColName(get_EVENT_CF()), 15  )
   # })
 
   output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})

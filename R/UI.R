@@ -40,7 +40,7 @@ ui <- fluidPage(
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
                                             # ** add conditional panels here to choose output **
-                                            plotlyOutput("previewThreadMap")
+                                            plotlyOutput("previewThreadMap_1")
                                             ),
                                    tabPanel("Intermediate Data",
                                             tags$h4("This table is display only. It shows the data threaded from your chosen POV"),
