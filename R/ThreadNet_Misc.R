@@ -486,7 +486,6 @@ get_event_mapping_threads <- function(gem, mapname){
   # print (paste0('mapname',mapname))
   # print(paste0('get_event_mapping_names', get_event_mapping_names(gem)))
   # print(paste0('are they equal', mapname==get_event_mapping_names(gem)))
-
   idx=which(mapname==get_event_mapping_names(gem) )
 
   # print(idx)
@@ -535,6 +534,26 @@ export_event_mapping <- function(gem, mapname){
   print(paste(" EventMapping saved in file: ", paste0(nicename,".Rdata")))
 
 }
+
+export_event_mapping_csv <- function(gem, mapname){
+
+  nicename = paste0("EventMap_",mapname)
+
+  output = as.data.frame(get_event_mapping_threads(gem, mapname))
+  output$v_actionnew = NA
+  output$v_actionnew = tidy::unnest(output, v_action)
+  #output$v_actionnew = unlist(sapply(output$v_action, paste, collapse = ", ", character(1L)))
+  output = output[-20]
+
+  colnames(output)[colnames(output)=='v_actionnew'] = 'v_action'
+
+  write.csv(output, file=choose.files(caption="Save As...",
+                    filters = c("Comma Delimited Files (.csv)","*.csv")))
+
+  print(paste(" EventMapping saved in file: ", paste0(nicename,".Rdata")))
+
+}
+
 
 # Make a nice dataframe to display
 # Issue is that DT::renderdatatable cannot display lists correctly.

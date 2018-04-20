@@ -506,7 +506,8 @@ server <- shinyServer(function(input, output, session) {
 
                        selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
 
-                       actionButton("ExportMappingButton", "Export"),
+                       actionButton("ExportMappingRData", "Export RData file"),
+                       actionButton("ExportMappingCsv", "Export to csv"),
                        actionButton("DeleteMappingButton", "Delete") )
 
             })
@@ -515,14 +516,21 @@ server <- shinyServer(function(input, output, session) {
             observeEvent(
               input$DeleteMappingButton,
               {delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
-                output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
               })
 
+
             observeEvent(
-              input$ExportMappingButton,
+              input$ExportMappingRData,
               {export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
-                output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
             })
+
+            observeEvent(
+              input$ExportMappingCsv,
+              {export_event_mapping_csv( GlobalEventMappings, input$ManageEventMapInputID )
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
+              })
 
 
   ########################################################################
