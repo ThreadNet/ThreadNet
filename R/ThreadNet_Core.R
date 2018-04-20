@@ -302,8 +302,14 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   eventMap = store_event_mapping('OneToOne', occ)
 
 
+  # superstitiously copy this...
+  e = eventMap[['threads']]
 
-  return(eventMap[['threads']])
+   print('done converting occurrences...')
+  # print(head(e))
+  # save(e, file='O_and_E.rdata')
+
+  return( e )
 
 }
 

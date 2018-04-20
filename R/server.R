@@ -106,8 +106,7 @@ server <- shinyServer(function(input, output, session) {
   # The POV tabs reconstruct the data into threads by sorting by tStamp and
   # adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 
-  threadedOcc = reactive({
-    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
+  threadedOcc = reactive( ThreadOccByPOV( selectOccFilter(), get_THREAD_CF(), get_EVENT_CF() ) )
 
 
   ########  define threads tab  ###############
