@@ -36,36 +36,34 @@ ui <- fluidPage(
                                             uiOutput("POV_Tab_Controls_3"),
                                             plotlyOutput("ContextFlowers_3")
                                             ),
-
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
                                             # ** add conditional panels here to choose output **
                                             plotlyOutput("previewThreadMap")
-                                   ),
-                                   # Maybe take this out
+                                            ),
                                    tabPanel("Intermediate Data",
                                             tags$h4("This table is display only. It shows the data threaded from your chosen POV"),
                                             DT::dataTableOutput("Thread_Tab_Output_1")
-                                   )
+                                            )
                                    )
               ),
               tabPanel("Occurrences to Events",
                        tags$h4("Map occurrences into events"),
                        tabsetPanel(type = "tabs",
-                                   tabPanel("One-to-One",
-                                            uiOutput("One_to_One_controls"),
-                                            radioButtons("One_to_One_Output_Button", label = h4("Display results:"),
-                                                         choices = c("None", "Data table (display only)", "Thread Map"),
-                                                         inline=TRUE),
-                                            conditionalPanel(
-                                              condition = "input.One_to_One_Output_Button == 'Data table (display only)'",
-                                                          DT::dataTableOutput("One_to_one_Tab_Output_1")),
-                                            conditionalPanel(
-                                              condition = "input.One_to_One_Output_Button == 'Thread Map'",
-                                                          plotlyOutput("One_to_one_Tab_Output_2"))
-
-                                   ),
+                                   # tabPanel("One-to-One",
+                                   #          uiOutput("One_to_One_controls"),
+                                   #          radioButtons("One_to_One_Output_Button", label = h4("Display results:"),
+                                   #                       choices = c("None", "Data table (display only)", "Thread Map"),
+                                   #                       inline=TRUE),
+                                   #          conditionalPanel(
+                                   #            condition = "input.One_to_One_Output_Button == 'Data table (display only)'",
+                                   #                        DT::dataTableOutput("One_to_one_Tab_Output_1")),
+                                   #          conditionalPanel(
+                                   #            condition = "input.One_to_One_Output_Button == 'Thread Map'",
+                                   #                        plotlyOutput("One_to_one_Tab_Output_2"))
+                                   #
+                                   # ),
                                    tabPanel("Contextual Chunks",
                                             uiOutput("Contextual_Chunk_controls"),
                                             radioButtons("Chunks_Output_Button", label = h4("Display results:"),
