@@ -256,20 +256,6 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
       start_time = min(lubridate::mdy_hms(occ$tStamp[start_row:end_row]))
       # print(start_time)
 
-      # subtract that from all of the time stamps -- I can't get this to work...
-      # for (t in start_row:end_row){
-      #   occ$relativeTime[t] = lubridate::mdy_hms(occ$tStamp[t]) -  start_time
-      # }
-
-      # split occ data frame by POVthreadNum to find earliest time value for that thread
-      # then substract that from initiated relativeTime from above
-
-      ##### FIX THIS!!! ###
-      # occ_split = lapply(split(occ, occ$POVthreadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
-      # # row bind data frame back together
-      # occ_comb= do.call(rbind, occ_split)
-      # occ_comb = data.frame(occ_comb)
-
 
       # increment the counters for the next thread
       start_row = end_row + 1
@@ -277,6 +263,11 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
     } # tlen>0
   }
 
+  # split occ data frame by threadNum to find earliest time value for that thread
+  # then substract that from initiated relativeTime from above
+   occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
+  # # row bind data frame back together
+   occ_comb= data.frame(do.call(rbind, occ_split))
 
   #  these are just equal to the row numbers -- one occurrence per event
   occ["occurrences"] =   1:nrow(occ)
@@ -301,15 +292,9 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping('OneToOne', occ)
 
-
-  # superstitiously copy this...
-  e = eventMap[['threads']]
-
    print('done converting occurrences...')
-  # print(head(e))
-  # save(e, file='O_and_E.rdata')
 
-  return( e )
+  return( eventMap[['threads']] )
 
 }
 

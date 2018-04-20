@@ -13,10 +13,8 @@ server <- shinyServer(function(input, output, session) {
 
   ##### make the global variables reactive  #########
   # # One for the event mappings
-     observe( makeReactiveBinding("GlobalEventMappings", env=.GlobalEnv) )
+  #   observe( makeReactiveBinding("GlobalEventMappings", env=.GlobalEnv) )
   #
-  # # One for the event clusters
-     observe( makeReactiveBinding("GlobalEventClusters", env=.GlobalEnv) )
 
 
   ##################################################
@@ -106,7 +104,7 @@ server <- shinyServer(function(input, output, session) {
   # The POV tabs reconstruct the data into threads by sorting by tStamp and
   # adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 
-  threadedOcc = reactive( ThreadOccByPOV( selectOccFilter(), get_THREAD_CF(), get_EVENT_CF() ) )
+   threadedOcc = reactive({ ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID ) })
 
 
   ########  define threads tab  ###############

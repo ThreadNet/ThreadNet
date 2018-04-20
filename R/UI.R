@@ -9,6 +9,9 @@
 # March 21, 2018 New organization of tabs.
 
 # pdf(NULL) # prevent plotly errors
+library(shiny)
+library(networkD3)
+library(visNetwork)
 
 ui <- fluidPage(
 
