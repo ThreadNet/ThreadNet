@@ -432,8 +432,8 @@ OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
     e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
 
     # copy in the threadNum and assign sequence number
-    e$threadNum[chunkNo] = o$POVthreadNum[start_idx]
-    thisThread = o$POVthreadNum[start_idx]
+    e$threadNum[chunkNo] = o$threadNum[start_idx]
+    thisThread = o$threadNum[start_idx]
 
 
     # fill in data for each of the context factors
