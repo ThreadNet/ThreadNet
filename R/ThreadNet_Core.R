@@ -234,15 +234,22 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
     # get the length of the thread
     tlen = sum(occ[[nPOV]]==p)
 
+    # print(paste('start_row=',start_row))
+    # print(paste('thrd =', thrd ))
+    # print(paste('p =', p ))
+    # print(paste('tlen =', tlen ))
+
     # guard against error
     if (tlen>0){
 
       #compute the index of the end row
       end_row = start_row+tlen-1
+      # print(paste('start_row =', start_row ))
+      # print(paste('end_row =',end_row  ))
 
       # they all get the same thread number and incrementing seqNum
-      occ[start_row:end_row, "POVthreadNum"] <- as.matrix(rep(as.integer(thrd),tlen))
-      occ[start_row:end_row, "POVseqNum"] <- as.matrix(c(1:tlen))
+      occ[start_row:end_row, "threadNum"] <- as.matrix(rep(as.integer(thrd),tlen))
+      occ[start_row:end_row, "seqNum"] <- as.matrix(c(1:tlen))
 
 
       # find the earliest time value for this thread
@@ -256,6 +263,8 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
       # split occ data frame by POVthreadNum to find earliest time value for that thread
       # then substract that from initiated relativeTime from above
+
+      ##### FIX THIS!!! ###
       # occ_split = lapply(split(occ, occ$POVthreadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
       # # row bind data frame back together
       # occ_comb= do.call(rbind, occ_split)
@@ -269,12 +278,32 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   }
 
 
+  #  these are just equal to the row numbers -- one occurrence per event
+  occ["occurrences"] =   1:nrow(occ)
+
+  # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
+  for (cf in EVENT_CF){
+    #make a new column for each CF
+    VCF = paste0("V_",cf)
+    occ[[VCF]]= vector(mode = "integer",length=nrow(occ))
+
+    for (r in 1:nrow(occ)){
+      occ[[r,VCF]] = list(convert_CF_to_vector(occ,cf,r))
+    }
+  }
+
+  # just add the one column with the combined values
+  occ["ZM_1"] = as.integer(occ[,newColName(EVENT_CF)])
+
+
   # Probably want to make sure this is sorted correctly??
 
   # store the event map in the GlobalEventMappings
   eventMap = store_event_mapping('OneToOne', occ)
 
-  return(eventMap)
+
+
+  return(eventMap[['threads']])
 
 }
 

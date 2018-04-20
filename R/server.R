@@ -107,7 +107,7 @@ server <- shinyServer(function(input, output, session) {
   # adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 
   threadedOcc = reactive({
-    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF())['threads'] })
+    ThreadOccByPOV(selectOccFilter(),get_THREAD_CF(),get_EVENT_CF()) })
 
 
   ########  define threads tab  ###############
@@ -148,7 +148,7 @@ server <- shinyServer(function(input, output, session) {
   #   threadMap(threadedOcc(), "threadNum", "seqNum", newColName(get_EVENT_CF()), 15  )
   # })
 
-  output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "POVthreadNum"),"threads in the selected data.")})
+  output$Preview_Thread_Output_1 <- renderText({ paste(numThreads(threadedOcc(), "threadNum"),"threads in the selected data.")})
 
 
   # output$Preview_Network_Tab_Controls_0 <- renderUI({
