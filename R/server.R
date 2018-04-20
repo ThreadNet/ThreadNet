@@ -631,6 +631,16 @@ server <- shinyServer(function(input, output, session) {
     forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ())
   })
 
+  # output$testtable <- renderTable({
+  #    x = input$Group
+  #   test = subset(threadedOcc(), x == threadedOcc()[,input$NetworkGroupID])
+  #   test
+  # })
+  output$networkPie <- renderPlotly({
+    get_group = input$Group
+    CF_multi_pie_event(threadedOcc(), threadedEventsViz(), get_EVENT_CF(), get_group, get_Zoom_VIZ())
+  })
+
   ######## Custom network tab  ###############
 
   output$VisualizeCustomNetwork <- renderPlotly({
