@@ -375,124 +375,124 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
 }
 
 # this one creates chunks based on the handoff index
-OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
-
-  # put this here for now
-  timescale='mins'
-
-  # Only run if eventMapName is filled in; return empty data frame otherwise
-  if (EventMapName ==""){return(data.frame())}
-
-  #### First get the break points between the events
-
-        # whenever there is a zero handoff gap that means everything has changed
-        breakpoints = which(o$handoffGap == 0)
-
-        # Grab the breakpoints from the beginning of the threads as well
-        threadbreaks = which(o$seqNum == 1)
-        breakpoints = sort(union(threadbreaks,breakpoints))
-
-
-  ### Use the break points to find the chunks -- just store the index back to the raw data
-  nChunks = length(breakpoints)
-
-  # print(paste("nChunks=",nChunks))
-
-  # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
-  e = make_event_df(EVENT_CF, compare_CF, nChunks)
-
-  #  need to create chunks WITHIN threads.  Need to respect thread boundaries
-  # take union of the breakpoints, plus thread boundaries, plus 1st and last row
-
-  # counters for assigning thread and sequence numbers
-  thisThread=1  # just for counting in this loop
-  lastThread=0
-  seqNo=0  # resets for each new thread
-
-  for (chunkNo in 1:nChunks){
-
-    # Chunks start at the current breakpoint
-    start_idx=breakpoints[chunkNo]
-
-    # Chunks end at the next breakpoint, minus one
-    # for the last chunk,the stop_idx is the last row
-    if (chunkNo < nChunks){
-      stop_idx = breakpoints[chunkNo+1] - 1
-    } else if (chunkNo==nChunks){
-      stop_idx = nrow(o)
-    }
-
-    # assign the occurrences
-    e$occurrences[[chunkNo]] = list(start_idx:stop_idx)
-   # e$eventStop[chunkNo] = as.integer(stop_idx)
-   # e$eventStart[chunkNo] = as.integer(start_idx)
-
-    # assign timestamp and duration
-    e$tStamp[chunkNo] = o$tStamp[start_idx]
-    e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
-
-    # copy in the threadNum and assign sequence number
-    e$threadNum[chunkNo] = o$threadNum[start_idx]
-    thisThread = o$threadNum[start_idx]
-
-
-    # fill in data for each of the context factors
-    for (cf in compare_CF){
-      e[chunkNo,cf] = as.character(o[start_idx,cf])
-     }
-
-    for (cf in EVENT_CF){
-      VCF = paste0("V_",cf)
-      e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
-    }
-
-    # Advance or reset the seq counters
-    if (thisThread == lastThread){
-      seqNo = seqNo +1
-    } else if (thisThread != lastThread){
-      lastThread = thisThread
-      seqNo = 1
-    }
-    e$seqNum[chunkNo] = seqNo
-
-  }
-
-  # convert them to factors
-  for (cf in compare_CF){
-    e[cf] = as.factor(e[,cf])
-  }
-
-
-  ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
-  clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
-
-  ## Create a new column for each cluster solution
-  for (cluster_level in 1:nChunks){
-
-    clevelName = paste0("ZM_",cluster_level)
-    e[clevelName] = cutree(clust, k=cluster_level)
-
-      } # for cluster_level
-
-  # for debugging, this is really handy
-  #  save(o,e,file="O_and_E_2.rdata")
-
-  # store the event map in the GlobalEventMappings
-  eventMap = store_event_mapping(EventMapName, e)
-
- # print( get_event_mapping_names( GlobalEventMappings ) )
- # save(GlobalEventMappings, file="eventMappings.RData")
-
-  #  need return the threads and also the cluster solution for display
-  return(eventMap)
-}
+# OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
+#
+#   # put this here for now
+#   timescale='mins'
+#
+#   # Only run if eventMapName is filled in; return empty data frame otherwise
+#   if (EventMapName ==""){return(data.frame())}
+#
+#   #### First get the break points between the events
+#
+#         # whenever there is a zero handoff gap that means everything has changed
+#         breakpoints = which(o$handoffGap == 0)
+#
+#         # Grab the breakpoints from the beginning of the threads as well
+#         threadbreaks = which(o$seqNum == 1)
+#         breakpoints = sort(union(threadbreaks,breakpoints))
+#
+#
+#   ### Use the break points to find the chunks -- just store the index back to the raw data
+#   nChunks = length(breakpoints)
+#
+#   # print(paste("nChunks=",nChunks))
+#
+#   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
+#   e = make_event_df(EVENT_CF, compare_CF, nChunks)
+#
+#   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
+#   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
+#
+#   # counters for assigning thread and sequence numbers
+#   thisThread=1  # just for counting in this loop
+#   lastThread=0
+#   seqNo=0  # resets for each new thread
+#
+#   for (chunkNo in 1:nChunks){
+#
+#     # Chunks start at the current breakpoint
+#     start_idx=breakpoints[chunkNo]
+#
+#     # Chunks end at the next breakpoint, minus one
+#     # for the last chunk,the stop_idx is the last row
+#     if (chunkNo < nChunks){
+#       stop_idx = breakpoints[chunkNo+1] - 1
+#     } else if (chunkNo==nChunks){
+#       stop_idx = nrow(o)
+#     }
+#
+#     # assign the occurrences
+#     e$occurrences[[chunkNo]] = list(start_idx:stop_idx)
+#    # e$eventStop[chunkNo] = as.integer(stop_idx)
+#    # e$eventStart[chunkNo] = as.integer(start_idx)
+#
+#     # assign timestamp and duration
+#     e$tStamp[chunkNo] = o$tStamp[start_idx]
+#     e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
+#
+#     # copy in the threadNum and assign sequence number
+#     e$threadNum[chunkNo] = o$threadNum[start_idx]
+#     thisThread = o$threadNum[start_idx]
+#
+#
+#     # fill in data for each of the context factors
+#     for (cf in compare_CF){
+#       e[chunkNo,cf] = as.character(o[start_idx,cf])
+#      }
+#
+#     for (cf in EVENT_CF){
+#       VCF = paste0("V_",cf)
+#       e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
+#     }
+#
+#     # Advance or reset the seq counters
+#     if (thisThread == lastThread){
+#       seqNo = seqNo +1
+#     } else if (thisThread != lastThread){
+#       lastThread = thisThread
+#       seqNo = 1
+#     }
+#     e$seqNum[chunkNo] = seqNo
+#
+#   }
+#
+#   # convert them to factors
+#   for (cf in compare_CF){
+#     e[cf] = as.factor(e[,cf])
+#   }
+#
+#
+#   ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
+#   clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
+#
+#   ## Create a new column for each cluster solution
+#   for (cluster_level in 1:nChunks){
+#
+#     clevelName = paste0("ZM_",cluster_level)
+#     e[clevelName] = cutree(clust, k=cluster_level)
+#
+#       } # for cluster_level
+#
+#   # for debugging, this is really handy
+#   #  save(o,e,file="O_and_E_2.rdata")
+#
+#   # store the event map in the GlobalEventMappings
+#   eventMap = store_event_mapping(EventMapName, e)
+#
+#  # print( get_event_mapping_names( GlobalEventMappings ) )
+#  # save(GlobalEventMappings, file="eventMappings.RData")
+#
+#   #  need return the threads and also the cluster solution for display
+#   return(eventMap)
+# }
 
 # new version containing more ways to create chunks -- uses concepts from original prototype, but better implementation
 # chunk by handoff, time gap and handoff gap
-OccToEvents2_new <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, EventMapName,CF_compare,timescale){
+OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale, chunk_CF, CF_compare){
 
   # Inputs: o = table of occurrences
-  #         m = method parameter = c('Variable chunks','Uniform chunks')
+  #         m = method parameter =  c( "Handoffs", "Time Gap","Fixed Size")
   #         uniform_chunk_size = used to identify breakpoints -- from input slider
   #         tThreshold = used to identify breakpoints -- from input slider
   #         EventMapName = used to store this mapping in an environment
@@ -505,9 +505,7 @@ OccToEvents2_new <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, Eve
   if (EventMapName ==""){return(data.frame())}
 
   #### First get the break points between the events
-  # Method one:  "Variable chunks"
-  # Method two:  Time gap
-  #  Consider MOVING the code the assigns the gaps INTO THE PREVIOUS SECTION, as a result of re-threading
+ # Ideally, these should operate WITHIN each thread, not on the whole set of occurrences...
 
   if (m=="Variable chunks"){
     o$handoffGap =  diff_handoffs(o[chunk_CF])
@@ -515,7 +513,7 @@ OccToEvents2_new <- function(o, m, uniform_chunk_size, tThreshold, chunk_CF, Eve
   } else if (m=="Time gap") {
     breakpoints = which(o$timeGap > tThreshold)
   } else if (m=="Uniform chunks") {
-    breakpoints = seq(1,nrow(o),uniform_chunk_size)  # NO -- should be within each thread.
+    breakpoints = seq(1,nrow(o),uniform_chunk_size)
   }
 
 

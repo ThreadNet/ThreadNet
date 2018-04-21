@@ -173,73 +173,76 @@ server <- shinyServer(function(input, output, session) {
   ##################### 3.OCC to EVENT  tab ################################
   ##########################################################################
 
-  ########  one to one tab  ###############
-
-  # output$One_to_One_controls  = renderUI({
-  #   tags$div(align="left",
-  #            tags$h4("One-to-One: Each occurrence in the raw data is interpreted as event."),
-  #            tags$p(" "),
-  #            textInput("EventMapName1", label = h4("Enter label for this mapping:"), value = "One-to-One"),
-  #            # actionButton("EventButton1", "Create New Mapping"),
-  #            hr()
-  #   )
-  #
-  # })
-
-  # # this function runs when you push the button to create a new mapping
-  # threadedEventCluster <- reactive({
-  #   # input$EventButton1
-  #   isolate(OccToEvents1(threadedOcc(),
-  #                        input$EventMapName1,
-  #                        get_EVENT_CF(),
-  #                        get_COMPARISON_CF()
-  #   ) )})
-
-  # Need to suppress some columns that contain lists that do not display correctly in the DT
-  # threadedEvents <- reactive({make_nice_event_DT(threadedEventCluster()[["threads"]])})
-
-  # threadedEvents <- reactive(make_nice_event_DT(OccToEvents1(threadedOcc(),
-  #                                                           'One_to_One',
-  #                                                           get_EVENT_CF(),
-  #                                                           get_COMPARISON_CF())[["threads"]] )
-  #                           )
-
-  # output$One_to_one_Tab_Output_1  = DT::renderDataTable( threadedEvents() )
-  #
-  # output$One_to_one_Tab_Output_2  = renderPlotly({
-  #   threadMap(threadedEvents(), "threadNum", "seqNum", 'ZM_1', 15  ) })
-
   ########  contextual chunk tab  ###############
 
-    output$Contextual_Chunk_controls = renderUI({
+    output$chunk_controls_1 = renderUI({
       tags$div(align="left",
-               tags$h4("Context-based chunks: Occurrences are grouped into events based on changes in contextual factors (INPUT = Occurrences)."),
-               tags$p(paste0("Start new event when ALL of these change: ", knitr::combine_words(get_EVENT_CF(), sep = ", "))),
+               tags$h4("Group occurrences into events based on context.") ) })
 
-               textInput("EventMapName2", label = h4("Enter label for this mapping"), value = "Chunks"),
-
-               actionButton("EventButton2", "Create New Mapping"),
-               hr() )
+  # handoff controls
+  output$chunk_controls_2 = renderUI({
+    # input$chunk_CFs
+    tags$div(checkboxGroupInput("chunk_CFs","Start new event when ALL of these change:",
+                                get_EVENT_CF(),
+                                inline=TRUE))
     })
 
-  # this function runs when you push the button to create a new mapping
-  # this is for the chunks
-  threadedEventCluster2 <- reactive({
+  # time gap controls
+  output$chunk_controls_3 = renderUI({
+    # input$chunk_time_gap_threshold,
+    # input$chunk_timescale,
+
+    sliderInput("chunk_time_gap_threshold",
+                "Minimum time gap between distinct chunks (minutes):",
+                threshold_slider_min(threadedOcc()),
+                threshold_slider_max(threadedOcc()),
+                threshold_slider_selected(threadedOcc()),
+                step = 1, ticks=FALSE)
+
+    })
+
+  # fixed size controls
+  output$chunk_controls_4 = renderUI({
+    # input$fixed_chunk_size,
+    tags$div(sliderInput("fixed_chunk_size", "Select fixed size for chunks:", 1,20,1, ticks=FALSE))
+    })
+
+  # mapping name and go button
+  output$chunk_controls_5 = renderUI({
+
+    tags$div(align="left",
+             textInput("EventMapName2", label = h4("Enter label for result") ),
+             actionButton("EventButton2", "Create New Mapping")  )
+
+    })
+
+  # show the results
+  output$chunk_controls_6 =   renderText(
+    paste(thread_text_vector(threadedChunks(),'threadNum', 'ZM_1', ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  )
+
+
+  # this function runs when you push the button to create a new mapping based on chunks
+  threadedChunks <- reactive({
     input$EventButton2
-    isolate(OccToEvents2(threadedOcc(),
-                         input$EventMapName2,
-                         get_EVENT_CF(),
-                         get_COMPARISON_CF()
-    ) )})
+    isolate(OccToEvents_By_Chunk(threadedOcc(),
+                                 input$Chunks_method_Button, # which method?
+                                 input$EventMapName2,
+                                 input$fixed_chunk_size,
+                                 input$chunk_time_gap_threshold,
+                                 'mins',
+                                 input$chunk_CFs,
+                                 get_COMPARISON_CF() ) )})
+
 
   # Need to suppress some columns that contain lists that do not display correctly in the DT
-  threadedEvents2 <- reactive({make_nice_event_DT(threadedEventCluster2()[["threads"]])})
+  # threadedEvents2 <- reactive({make_nice_event_DT(threadedChunks()[["threads"]])})
+  #
+  #   output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable( threadedEvents2() )
+  #
+  #   output$Contextual_Chunks_Tab_Output_2  = renderPlotly({
+  #     threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
 
 
-    output$Contextual_Chunks_Tab_Output_1  = DT::renderDataTable( threadedEvents2() )
-
-    output$Contextual_Chunks_Tab_Output_2  = renderPlotly({
-      threadMap(threadedEvents2(), "threadNum", "tStamp", 'ZM_1', 15  ) })
 
     ########  regular expression tab  ###############
 

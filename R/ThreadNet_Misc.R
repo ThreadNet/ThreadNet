@@ -166,10 +166,6 @@ timeRangePhrase = function(tr){
   rangeunits = attr(tr,"units")
   paste(floor(as.numeric(tr)),rangeunits,"from start to finish.")}
 
-# This function limits the number of rows that get used
-# SubsetOfTable <- function(df,pct) {df[1:(floor((pct/100) * nrow(df))),] }
-# SubsetOfTable <- function(df,r) {df[r[1]:r[2],] }
-
 
 # this function is used to split up the threads into n ~equal buckets
 make_subsets <- function(d,n){
@@ -261,17 +257,17 @@ newColName <- function(CF_list){
 
 
 # These were used on the occ-to-event tab to configure the slider
-# threshold_slider_min <- function(o){
-#      return(floor(min(o$timeGap)))
-#  }
-#
-#  threshold_slider_max <- function(o){
-#      return(ceiling(max(o$timeGap)))
-#  }
-#
-#  threshold_slider_selected <- function(o){
-#      return(min(o$timeGap))
-#  }
+threshold_slider_min <- function(o){
+     return(floor(min(o$timeGap)))
+ }
+
+ threshold_slider_max <- function(o){
+     return(ceiling(max(o$timeGap)))
+ }
+
+ threshold_slider_selected <- function(o){
+     return(min(o$timeGap))
+ }
 
 
 

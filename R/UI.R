@@ -54,31 +54,28 @@ ui <- fluidPage(
               tabPanel("Occurrences to Events",
                        tags$h4("Map occurrences into events"),
                        tabsetPanel(type = "tabs",
-                                   # tabPanel("One-to-One",
-                                   #          uiOutput("One_to_One_controls"),
-                                   #          radioButtons("One_to_One_Output_Button", label = h4("Display results:"),
-                                   #                       choices = c("None", "Data table (display only)", "Thread Map"),
-                                   #                       inline=TRUE),
-                                   #          conditionalPanel(
-                                   #            condition = "input.One_to_One_Output_Button == 'Data table (display only)'",
-                                   #                        DT::dataTableOutput("One_to_one_Tab_Output_1")),
-                                   #          conditionalPanel(
-                                   #            condition = "input.One_to_One_Output_Button == 'Thread Map'",
-                                   #                        plotlyOutput("One_to_one_Tab_Output_2"))
-                                   #
-                                   # ),
-                                   tabPanel("Contextual Chunks",
-                                            uiOutput("Contextual_Chunk_controls"),
-                                            radioButtons("Chunks_Output_Button", label = h4("Display results:"),
-                                                         choices = c("None", "Data table (display only)", "Thread Map"),
-                                                         inline=TRUE),
-                                            conditionalPanel(
-                                              condition = "input.Chunks_Output_Button == 'Data table (display only)'",
-                                              DT::dataTableOutput("Contextual_Chunks_Tab_Output_1") ),
-                                            conditionalPanel(
-                                              condition = "input.Chunks_Output_Button == 'Thread Map'",
-                                              plotlyOutput("Contextual_Chunks_Tab_Output_2"))
 
+                                   tabPanel("Contextual Chunks",
+                                            fluidRow(
+                                              column(3, uiOutput("chunk_controls_1")),
+                                              column(3,
+                                                     radioButtons("Chunks_method_Button", label = h4("Choose method for chunking:"),
+                                                                                        choices = c( "Handoffs", "Time Gap","Fixed Size"),
+                                                                                        inline=TRUE),
+
+                                                                           conditionalPanel(
+                                                                             condition = "input.Chunks_Output_Button == 'Handoffs'",
+                                                                             uiOutput("chunk_controls_2") ),
+                                                                           conditionalPanel(
+                                                                              condition = "input.Chunks_Output_Button == 'Time Gap'",
+                                                                              uiOutput("chunk_controls_3") ),
+                                                                          conditionalPanel(
+                                                                              condition = "input.Chunks_Output_Button == 'Fixed Size'",
+                                                                              uiOutput("chunk_controls_4") )
+                                                        ),
+                                              column(3, uiOutput("chunk_controls_5"))
+                                            ),
+                                            verbatimTextOutput("chunk_controls_6")
                                    ),
 
                                    tabPanel("Cluster for Zooming",
