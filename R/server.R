@@ -13,9 +13,9 @@ server <- shinyServer(function(input, output, session) {
 
   ##### make the global variables reactive  #########
   # # One for the event mappings
-  #   observe( makeReactiveBinding("GlobalEventMappings", env=.GlobalEnv) )
+  #  observe( makeReactiveBinding("GlobalEventMappings", env=.GlobalEnv) )
   #
-
+  # makeReactiveBinding("GlobalEventMappings" )
 
   ##################################################
   # capture reactive values from the UI that are needed elsewhere
@@ -264,9 +264,11 @@ server <- shinyServer(function(input, output, session) {
 
     ########  regular expression tab  ###############
 
+    mapping_names <- reactive({ifelse( (length( GlobalEventMappings)==0), list(), get_event_mapping_names( GlobalEventMappings )) } )
+
       output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
-                 selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ))
+                 selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), mapping_names()  ))
       })
 
       # get the data that will be the input for this tab
@@ -352,7 +354,7 @@ server <- shinyServer(function(input, output, session) {
 
       output$Frequent_Ngram_controls_1 = renderUI({
         tags$div(align="left",
-                 selectizeInput("freqNgramInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings )  ))
+                 selectizeInput("freqNgramInputMapID",label = h4("Choose input for this mapping:"), mapping_names()  ))
       })
 
       # get the data that will be the input for this tab
@@ -466,7 +468,7 @@ server <- shinyServer(function(input, output, session) {
             tags$div(align="left",
                      tags$h4("Cluster Events: Group similar events to together to allow zooming"),
 
-                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names( GlobalEventMappings ) ))
+                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), mapping_names() ))
           })
             output$Cluster_Event_controls_2 = renderUI({
               tags$div(align="left",
@@ -494,7 +496,7 @@ server <- shinyServer(function(input, output, session) {
 
           # Controls for the whole set of tabs
           output$SelectSubsetControls_1 = renderUI({
-            selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),  get_event_mapping_names( GlobalEventMappings )  )
+            selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),  mapping_names()  )
           })
 
           output$SelectSubsetControls_2 <- renderUI({
@@ -521,7 +523,7 @@ server <- shinyServer(function(input, output, session) {
               tags$div(align="left",
                        tags$h4("Select event mapping to export or delete"),
 
-                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
+                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), mapping_names() ),
 
                        actionButton("ExportMappingButton", "Export"),
                        actionButton("DeleteMappingButton", "Delete") )
@@ -548,7 +550,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Controls for the whole set of tabs
   output$Visualize_Tab_Controls_1 = renderUI({
-        selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ), selected='One-to-One' )
+        selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  mapping_names(), selected='OneToOne' )
   })
 
   output$Visualize_Tab_Controls_2 = renderUI({
@@ -665,7 +667,7 @@ server <- shinyServer(function(input, output, session) {
 
   # ####### SUBSET A   ##########
   output$Comparison_Tab_Controls_A1 <- renderUI({
-    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
+    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping:"),  mapping_names() )
     })
 
   output$Comparison_Tab_Controls_A2 <- renderUI({
@@ -689,7 +691,7 @@ server <- shinyServer(function(input, output, session) {
 
    # ####### SUBSET B   ##########
   output$Comparison_Tab_Controls_B1 <- renderUI({
-    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
+    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping:"),  mapping_names() )
   })
 
   output$Comparison_Tab_Controls_B2 <- renderUI({
@@ -713,7 +715,7 @@ server <- shinyServer(function(input, output, session) {
 
   # ##########  DIACHRONIC Comparison sub-tab   ###########
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
-    selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names( GlobalEventMappings ) )
+    selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  mapping_names() )
   })
 
   output$Diachronic_Comparison_Tab_Controls_2 <- renderUI({
@@ -770,7 +772,7 @@ server <- shinyServer(function(input, output, session) {
   ############################################################################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
-    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names( GlobalEventMappings ) )
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), mapping_names() )
   })
 
   output$Moving_Window_Tab_Controls_2 <- renderUI({

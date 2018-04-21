@@ -589,17 +589,22 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
     e[cf] = as.factor(e[,cf])
   }
 
-
+# take out the clustering here
   ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
-  clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
+ # clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
 
   ## Create a new column for each cluster solution
-  for (cluster_level in 1:nChunks){
+  # for (cluster_level in 1:nChunks){
+  #
+  #   clevelName = paste0("ZM_",cluster_level)
+  #   e[clevelName] = cutree(clust, k=cluster_level)
+  #
+  # } # for cluster_level
 
-    clevelName = paste0("ZM_",cluster_level)
-    e[clevelName] = cutree(clust, k=cluster_level)
+  # fill in the last column with the row number
+  e$ZM_1 = 1:nrow(e)
 
-  } # for cluster_level
+  print(head(e))
 
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E_2.rdata")

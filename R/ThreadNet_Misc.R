@@ -451,19 +451,26 @@ get_moving_window <- function(e, s, l ){
 # GlobalEventMappings is a global variable -- pass in as gem
 get_event_mapping_names <- function(gem){
 
-  n=length(gem)
-  # if list is empty, return 'One-to-One'
-  if (n==0)
-    return('One-to-One')
-  else {
-    print (n)
-    e_names=list()
-    for (i in 1:n) {
-      e_names = c(e_names, unlist(gem[[i]][["name"]]) )
+  # n=length(gem)
+  # # if list is empty, return 'OneToOne'
+  # if (n==0)
+  #   return('OneToOne')
+  # else {
+  #   e_names=list()
+  #   for (i in 1:n) {
+  #     e_names = c(e_names, unlist(gem[[i]][["name"]]) )
+  # }
+  # return(unlist(e_names))
+
+  print(paste('length of gem:',length(gem)))
+
+  n= unlist(lapply(1:length(GlobalEventMappings),function(i){
+    unlist(GlobalEventMappings[[i]][["name"]]) }))
+
+  print(n)
+    return(n)
   }
-  return(unlist(e_names))
-  }
-}
+
 
 store_event_mapping <- function(EventMapName, e){
 
