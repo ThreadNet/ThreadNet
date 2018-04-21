@@ -62,6 +62,7 @@ server <- shinyServer(function(input, output, session) {
                                                     "ZM_1", paste0("ZM_",input$freqNgramZoomID))) })
 
 
+
   #################################################################
   ################## 1.READ DATA TAB ##############################
   #################################################################
@@ -175,9 +176,16 @@ server <- shinyServer(function(input, output, session) {
 
   ########  contextual chunk tab  ###############
 
-    output$chunk_controls_1 = renderUI({
-      tags$div(align="left",
-               tags$h4("Group occurrences into events based on context.") ) })
+
+  output$chunk_controls_1 <- renderUI({
+    zoom_limit = zoom_upper_limit( threadedChunks())
+    if (zoom_limit == 1)
+    {tags$h4("Zooming not available with this mapping")}
+    else
+    {sliderInput("chunkZoomID",
+                 label=h4("Zoom in and out by event similarity:"),
+                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+  })
 
   # handoff controls
   output$chunk_controls_2 = renderUI({
@@ -193,7 +201,7 @@ server <- shinyServer(function(input, output, session) {
     # input$chunk_timescale,
 
     sliderInput("chunk_time_gap_threshold",
-                "Minimum time gap between distinct chunks (minutes):",
+                "Minimum time gap between chunks (mins):",
                 threshold_slider_min(threadedOcc()),
                 threshold_slider_max(threadedOcc()),
                 threshold_slider_selected(threadedOcc()),
@@ -216,9 +224,18 @@ server <- shinyServer(function(input, output, session) {
 
     })
 
+  output$chunk_controls_6 <- renderUI({ maxrows=length(unique(threadedOcc()[['threadNum']]))
+  sliderInput("chunkVerbatimRows",
+              label=h4("How many threads to view:"),
+              min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
+  })
+
   # show the results
-  output$chunk_controls_6 =   renderText(
-    paste(thread_text_vector(threadedChunks(),'threadNum', 'ZM_1', ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  )
+  output$chunk_controls_7 =   renderText({
+    if (is.null(threadedChunks))
+    { paste(thread_text_vector(threadedOcc(),'threadNum', 'ZM_1', ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )}
+    else
+    {paste(thread_text_vector(threadedChunks(),'threadNum',    paste0("ZM_",input$chunkZoomID), ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  } })
 
 
   # this function runs when you push the button to create a new mapping based on chunks
@@ -231,6 +248,7 @@ server <- shinyServer(function(input, output, session) {
                                  input$chunk_time_gap_threshold,
                                  'mins',
                                  input$chunk_CFs,
+                                 get_EVENT_CF(),
                                  get_COMPARISON_CF() ) )})
 
 

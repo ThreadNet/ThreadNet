@@ -57,25 +57,28 @@ ui <- fluidPage(
 
                                    tabPanel("Contextual Chunks",
                                             fluidRow(
-                                              column(3, uiOutput("chunk_controls_1")),
-                                              column(3,
+                                              column(4,
                                                      radioButtons("Chunks_method_Button", label = h4("Choose method for chunking:"),
                                                                                         choices = c( "Handoffs", "Time Gap","Fixed Size"),
                                                                                         inline=TRUE),
+                                                                          hr(),
 
                                                                            conditionalPanel(
-                                                                             condition = "input.Chunks_Output_Button == 'Handoffs'",
+                                                                             condition = "input.Chunks_method_Button == 'Handoffs'",
                                                                              uiOutput("chunk_controls_2") ),
                                                                            conditionalPanel(
-                                                                              condition = "input.Chunks_Output_Button == 'Time Gap'",
+                                                                              condition = "input.Chunks_method_Button == 'Time Gap'",
                                                                               uiOutput("chunk_controls_3") ),
                                                                           conditionalPanel(
-                                                                              condition = "input.Chunks_Output_Button == 'Fixed Size'",
+                                                                              condition = "input.Chunks_method_Button == 'Fixed Size'",
                                                                               uiOutput("chunk_controls_4") )
                                                         ),
-                                              column(3, uiOutput("chunk_controls_5"))
+
+                                              column(4, uiOutput("chunk_controls_5"))
                                             ),
-                                            verbatimTextOutput("chunk_controls_6")
+                                            uiOutput("chunk_controls_1"),
+                                            uiOutput("chunk_controls_6"),
+                                            verbatimTextOutput("chunk_controls_7")
                                    ),
 
                                    tabPanel("Cluster for Zooming",

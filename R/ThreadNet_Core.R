@@ -489,7 +489,7 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
 
 # new version containing more ways to create chunks -- uses concepts from original prototype, but better implementation
 # chunk by handoff, time gap and handoff gap
-OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale, chunk_CF, CF_compare){
+OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale='mins', chunk_CF, event_CF, compare_CF){
 
   # Inputs: o = table of occurrences
   #         m = method parameter =  c( "Handoffs", "Time Gap","Fixed Size")
@@ -501,18 +501,16 @@ OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   # put this here for now
   timescale='mins'
 
-  # Only run if eventMapName is filled in; return empty data frame otherwise
-  if (EventMapName ==""){return(data.frame())}
 
   #### First get the break points between the events
  # Ideally, these should operate WITHIN each thread, not on the whole set of occurrences...
-
-  if (m=="Variable chunks"){
+# choices = c( "Handoffs", "Time Gap","Fixed Size"),
+  if (m=="Handoffs"){
     o$handoffGap =  diff_handoffs(o[chunk_CF])
     breakpoints = which(o$handoffGap == 0)
-  } else if (m=="Time gap") {
+  } else if (m=="Time Gap") {
     breakpoints = which(o$timeGap > tThreshold)
-  } else if (m=="Uniform chunks") {
+  } else if (m=="Fixed Size") {
     breakpoints = seq(1,nrow(o),uniform_chunk_size)
   }
 
@@ -528,7 +526,7 @@ OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   # print(paste("nChunks=",nChunks))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
-  e = make_event_df(EVENT_CF, compare_CF, nChunks)
+  e = make_event_df(event_CF, compare_CF, nChunks)
 
   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
@@ -561,8 +559,8 @@ OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
     e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
 
     # copy in the threadNum and assign sequence number
-    e$threadNum[chunkNo] = o$POVthreadNum[start_idx]
-    thisThread = o$POVthreadNum[start_idx]
+    e$threadNum[chunkNo] = o$threadNum[start_idx]
+    thisThread = o$threadNum[start_idx]
 
 
     # fill in data for each of the context factors
@@ -570,7 +568,7 @@ OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
       e[chunkNo,cf] = as.character(o[start_idx,cf])
     }
 
-    for (cf in EVENT_CF){
+    for (cf in event_CF){
       VCF = paste0("V_",cf)
       e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
     }
@@ -606,14 +604,15 @@ OccToEvents_by_chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E_2.rdata")
 
-  # store the event map in the GlobalEventMappings
+  # Only store the result if eventMapName is filled in
+  # The event map is sorted by threadNum and seqNum when it is stored, so do it here just in case
+  if (EventMapName =="")
+  {    return(e[order(e[['threadNum']],e[['seqNum']]),]) }
+  else {
+  # store the event map in the GlobalEventMappings and return the eventmap
   eventMap = store_event_mapping(EventMapName, e)
-
-  # print( get_event_mapping_names( GlobalEventMappings ) )
-  # save(GlobalEventMappings, file="eventMappings.RData")
-
-  #  need return the threads and also the cluster solution for display
-  return(eventMap)
+  return(eventMap[['threads']])
+  }
 }
 
 
