@@ -15,7 +15,9 @@ server <- shinyServer(function(input, output, session) {
   # # One for the event mappings
   #  observe( makeReactiveBinding("GlobalEventMappings", env=.GlobalEnv) )
   #
-  # makeReactiveBinding("GlobalEventMappings" )
+
+  # create reactive value to force execution of function that gets map names for menus
+  rv <-reactiveValues(newmap=0)
 
   ##################################################
   # capture reactive values from the UI that are needed elsewhere
@@ -40,28 +42,33 @@ server <- shinyServer(function(input, output, session) {
 
   # These sliders controls the zoom level for zooming in-out
   # they are grouoped here because hopefully they can be replaced by a single function... except that reactive functions don't take parameters
-  get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))==1 ,
+  get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$VisualizeEventMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
 
-  get_Zoom_COMP_A <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_A))==1 ,
+  get_Zoom_COMP_A <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_A))==1 ,
                                                "ZM_1", paste0("ZM_",input$CompareZoomID_A))) })
 
-  get_Zoom_COMP_B <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_B))==1 ,
+  get_Zoom_COMP_B <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_B))==1 ,
                                                "ZM_1", paste0("ZM_",input$CompareZoomID_B))) })
 
-  get_Zoom_DIA_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$DiaCompareMapInputID))==1 ,
+  get_Zoom_DIA_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$DiaCompareMapInputID))==1 ,
                                                  "ZM_1", paste0("ZM_",input$DiaCompareZoomID))) })
 
-  get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))==1 ,
+  get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$MovingWindowMapInputID))==1 ,
                                               "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
-  get_Zoom_REGEX <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID))==1 ,
+  get_Zoom_REGEX <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$RegExInputMapID))==1 ,
                                                "ZM_1", paste0("ZM_",input$regexZoomID))) })
 
-  get_Zoom_freqNgram <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$freqNgramInputMapID))==1 ,
+  get_Zoom_freqNgram <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$freqNgramInputMapID))==1 ,
                                                     "ZM_1", paste0("ZM_",input$freqNgramZoomID))) })
 
+  get_Zoom_CHUNK <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$ChunkInputMapID))==1 ,
+                                                    "ZM_1", paste0("ZM_",input$chunkZoomID))) })
 
+  # add reactive value to force update
+  get_event_mapping_names <- reactive({rv$newmap
+                                      get_event_mapping_name_list() })
 
   #################################################################
   ################## 1.READ DATA TAB ##############################
@@ -176,22 +183,30 @@ server <- shinyServer(function(input, output, session) {
 
   ########  contextual chunk tab  ###############
 
+  output$chunk_controls_0 = renderUI({
+    tags$div(align="left",
+             selectizeInput("ChunkInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ))
+  })
+
+  # get the data that will be the input for this tab
+  chunkInputEvents <- reactive({rv$newmap
+                                get_event_mapping_threads( input$ChunkInputMapID) })
 
   output$chunk_controls_1 <- renderUI({
-    zoom_limit = zoom_upper_limit( threadedChunks())
+    zoom_limit = zoom_upper_limit( chunkInputEvents())
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
     {sliderInput("chunkZoomID",
                  label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+                 1, zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
   })
 
   # handoff controls
   output$chunk_controls_2 = renderUI({
     # input$chunk_CFs
     tags$div(checkboxGroupInput("chunk_CFs","Start new event when ALL of these change:",
-                                get_EVENT_CF(),
+                                intersect(colnames(chunkInputEvents()), union(get_EVENT_CF(),get_COMPARISON_CF())),
                                 inline=TRUE))
     })
 
@@ -202,9 +217,9 @@ server <- shinyServer(function(input, output, session) {
 
     sliderInput("chunk_time_gap_threshold",
                 "Minimum time gap between chunks (mins):",
-                threshold_slider_min(threadedOcc()),
-                threshold_slider_max(threadedOcc()),
-                threshold_slider_selected(threadedOcc()),
+                threshold_slider_min(chunkInputEvents()),
+                threshold_slider_max(chunkInputEvents()),
+                threshold_slider_selected(chunkInputEvents()),
                 step = 1, ticks=FALSE)
 
     })
@@ -219,29 +234,28 @@ server <- shinyServer(function(input, output, session) {
   output$chunk_controls_5 = renderUI({
 
     tags$div(align="left",
-             textInput("EventMapName2", label = h4("Enter label for result") ),
+             textInput("EventMapName2", label = h4("Enter label to save result") ),
              actionButton("EventButton2", "Create New Mapping")  )
 
     })
 
-  output$chunk_controls_6 <- renderUI({ maxrows=length(unique(threadedOcc()[['threadNum']]))
+  output$chunk_controls_6 <- renderUI({ maxrows=length(unique(chunkInputEvents()[['threadNum']]))
   sliderInput("chunkVerbatimRows",
               label=h4("How many threads to view:"),
               min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
   })
 
   # show the results
-  output$chunk_controls_7 =   renderText({
-    if (is.null(threadedChunks))
-    { paste(thread_text_vector(threadedOcc(),'threadNum', 'ZM_1', ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )}
-    else
-    {paste(thread_text_vector(threadedChunks(),'threadNum',    paste0("ZM_",input$chunkZoomID), ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  } })
+  output$chunk_controls_7 =   renderText({ paste(thread_text_vector(chunkInputEvents(),'threadNum',
+                                                get_Zoom_CHUNK(), ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  })
 
 
   # this function runs when you push the button to create a new mapping based on chunks
-  threadedChunks <- reactive({
-    input$EventButton2
-    isolate(OccToEvents_By_Chunk(threadedOcc(),
+  observeEvent(
+    input$EventButton2,
+    {rv$newmap = rv$newmap+1 # trigger reactive value
+    print(paste('threadedChunks newmap=',rv$newmap))
+    isolate( OccToEvents_By_Chunk(chunkInputEvents(),
                                  input$Chunks_method_Button, # which method?
                                  input$EventMapName2,
                                  input$fixed_chunk_size,
@@ -249,7 +263,7 @@ server <- shinyServer(function(input, output, session) {
                                  'mins',
                                  input$chunk_CFs,
                                  get_EVENT_CF(),
-                                 get_COMPARISON_CF() ) )})
+                                 get_COMPARISON_CF() ) )}, ignoreInit = TRUE)
 
 
   # Need to suppress some columns that contain lists that do not display correctly in the DT
@@ -264,15 +278,14 @@ server <- shinyServer(function(input, output, session) {
 
     ########  regular expression tab  ###############
 
-    mapping_names <- reactive({ifelse( (length( GlobalEventMappings)==0), list(), get_event_mapping_names( GlobalEventMappings )) } )
 
       output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
-                 selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), mapping_names()  ))
+                 selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ))
       })
 
       # get the data that will be the input for this tab
-    regexInputEvents <- reactive( get_event_mapping_threads( GlobalEventMappings , input$RegExInputMapID) )
+    regexInputEvents <- reactive( get_event_mapping_threads( input$RegExInputMapID) )
 
 
     output$Regular_Expression_controls_2 <- renderUI({
@@ -336,17 +349,18 @@ server <- shinyServer(function(input, output, session) {
       })
 
       # this function runs when you push the button to create a new mapping
-      threadedEventsRegEx <- observeEvent(
+      observeEvent(
         input$EventButton3,
-        {isolate(OccToEvents3(regexInputEvents(),
+       { rv$newmap = rv$newmap+1 # trigger reactive value
+       print(paste('threadedEventsRegEx newmap=',rv$newmap))
+        isolate(OccToEvents3(regexInputEvents(),
                              input$EventMapName3,
                              get_EVENT_CF(),
                              get_COMPARISON_CF(),
                              'threadNum',
                              get_Zoom_REGEX(),
                              regexInput(),
-                             input$KeepIrregularEvents))
-        })
+                             input$KeepIrregularEvents))}, ignoreInit = TRUE)
 
 
       ########  Frequent n-gram tab  ###############
@@ -354,11 +368,11 @@ server <- shinyServer(function(input, output, session) {
 
       output$Frequent_Ngram_controls_1 = renderUI({
         tags$div(align="left",
-                 selectizeInput("freqNgramInputMapID",label = h4("Choose input for this mapping:"), mapping_names()  ))
+                 selectizeInput("freqNgramInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ))
       })
 
       # get the data that will be the input for this tab
-      freqNgramInputEvents <- reactive( get_event_mapping_threads( GlobalEventMappings , input$freqNgramInputMapID) )
+      freqNgramInputEvents <- reactive( get_event_mapping_threads( input$freqNgramInputMapID) )
 
 
       output$Frequent_Ngram_controls_2 <- renderUI({
@@ -427,24 +441,24 @@ server <- shinyServer(function(input, output, session) {
 
       output$Frequent_Ngram_controls_7 = renderUI({
         tags$div(align="left",
-                 textInput("EventMapName4", label = h4("Enter label for result"), value = "freqNgram_"),
+                 textInput("EventMapName4", label = h4("Enter label for result") ),
                  radioButtons("KeepIrregularEvents_2",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
                  actionButton("EventButton4", "Create New Mapping")  )
 
       })
 
       # this function runs when you push the button to create a new mapping
-      threadedEventsfreqNgram <- observeEvent(
+      threadedEventsfreqNgram <- eventReactive(
         input$EventButton4,
-        {isolate(OccToEvents3(freqNgramInputEvents(),
+        {rv$newmap = rv$newmap+1 # trigger reactive value
+        isolate( OccToEvents3(freqNgramInputEvents(),
                               input$EventMapName4,
                               get_EVENT_CF(),
                               get_COMPARISON_CF(),
                               'threadNum',
                               get_Zoom_freqNgram(),
                               selected_ngrams(),
-                              input$KeepIrregularEvents_2))
-        })
+                              input$KeepIrregularEvents_2) )}, ignoreInit = TRUE)
 
 
 
@@ -454,7 +468,7 @@ server <- shinyServer(function(input, output, session) {
           #   tags$div(align="left",
           #            tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
           #
-          #            selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names( GlobalEventMappings ) ),
+          #            selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names(  ) ),
           #
           #            textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal_"),
           #
@@ -467,36 +481,35 @@ server <- shinyServer(function(input, output, session) {
           output$Cluster_Event_controls_1 = renderUI({
             tags$div(align="left",
                      tags$h4("Cluster Events: Group similar events to together to allow zooming"),
-
-                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), mapping_names() ))
+                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names() ))
           })
             output$Cluster_Event_controls_2 = renderUI({
               tags$div(align="left",
                      textInput("EventMapName6", label = h4("Enter new label for this mapping + clustering"), value =""),
-
                      radioButtons("ClusterMethodID", "Cluster based on:",
                                   choices = c("Sequential similarity", "Contextual Similarity", "Network Structure"),
                                   selected="Sequential similarity", inline=TRUE),
-
                      actionButton("EventButton6", "Cluster Events")  )
           })
 
 
-          output$dendroClusterResult <- renderDendroNetwork({
-             input$EventButton6
-            isolate( dendroNetwork(clusterEvents( get_event_mapping_threads( GlobalEventMappings,
-                                                                    input$ClusterEventsInputID),
-                                         input$EventMapName6,
-                                         input$ClusterMethodID,
-                                         get_EVENT_CF()),
-                          treeOrientation = "vertical", textColour = "black"))
-          })
+            # separate the cluster calculation from the dendrogram display
+            cluster_result <- eventReactive(
+              input$EventButton6,
+              {rv$newmap = rv$newmap+1 # trigger reactive value
+              isolate( clusterEvents( get_event_mapping_threads( input$ClusterEventsInputID),
+                                                         input$EventMapName6,
+                                                         input$ClusterMethodID,
+                                                         get_EVENT_CF()))}, ignoreInit = TRUE )
+
+          output$dendroClusterResult <- renderDendroNetwork({ dendroNetwork(cluster_result(),
+                                                                           treeOrientation = "vertical", textColour = "black" ) })
 
           ######## create subsets tab  ###############
 
           # Controls for the whole set of tabs
           output$SelectSubsetControls_1 = renderUI({
-            selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),  mapping_names()  )
+            selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),  get_event_mapping_names()  )
           })
 
           output$SelectSubsetControls_2 <- renderUI({
@@ -507,14 +520,15 @@ server <- shinyServer(function(input, output, session) {
           })
 
           # Get data for the Visualize tab.  Need parallel functions for the other tabs.
-          subsetEventsViz <- reactive({  get_event_mapping_threads( GlobalEventMappings, input$SelectSubsetMapInputID ) })
+          subsetEventsViz <- reactive({  get_event_mapping_threads( input$SelectSubsetMapInputID ) })
 
           output$SelectSubsetDataTable  = DT::renderDataTable({ subsetEventsViz() }, filter = "top")
 
           observeEvent(
             input$SelectSubsetButton,
-            {store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
-            })
+            {rv$newmap = rv$newmap+1 # trigger reactive value
+            store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
+            }, ignoreInit = TRUE)
 
 
           ######## manage event mappings tab  ###############
@@ -523,7 +537,7 @@ server <- shinyServer(function(input, output, session) {
               tags$div(align="left",
                        tags$h4("Select event mapping to export or delete"),
 
-                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), mapping_names() ),
+                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() ),
 
                        actionButton("ExportMappingButton", "Export"),
                        actionButton("DeleteMappingButton", "Delete") )
@@ -533,15 +547,17 @@ server <- shinyServer(function(input, output, session) {
             # reactive functions for the export and delete buttons
             observeEvent(
               input$DeleteMappingButton,
-              {delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+              {rv$newmap = rv$newmap+1 # trigger reactive value
+              delete_event_mapping( input$ManageEventMapInputID )
                 output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
-              })
+              }, ignoreInit = TRUE)
 
             observeEvent(
               input$ExportMappingButton,
-              {export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
+              {rv$newmap = rv$newmap+1 # trigger reactive value
+              export_event_mapping(  input$ManageEventMapInputID )
                 output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
-            })
+            }, ignoreInit = TRUE)
 
 
   ########################################################################
@@ -550,11 +566,11 @@ server <- shinyServer(function(input, output, session) {
 
   # Controls for the whole set of tabs
   output$Visualize_Tab_Controls_1 = renderUI({
-        selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  mapping_names(), selected='OneToOne' )
+        selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names(), selected='OneToOne' )
   })
 
   output$Visualize_Tab_Controls_2 = renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$VisualizeEventMapInputID))
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$VisualizeEventMapInputID))
     if ( zoom_limit == 1)
        {tags$h4("Zooming not available for this mapping")}
     else
@@ -564,7 +580,7 @@ server <- shinyServer(function(input, output, session) {
   })
 
   # Get data for the Visualize tab.  Need parallel functions for the other tabs.
-  threadedEventsViz <- reactive({  get_event_mapping_threads( GlobalEventMappings, input$VisualizeEventMapInputID ) })
+  threadedEventsViz <- reactive({  get_event_mapping_threads( input$VisualizeEventMapInputID ) })
 
 
   ######## Basic ngrams tab  ###############
@@ -667,11 +683,11 @@ server <- shinyServer(function(input, output, session) {
 
   # ####### SUBSET A   ##########
   output$Comparison_Tab_Controls_A1 <- renderUI({
-    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping:"),  mapping_names() )
+    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping:"),  get_event_mapping_names() )
     })
 
   output$Comparison_Tab_Controls_A2 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_A))
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_A))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
@@ -682,7 +698,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Get data for the COMPARE tab mapping A
   threadedEventsComp_A <- reactive({
-    get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID_A ) })
+    get_event_mapping_threads(  input$CompareMapInputID_A ) })
 
   # just one type of plot for now -- need to select different plot types
   output$Comparison_Plots_A <- renderPlotly({
@@ -691,11 +707,11 @@ server <- shinyServer(function(input, output, session) {
 
    # ####### SUBSET B   ##########
   output$Comparison_Tab_Controls_B1 <- renderUI({
-    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping:"),  mapping_names() )
+    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping:"),  get_event_mapping_names() )
   })
 
   output$Comparison_Tab_Controls_B2 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$CompareMapInputID_B))
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_B))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
@@ -706,7 +722,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Get data for the COMPARE tab mapping B.
   threadedEventsComp_B <- reactive({
-    get_event_mapping_threads( GlobalEventMappings, input$CompareMapInputID_B ) })
+    get_event_mapping_threads( input$CompareMapInputID_B ) })
 
   # just one type of plot for now -- need to select different plot types
   output$Comparison_Plots_B <- renderPlotly({
@@ -715,11 +731,11 @@ server <- shinyServer(function(input, output, session) {
 
   # ##########  DIACHRONIC Comparison sub-tab   ###########
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
-    selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  mapping_names() )
+    selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() )
   })
 
   output$Diachronic_Comparison_Tab_Controls_2 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$DiaCompareMapInputID))
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$DiaCompareMapInputID))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
@@ -735,7 +751,7 @@ server <- shinyServer(function(input, output, session) {
 
    # Get data for the Diachronic COMPARE tab  .
    threadedEventsDiaComp <- reactive({
-     get_event_mapping_threads( GlobalEventMappings, input$DiaCompareMapInputID ) })
+     get_event_mapping_threads(  input$DiaCompareMapInputID ) })
 
 
    # controls for the comparison input panels
@@ -772,11 +788,11 @@ server <- shinyServer(function(input, output, session) {
   ############################################################################
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
-    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), mapping_names() )
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() )
   })
 
   output$Moving_Window_Tab_Controls_2 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads( GlobalEventMappings , input$MovingWindowMapInputID))
+    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$MovingWindowMapInputID))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
@@ -786,15 +802,15 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$Moving_Window_Tab_Controls_3 <- renderUI({
-    sliderInput("MovingWindowSizeID","Window Size", 1, numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
+    sliderInput("MovingWindowSizeID","Window Size", 1, numThreads(threadedEventsMove(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
   output$Moving_Window_Tab_Controls_4_A <- renderUI({
-    sliderInput("WindowLocation_A_ID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
+    sliderInput("WindowLocation_A_ID","Window Location", 1,numThreads(threadedEventsMove(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
   output$Moving_Window_Tab_Controls_4_B <- renderUI({
-    sliderInput("WindowLocation_B_ID","Window Location", 1,numThreads(threadedEvents(),"threadNum" ),1,step=1,ticks=FALSE )
+    sliderInput("WindowLocation_B_ID","Window Location", 1,numThreads(threadedEventsMove(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
   # "Timesplit" appears to be used for the custom network plotly layout
@@ -805,7 +821,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Get data for the Moving Window tab.
   threadedEventsMove <- reactive({
-    get_event_mapping_threads( GlobalEventMappings, input$MovingWindowMapInputID ) })
+    get_event_mapping_threads(  input$MovingWindowMapInputID ) })
 
 
    output$MovingWindow_Plot_A <- renderPlotly({

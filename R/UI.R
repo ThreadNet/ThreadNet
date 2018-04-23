@@ -30,7 +30,7 @@ ui <- fluidPage(
                        tags$h3("Select columns from your data to define your point of view."),
                        tabsetPanel(type = "tabs",
                                    tabPanel("Define Threads",
-                                            tags$h4("Threads are defined by contextual features that STAY THE SAME during the thread. At least ONE is required."),
+                                            tags$h4("Threads are defined by contextual features that STAY THE SAME during a thread. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_2"),
                                             plotlyOutput("ContextFlowers_2")
                                             ),
@@ -46,7 +46,7 @@ ui <- fluidPage(
                                             plotlyOutput("previewThreadMap_1")
                                             ),
                                    tabPanel("Intermediate Data",
-                                            tags$h4("This table is display only. It shows the data threaded from your chosen POV"),
+                                            tags$h5("This table shows the data threaded from your chosen POV"),
                                             DT::dataTableOutput("Thread_Tab_Output_1")
                                             )
                                    )
@@ -57,14 +57,14 @@ ui <- fluidPage(
 
                                    tabPanel("Contextual Chunks",
                                             fluidRow(
-                                              column(4,
+                                              column(3, uiOutput("chunk_controls_0")),
+                                              column(3,
+                                                     # add method for RLE -- remove sequential runs
                                                      radioButtons("Chunks_method_Button", label = h4("Choose method for chunking:"),
-                                                                                        choices = c( "Handoffs", "Time Gap","Fixed Size"),
+                                                                                        choices = c( "Changes", "Time Gap","Fixed Size"),
                                                                                         inline=TRUE),
-                                                                          hr(),
-
                                                                            conditionalPanel(
-                                                                             condition = "input.Chunks_method_Button == 'Handoffs'",
+                                                                             condition = "input.Chunks_method_Button == 'Changes'",
                                                                              uiOutput("chunk_controls_2") ),
                                                                            conditionalPanel(
                                                                               condition = "input.Chunks_method_Button == 'Time Gap'",
@@ -74,7 +74,7 @@ ui <- fluidPage(
                                                                               uiOutput("chunk_controls_4") )
                                                         ),
 
-                                              column(4, uiOutput("chunk_controls_5"))
+                                              column(3, uiOutput("chunk_controls_5"))
                                             ),
                                             uiOutput("chunk_controls_1"),
                                             uiOutput("chunk_controls_6"),
@@ -241,7 +241,7 @@ ui <- fluidPage(
                           tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
                           tags$p("Antecedents of Complexity in Healthcare Routines"),
                         tags$h4("Code Gurus:"),
-                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson"),
+                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson, Douglas Krum"),
                         tags$h4("Collaborators:"),
                              tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
                         tags$h4("Related Publications:"),

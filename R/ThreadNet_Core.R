@@ -189,7 +189,7 @@ count_ngrams <- function(o,TN,CF,n){
 ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
   # make sure there is a value
-  if (length(THREAD_CF) == 0){return(o)}
+  if (length(THREAD_CF) == 0 | length(EVENT_CF)==0){return(data.frame())}
 
   # Sort by POV and timestamp. The idea is to get the stream of activities from
   # a particular point of view (e.g., actor, location, etc.)
@@ -213,6 +213,10 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   occ$threadNum = integer(nrow(occ))
   occ$seqNum =   integer(nrow(occ))
 
+  # add new column called label - just copy the new combined event_CF column
+  occ$label = occ[[newColName(EVENT_CF)]]
+
+  # occurrences have zero duration
   occ$eventDuration = 0
 
   # Also add columns for the time gapsthat appear from this POV
@@ -284,17 +288,17 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   }
 
   # just add the one column with the combined values
-  occ["ZM_1"] = as.integer(occ[,newColName(EVENT_CF)])
+ # occ["ZM_1"] = as.integer(occ[,newColName(EVENT_CF)])
 
 
-  # Probably want to make sure this is sorted correctly??
+  # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
+  e=clusterEvents(occ, 'OneToOne', 'Network Structure', EVENT_CF,'threads')
 
-  # store the event map in the GlobalEventMappings
-  eventMap = store_event_mapping('OneToOne', occ)
+ # eventMap = store_event_mapping('OneToOne', occ)
 
    print('done converting occurrences...')
 
-  return( eventMap[['threads']] )
+  return( e )
 
 }
 
@@ -321,58 +325,58 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 #' and set of columns E_1, E_2, ..., that indicate the membership of events in clusters of events.
 #'
 #' @export
-OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
-
-
-  # Only run if eventMapName is filled in; return empty data frame otherwise
-  if (EventMapName ==""){return(data.frame())}
-
-  # we are mapping one-to-one, so copy the input to the output and then add/rename some other columns as needed
-  e=o
-
-   # occurrences have no duration
-   e$eventDuration = 0
-
-    # rename the threadNum and seqNum columns
-    names(e)[names(e)=="POVthreadNum"] <- "threadNum"
-    names(e)[names(e)=="POVseqNum"] <- "seqNum"
-
-    #  these are just equal to the row numbers -- one occurrence per event
-    e["occurrences"] =   1:nrow(e)
-
-    # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
-      for (cf in EVENT_CF){
-        #make a new column for each CF
-        VCF = paste0("V_",cf)
-        e[[VCF]]= vector(mode = "integer",length=nrow(e))
-
-        for (r in 1:nrow(e)){
-        e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
-        }
-      }
-
-
-    # just add the one column with the combined values
-  #  e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
-     e["ZM_1"] = as.integer(e[,newColName(EVENT_CF)])
-
-    # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
-    # map = list(name = paste(EventMapName), threads = e)
-    #
-    # GlobalEventMappings <<- append(list(map), GlobalEventMappings )
-
-    # store the event map in the GlobalEventMappings
-    eventMap = store_event_mapping(EventMapName, e)
-
-    # print( get_event_mapping_names( GlobalEventMappings ) )
-    # save(GlobalEventMappings, file="eventMappings.RData")
-
-    # for debugging, this is really handy
-    # save(o,e,file="O_and_E_1.rdata")
-
-    return(eventMap)
-
-}
+# OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
+#
+#
+#   # Only run if eventMapName is filled in; return empty data frame otherwise
+#   if (EventMapName ==""){return(data.frame())}
+#
+#   # we are mapping one-to-one, so copy the input to the output and then add/rename some other columns as needed
+#   e=o
+#
+#    # occurrences have no duration
+#    e$eventDuration = 0
+#
+#     # rename the threadNum and seqNum columns
+#     names(e)[names(e)=="POVthreadNum"] <- "threadNum"
+#     names(e)[names(e)=="POVseqNum"] <- "seqNum"
+#
+#     #  these are just equal to the row numbers -- one occurrence per event
+#     e["occurrences"] =   1:nrow(e)
+#
+#     # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
+#       for (cf in EVENT_CF){
+#         #make a new column for each CF
+#         VCF = paste0("V_",cf)
+#         e[[VCF]]= vector(mode = "integer",length=nrow(e))
+#
+#         for (r in 1:nrow(e)){
+#         e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
+#         }
+#       }
+#
+#
+#     # just add the one column with the combined values
+#   #  e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
+#      e["ZM_1"] = as.integer(e[,newColName(EVENT_CF)])
+#
+#     # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
+#     # map = list(name = paste(EventMapName), threads = e)
+#     #
+#     # GlobalEventMappings <<- append(list(map), GlobalEventMappings )
+#
+#     # store the event map in the GlobalEventMappings
+#     eventMap = store_event_mapping(EventMapName, e)
+#
+#     # print( get_event_mapping_names( GlobalEventMappings ) )
+#     # save(GlobalEventMappings, file="eventMappings.RData")
+#
+#     # for debugging, this is really handy
+#     # save(o,e,file="O_and_E_1.rdata")
+#
+#     return(eventMap)
+#
+# }
 
 # this one creates chunks based on the handoff index
 # OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
@@ -480,7 +484,7 @@ OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
 #   # store the event map in the GlobalEventMappings
 #   eventMap = store_event_mapping(EventMapName, e)
 #
-#  # print( get_event_mapping_names( GlobalEventMappings ) )
+#  # print( get_event_mapping_names(  ) )
 #  # save(GlobalEventMappings, file="eventMappings.RData")
 #
 #   #  need return the threads and also the cluster solution for display
@@ -498,14 +502,21 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   #         EventMapName = used to store this mapping in an environment
   #         CF_compare = context factors used for comparison -- need to be copied over here when the thread is created.
 
+
+  # Only run if eventMapName is filled in
+  if (EventMapName =="") {return(data.frame()) }
+
+
   # put this here for now
   timescale='mins'
 
 
   #### First get the break points between the events
  # Ideally, these should operate WITHIN each thread, not on the whole set of occurrences...
-# choices = c( "Handoffs", "Time Gap","Fixed Size"),
-  if (m=="Handoffs"){
+  # Add RLE -- consecutive runs -- as a way to chunk -- let user pick the CFs
+  # very similar to the changes algorithm...
+# choices = c( "Changes", "Time Gap","Fixed Size"),
+  if (m=="Changes"){
     o$handoffGap =  diff_handoffs(o[chunk_CF])
     breakpoints = which(o$handoffGap == 0)
   } else if (m=="Time Gap") {
@@ -609,15 +620,11 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E_2.rdata")
 
-  # Only store the result if eventMapName is filled in
-  # The event map is sorted by threadNum and seqNum when it is stored, so do it here just in case
-  if (EventMapName =="")
-  {    return(e[order(e[['threadNum']],e[['seqNum']]),]) }
-  else {
+
   # store the event map in the GlobalEventMappings and return the eventmap
   eventMap = store_event_mapping(EventMapName, e)
   return(eventMap[['threads']])
-  }
+
 }
 
 
@@ -625,6 +632,9 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
   # print(rx)
+
+  # Only run if eventMapName is filled in
+  if (EventMapName =="") {return(data.frame()) }
 
   # keep track of the length of each pattern
   for (i in 1:nrow(rx))
@@ -688,7 +698,6 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       e[[chunkNo, cf]] =  o[[original_row, cf]]
     }
 
-
     if (tvrxs[[thread]][sn] %in% rx$label ){
 
       # print(paste('thread sn = ',thread, sn))
@@ -697,9 +706,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
 
-      # try just sticking in the pattern -- need to pick the correct one & convert to list of integers
-      # INCORRECT: e$occurrences[[chunkNo]] = list(as.integer(unlist(strsplit( rx$pattern[which( rx$label==tvrxs[[thread]][sn])], ','))))
-    # need to locate the unique for from the o dataframe and aggregate those V_cf values.
+     # need to locate the unique for from the o dataframe and aggregate those V_cf values.
       rxLen = rx$patLength[which( rx$label==tvrxs[[thread]][sn])]
       e$occurrences[[chunkNo]] = list(seq(original_row,original_row+rxLen-1,1))
 
@@ -713,7 +720,6 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       # assign timestamp and duration -- use first - last occurrence times
       # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
       e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
-
 
     }
     else if (KeepIrregularEvents=='Keep') {
@@ -742,36 +748,25 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
 # take out the irregular events (empty rows) if so desired
   if (KeepIrregularEvents=='Drop'){
-
     # keep the subset where the event is not blank
     e=subset(e, !ZM_1=='')
-
-    # should probably re-number the sequence numbers...
-
     }
-
 
   # # for debugging, this is really handy
   #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
-  # store the event map in the GlobalEventMappings
-  eventMap = store_event_mapping(EventMapName, e)
 
-  # print( get_event_mapping_names( GlobalEventMappings ) )
-  # save(GlobalEventMappings, file="eventMappings.RData")
+    # store the event map in the GlobalEventMappings and return the eventmap
+    eventMap = store_event_mapping(EventMapName, e)
+    return(eventMap[['threads']])
 
-  #  need return the threads and also the cluster solution for display
-  return(eventMap)
 }
 
 # new function for new tab
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
-# cluster_method is either "Sequential similarity" or "Contextual Similarity"
-clusterEvents <- function(e, NewMapName, cluster_method, event_CF){
-
-  # only run if something is filled in
-  if (is.null(NewMapName) | NewMapName=="") return(NULL)
+# cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
+clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return='cluster'){
 
   if (cluster_method=="Sequential similarity")
     { dd = dist_matrix_seq(e) }
@@ -815,11 +810,15 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF){
 
   # save(newmap,e,zm, file='O_and_E_zoom.rdata')
 
-  # store the event map in the GlobalEventMappings
-   eventMap = store_event_mapping( NewMapName, newmap )
+  # only  store the event map in the GlobalEventMappings if something is filled in
+  if (!NewMapName=="")  {
+   eventMap = store_event_mapping( NewMapName, newmap ) }
 
    # return the cluster solution for display
-  return(clust)
+  if (what_to_return=='cluster')
+    {return(clust)}
+  else
+    {return(eventMap[['threads']])}
 }
 
 # this function pulls computes their similarity of chunks based on sequence
@@ -875,22 +874,20 @@ make_event_df <- function(event_CF,compare_CF,N){
   e = data.frame(
     tStamp = numeric(N),  # this is the event start time
     eventDuration = numeric(N),
+    label = character(N),
     occurrences = integer(N),
     threadNum = integer(N),
     seqNum = integer(N))
 
   # add columns for each of the context factors used to define events
   # first make the dataframes for each
-#  cf1=setNames(data.frame(matrix(ncol = length(event_CF), nrow = N)), event_CF)
   cf1v=setNames(data.frame(matrix(ncol = length(event_CF), nrow = N)), paste0("V_",event_CF))
   cf2=setNames(data.frame(matrix(ncol = length(compare_CF), nrow = N)), compare_CF)
-  # cf2v=setNames(data.frame(matrix(ncol = length(compare_CF), nrow = N)), paste0("V_", compare_CF))
-
 
   # Then combine them
   e = cbind(e, cf2,cf1v)
 
-  # and add one more column for the event code/description
+  # and add one more column for the event code/description -- maybe use label instead of this?
   e$ZM_1 = character(N)
 
   return(e)

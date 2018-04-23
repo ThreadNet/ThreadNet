@@ -448,27 +448,17 @@ get_moving_window <- function(e, s, l ){
 }
 
 #####################################################
-# GlobalEventMappings is a global variable -- pass in as gem
-get_event_mapping_names <- function(gem){
+# GlobalEventMappings is a global variable
+get_event_mapping_name_list <- function(){
 
-  # n=length(gem)
-  # # if list is empty, return 'OneToOne'
-  # if (n==0)
-  #   return('OneToOne')
-  # else {
-  #   e_names=list()
-  #   for (i in 1:n) {
-  #     e_names = c(e_names, unlist(gem[[i]][["name"]]) )
-  # }
-  # return(unlist(e_names))
-
-  print(paste('length of gem:',length(gem)))
+  print(paste('length of gem:',length(GlobalEventMappings)))
 
   n= unlist(lapply(1:length(GlobalEventMappings),function(i){
     unlist(GlobalEventMappings[[i]][["name"]]) }))
 
   print(n)
-    return(n)
+
+  return(n)
   }
 
 
@@ -483,14 +473,14 @@ store_event_mapping <- function(EventMapName, e){
 
 }
 
-get_event_mapping_threads <- function(gem, mapname){
+get_event_mapping_threads <- function( mapname){
 
     # get the index for the mapname
   # print (paste0('mapname',mapname))
   # print(paste0('get_event_mapping_names', get_event_mapping_names(gem)))
   # print(paste0('are they equal', mapname==get_event_mapping_names(gem)))
 
-  idx=which(mapname==get_event_mapping_names(gem) )
+  idx=which(mapname==get_event_mapping_names() )
 
   # print(idx)
   if (idx==0) {
@@ -498,27 +488,15 @@ get_event_mapping_threads <- function(gem, mapname){
     return(NULL)
   }
   else
-  return(gem[[idx]][["threads"]])
+  return(GlobalEventMappings[[idx]][["threads"]])
 }
 
-get_event_mapping_cluster <- function(gem, mapname){
+delete_event_mapping <- function( mapname){
 
   # get the index for the mapname
-  idx=which(mapname==get_event_mapping_names(gem) )
-  #print(idx)
-  if (idx==0) {
-    print('mapname not found for clusters')
-    return(NULL)
-  }
-  else
-    return(unlist(gem[[idx]][["cluster"]]))
-}
-delete_event_mapping <- function(gem, mapname){
+  idx=which(mapname==get_event_mapping_names() )
 
-  # get the index for the mapname
-  idx=which(mapname==get_event_mapping_names(gem) )
-
-  GlobalEventMappings[idx] <-NULL
+  GlobalEventMappings[[idx]] <-NULL
   # GlobalEventMappings[[idx]][["threads"]] <-NULL
   # GlobalEventMappings[[idx]][["cluster"]] <-NULL
 
@@ -527,11 +505,11 @@ delete_event_mapping <- function(gem, mapname){
 
 
 }
-export_event_mapping <- function(gem, mapname){
+export_event_mapping <- function(mapname){
 
   nicename = paste0("EventMap_",mapname)
 
-  assign(nicename, get_event_mapping_threads(gem, mapname))
+  assign(nicename, get_event_mapping_threads(mapname))
 
   save(list=nicename, file = paste0(nicename,".Rdata"))
 
