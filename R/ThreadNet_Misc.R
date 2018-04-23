@@ -451,12 +451,12 @@ get_moving_window <- function(e, s, l ){
 # GlobalEventMappings is a global variable
 get_event_mapping_name_list <- function(){
 
-  print(paste('length of gem:',length(GlobalEventMappings)))
+  # print(paste('length of gem:',length(GlobalEventMappings)))
 
   n= unlist(lapply(1:length(GlobalEventMappings),function(i){
     unlist(GlobalEventMappings[[i]][["name"]]) }))
 
-  print(n)
+  # print(n)
 
   return(n)
   }
