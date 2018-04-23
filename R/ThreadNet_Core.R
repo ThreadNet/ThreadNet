@@ -260,7 +260,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
       # split occ data frame by POVthreadNum to find earliest time value for that thread
       # then substract that from initiated relativeTime from above
-      occ_split = lapply(split(occ, occ$POVthreadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
+      occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
       # row bind data frame back together
       occ_comb= do.call(rbind, occ_split)
       occ_comb = data.frame(occ_comb)
