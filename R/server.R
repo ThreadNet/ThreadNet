@@ -687,8 +687,13 @@ server <- shinyServer(function(input, output, session) {
 
   ######## Custom network tab  ###############
 
-  output$VisualizeCustomNetwork <- renderPlotly({
-    eventNetwork(threadedEventsViz(), "threadNum", get_THREAD_CF(), get_Zoom_VIZ())
+  output$Pos_Layout_Controls_0 <- renderUI({
+    radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
+  })
+
+  output$eventNetwork <- renderVisNetwork({
+    req(input$Timesplit2)
+    eventNetwork(threadedEvents(), "threadNum", get_Zoom_TM(), input$Timesplit2)
   })
 
 
