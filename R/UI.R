@@ -172,8 +172,12 @@ ui <- fluidPage(
 
                           tabPanel("Force layout",
                                    uiOutput("Network_Tab_Controls_2"),
-                                   forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px"),
-                                   plotlyOutput("networkPie")),
+                                   fluidRow(
+                                     column(6,
+                                            forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
+                                     column(6,
+                                            plotlyOutput("networkPie"))
+                                     )),
 
                           tabPanel("Custom layout",
                                    plotlyOutput("VisualizeCustomNetwork"))
