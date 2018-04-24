@@ -128,7 +128,7 @@ ui <- fluidPage(
 
                                    tabPanel("Manage Event Maps",
                                             uiOutput("Manage_Event_Map_controls"),
-                                            verbatimTextOutput("delete_confirm")
+                                            verbatimTextOutput("action_confirm")
                                             )
                        )
 
