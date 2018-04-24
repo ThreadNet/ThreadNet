@@ -696,38 +696,33 @@ server <- shinyServer(function(input, output, session) {
     eventNetwork(threadedEvents(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
   })
 
-  event.data <- reactive({
-    event.data <- event_data("plotly_click", source="A")
-  })
-
   output$hover <- renderPrint({
     d <- event_data("plotly_hover")
     if (is.null(d)) "Hover events appear here (unhover to clear)" else d
   })
 
   output$click <- renderPrint({
-    browser()
+
     d <- event_data("plotly_click", source = "A")
     if (is.null(d)) "Click events appear here (double-click to clear)" else d
-    key = event_data("plotly_click")$key
-    TE = threadedEvents()
 
   })
 
-
-  #EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF()) )
-
-  eventNetworksubset <- reactive({
-    browser()
-    TE = threadedEvents()
-    TE
-  })
+  # event.data <- reactive({
+  #   event.data <- event_data("plotly_click", source="A")
+  # })
+  #
+  # eventNetworksubset <- reactive({
+  #   browser()
+  #   TE = threadedEvents()
+  #   TE
+  # })
 
 
   output$eventNetworksubset_data <- renderDataTable({
+
     browser()
-    req(event_data("plotly_click"))
-    key = event_data("plotly_click")$key
+    d <- event_data("plotly_click")
 
     ENsubset = subset(eventNetworksubset(), ZM_1 == key)
     ENsubset
