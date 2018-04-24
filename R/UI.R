@@ -194,7 +194,11 @@ ui <- fluidPage(
                                    forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
 
                           tabPanel("Custom layout",
-                                   plotlyOutput("VisualizeCustomNetwork"))
+                                   uiOutput("Pos_Layout_Controls_0"),
+                                   plotlyOutput("VisualizeCustomNetwork"),
+                                   verbatimTextOutput("hover"),
+                                   verbatimTextOutput("click"),
+                                   dataTableOutput("eventNetworksubset_data"))
                           )
 
               ),
