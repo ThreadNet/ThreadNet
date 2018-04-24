@@ -206,12 +206,21 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #' @return  plotly object
 #' @export
 #'
-threadMap <- function(or,TN, timescale, CF, shape){
+threadMap <- function(or, TN, timescale, CF, shape){
+
 
   # setting color palettes
   # first find the number of distinct colors
   nColors = length(unique(or[,CF]))
   pal <- diverge_hcl(nColors)
+
+  if (timescale == 'seqNum') {
+    xaxis = 'Event Time'
+  } else if (timescale == 'tStamp') {
+    xaxis = 'Actual Time'
+  } else if (timescale == 'relativeTime') {
+    xaxis = 'Relative time'
+  }
 
   return( plot_ly(or, x = ~as.integer(or[[timescale]]), y = ~or[[TN]], color= ~as.character(or[,CF]),
              colors=pal,
@@ -219,6 +228,11 @@ threadMap <- function(or,TN, timescale, CF, shape){
              text = ~or[[CF]],
              hoverinfo = "x+y+text",
              symbol= "line-ew", symbols=shape, showlegend=FALSE)
+             %>%
+               layout(
+                 xaxis = list(title = xaxis),
+                 yaxis = list(title = knitr::combine_words(get_THREAD_CF(), sep = ", "))
+               )
         )
 }
 

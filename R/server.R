@@ -601,11 +601,11 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$WholeSequenceThreadMap_ActualTime <- renderPlotly({
-    threadMap(threadedEventsViz(), "threadNum", "tStamp", get_Zoom_VIZ(), 15  )
+    threadMap(threadedEventsViz(), "threadNum", "tStamp", get_Zoom_VIZ(), 15 )
   })
 
   output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({
-    threadMap(threadedEventsViz(), "threadNum", "relativeTime", get_Zoom_VIZ(), 15  )
+    threadMap(threadedEventsViz(), "threadNum", "relativeTime", get_Zoom_VIZ(), 15 )
   })
 
   ######## Circular network tab  ###############
