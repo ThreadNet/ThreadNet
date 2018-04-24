@@ -537,20 +537,18 @@ export_event_mapping <- function(gem, mapname){
 
 export_event_mapping_csv <- function(gem, mapname){
 
-  nicename = paste0("EventMap_",mapname)
-
   output = as.data.frame(get_event_mapping_threads(gem, mapname))
-  output$v_actionnew = NA
-  output$v_actionnew = tidy::unnest(output, v_action)
-  #output$v_actionnew = unlist(sapply(output$v_action, paste, collapse = ", ", character(1L)))
-  output = output[-20]
 
-  colnames(output)[colnames(output)=='v_actionnew'] = 'v_action'
+  output %>%
+    dplyr::mutate_all(as.character()) %>%
+    attributes()
 
-  write.csv(output, file=choose.files(caption="Save As...",
+  output[, ] <- lapply(output[, ], as.character)
+
+  write.csv(output, quote = TRUE, file=choose.files(caption="Save As...",
                     filters = c("Comma Delimited Files (.csv)","*.csv")))
 
-  print(paste(" EventMapping saved in file: ", paste0(nicename,".Rdata")))
+  print(" EventMapping saved as .csv file")
 
 }
 

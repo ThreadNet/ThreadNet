@@ -523,13 +523,13 @@ server <- shinyServer(function(input, output, session) {
             observeEvent(
               input$ExportMappingRData,
               {export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
-                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
             })
 
             observeEvent(
               input$ExportMappingCsv,
               {export_event_mapping_csv( GlobalEventMappings, input$ManageEventMapInputID )
-                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
               })
 
 
