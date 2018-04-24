@@ -310,8 +310,8 @@ ng_bar_chart_freq <- function(ngdf){
 #' @export
 
 eventNetwork <- function(et, TN, CF, timesplit){
-  #n <- threads_to_network(et, TN, CF, timesplit)
-  n <- threads_to_network(et, TN, CF)
+  n <- threads_to_network(et, TN, CF, timesplit)
+
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
   edge_shapes <- list()
