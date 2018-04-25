@@ -166,10 +166,6 @@ timeRangePhrase = function(tr){
   rangeunits = attr(tr,"units")
   paste(floor(as.numeric(tr)),rangeunits,"from start to finish.")}
 
-# This function limits the number of rows that get used
-# SubsetOfTable <- function(df,pct) {df[1:(floor((pct/100) * nrow(df))),] }
-# SubsetOfTable <- function(df,r) {df[r[1]:r[2],] }
-
 
 # this function is used to split up the threads into n ~equal buckets
 make_subsets <- function(d,n){
@@ -179,14 +175,14 @@ make_subsets <- function(d,n){
 # This function takes a slider value and returns a valid column name for zooming
 # if the argument is null, then use ZM_1
 zoomColumn <- function(z){
-  print(paste("In zoomColumn z=",z))
+  # print(paste("In zoomColumn z=",z))
 
   if (is.null(z))
     {r="ZM_1"}
   else
     {r=paste0("ZM_",z)}
 
-  print(paste("In zoomColumn r=",r))
+  # print(paste("In zoomColumn r=",r))
 
   return(r)
 }
@@ -261,17 +257,17 @@ newColName <- function(CF_list){
 
 
 # These were used on the occ-to-event tab to configure the slider
-# threshold_slider_min <- function(o){
-#      return(floor(min(o$timeGap)))
-#  }
-#
-#  threshold_slider_max <- function(o){
-#      return(ceiling(max(o$timeGap)))
-#  }
-#
-#  threshold_slider_selected <- function(o){
-#      return(min(o$timeGap))
-#  }
+threshold_slider_min <- function(o){
+     return(floor(min(o$timeGap)))
+ }
+
+ threshold_slider_max <- function(o){
+     return(ceiling(max(o$timeGap)))
+ }
+
+ threshold_slider_selected <- function(o){
+     return(min(o$timeGap))
+ }
 
 
 
@@ -452,22 +448,19 @@ get_moving_window <- function(e, s, l ){
 }
 
 #####################################################
-# GlobalEventMappings is a global variable -- pass in as gem
-get_event_mapping_names <- function(gem){
+# GlobalEventMappings is a global variable
+get_event_mapping_name_list <- function(){
 
-  n=length(gem)
-  # if list is empty, return 'One-to-One'
-  if (n==0)
-    return('One-to-One')
-  else {
-    print (n)
-    e_names=list()
-    for (i in 1:n) {
-      e_names = c(e_names, unlist(gem[[i]][["name"]]) )
+  # print(paste('length of gem:',length(GlobalEventMappings)))
+
+  n= unlist(lapply(1:length(GlobalEventMappings),function(i){
+    unlist(GlobalEventMappings[[i]][["name"]]) }))
+
+  # print(n)
+
+  return(n)
   }
-  return(unlist(e_names))
-  }
-}
+
 
 store_event_mapping <- function(EventMapName, e){
 
@@ -480,13 +473,16 @@ store_event_mapping <- function(EventMapName, e){
 
 }
 
-get_event_mapping_threads <- function(gem, mapname){
+get_event_mapping_threads <- function( mapname){
 
     # get the index for the mapname
   # print (paste0('mapname',mapname))
   # print(paste0('get_event_mapping_names', get_event_mapping_names(gem)))
   # print(paste0('are they equal', mapname==get_event_mapping_names(gem)))
-  idx=which(mapname==get_event_mapping_names(gem) )
+
+
+  idx=which(mapname==get_event_mapping_names() )
+
 
   # print(idx)
   if (idx==0) {
@@ -494,27 +490,15 @@ get_event_mapping_threads <- function(gem, mapname){
     return(NULL)
   }
   else
-  return(gem[[idx]][["threads"]])
+  return(GlobalEventMappings[[idx]][["threads"]])
 }
 
-get_event_mapping_cluster <- function(gem, mapname){
+delete_event_mapping <- function( mapname){
 
   # get the index for the mapname
-  idx=which(mapname==get_event_mapping_names(gem) )
-  #print(idx)
-  if (idx==0) {
-    print('mapname not found for clusters')
-    return(NULL)
-  }
-  else
-    return(unlist(gem[[idx]][["cluster"]]))
-}
-delete_event_mapping <- function(gem, mapname){
+  idx=which(mapname==get_event_mapping_names() )
 
-  # get the index for the mapname
-  idx=which(mapname==get_event_mapping_names(gem) )
-
-  GlobalEventMappings[idx] <-NULL
+  GlobalEventMappings[[idx]] <-NULL
   # GlobalEventMappings[[idx]][["threads"]] <-NULL
   # GlobalEventMappings[[idx]][["cluster"]] <-NULL
 
@@ -523,11 +507,11 @@ delete_event_mapping <- function(gem, mapname){
 
 
 }
-export_event_mapping <- function(gem, mapname){
+export_event_mapping <- function(mapname){
 
   nicename = paste0("EventMap_",mapname)
 
-  assign(nicename, get_event_mapping_threads(gem, mapname))
+  assign(nicename, get_event_mapping_threads(mapname))
 
   save(list=nicename, file = paste0(nicename,".Rdata"))
 
@@ -535,9 +519,9 @@ export_event_mapping <- function(gem, mapname){
 
 }
 
-export_event_mapping_csv <- function(gem, mapname){
+export_event_mapping_csv <- function( mapname){
 
-  output = as.data.frame(get_event_mapping_threads(gem, mapname))
+  output = as.data.frame(get_event_mapping_threads(GlobalEventMappings, mapname))
 
   output %>%
     dplyr::mutate_all(as.character()) %>%

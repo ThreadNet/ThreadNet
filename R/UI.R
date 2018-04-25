@@ -9,6 +9,9 @@
 # March 21, 2018 New organization of tabs.
 
 # pdf(NULL) # prevent plotly errors
+library(shiny)
+library(networkD3)
+library(visNetwork)
 
 ui <- fluidPage(
 
@@ -19,15 +22,18 @@ ui <- fluidPage(
 
   tabsetPanel(type = "tabs",
               tabPanel("Read Data",
+                       helpText('Select a file that contains your data.'),
+                       tags$hr(),
                        uiOutput("Data_Tab_Controls_1"),
                        uiOutput("Data_Tab_Controls_2"),
                        DT::dataTableOutput("Data_Tab_Output_2")
               ),
               tabPanel("Choose POV",
-                       tags$h3("Select columns from your data to define your point of view."),
+                       helpText('Select columns from your data to define your point of view. You MUST click on either Preview Threads or Preview Data before proceeding.'),
+                       tags$hr(),
                        tabsetPanel(type = "tabs",
                                    tabPanel("Define Threads",
-                                            tags$h4("Threads are defined by contextual features that STAY THE SAME during the thread. At least ONE is required."),
+                                            tags$h4("Threads are defined by contextual features that STAY THE SAME during a thread. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_2"),
                                             plotlyOutput("ContextFlowers_2")
                                             ),
@@ -36,60 +42,67 @@ ui <- fluidPage(
                                             uiOutput("POV_Tab_Controls_3"),
                                             plotlyOutput("ContextFlowers_3")
                                             ),
-
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
                                             # ** add conditional panels here to choose output **
-                                            plotlyOutput("previewThreadMap")
-                                   ),
-                                   # Maybe take this out
-                                   tabPanel("Intermediate Data",
-                                            tags$h4("This table is display only. It shows the data threaded from your chosen POV"),
+                                            plotlyOutput("previewThreadMap_1")
+                                            ),
+                                   tabPanel("Preview Data",
+                                            tags$h4("This table shows the data threaded from your chosen POV"),
                                             DT::dataTableOutput("Thread_Tab_Output_1")
-                                   )
+                                            )
                                    )
               ),
               tabPanel("Occurrences to Events",
-                       tags$h4("Map occurrences into events"),
+                       helpText('This is some help text for this tab...'),
+                       tags$hr(),
                        tabsetPanel(type = "tabs",
-                                   tabPanel("One-to-One",
-                                            uiOutput("One_to_One_controls"),
-                                            radioButtons("One_to_One_Output_Button", label = h4("Display results:"),
-                                                         choices = c("None", "Data table (display only)", "Thread Map"),
-                                                         inline=TRUE),
-                                            conditionalPanel(
-                                              condition = "input.One_to_One_Output_Button == 'Data table (display only)'",
-                                                          DT::dataTableOutput("One_to_one_Tab_Output_1")),
-                                            conditionalPanel(
-                                              condition = "input.One_to_One_Output_Button == 'Thread Map'",
-                                                          plotlyOutput("One_to_one_Tab_Output_2"))
 
-                                   ),
                                    tabPanel("Contextual Chunks",
-                                            uiOutput("Contextual_Chunk_controls"),
-                                            radioButtons("Chunks_Output_Button", label = h4("Display results:"),
-                                                         choices = c("None", "Data table (display only)", "Thread Map"),
-                                                         inline=TRUE),
-                                            conditionalPanel(
-                                              condition = "input.Chunks_Output_Button == 'Data table (display only)'",
-                                              DT::dataTableOutput("Contextual_Chunks_Tab_Output_1") ),
-                                            conditionalPanel(
-                                              condition = "input.Chunks_Output_Button == 'Thread Map'",
-                                              plotlyOutput("Contextual_Chunks_Tab_Output_2"))
+                                            helpText('This is some help text for this tab...'),
+                                            tags$hr(),
+                                            fluidRow(
+                                              column(3, uiOutput("chunk_controls_0")),
+                                              column(3,
+                                                     # add method for RLE -- remove sequential runs
+                                                     radioButtons("Chunks_method_Button", label = h4("Choose method for chunking:"),
+                                                                                        choices = c( "Changes", "Time Gap","Fixed Size"),
+                                                                                        inline=TRUE),
+                                                                           conditionalPanel(
+                                                                             condition = "input.Chunks_method_Button == 'Changes'",
+                                                                             uiOutput("chunk_controls_2") ),
+                                                                           conditionalPanel(
+                                                                              condition = "input.Chunks_method_Button == 'Time Gap'",
+                                                                              uiOutput("chunk_controls_3") ),
+                                                                          conditionalPanel(
+                                                                              condition = "input.Chunks_method_Button == 'Fixed Size'",
+                                                                              uiOutput("chunk_controls_4") )
+                                                        ),
 
+                                              column(3, uiOutput("chunk_controls_5"))
+                                            ),
+                                            uiOutput("chunk_controls_1"),
+                                            uiOutput("chunk_controls_6"),
+                                            verbatimTextOutput("chunk_controls_7"),
+                                            plotlyOutput("chunk_controls_8")
                                    ),
 
                                    tabPanel("Cluster for Zooming",
-                                            tags$h4("Note: Only mappings with sequential chunks can be clustered by sequence."),
-                                            uiOutput("Cluster_Event_controls_1"),
-                                            uiOutput("Cluster_Event_controls_2"),
+                                            helpText('This is some help text for this tab...'),
+                                            tags$hr(),
+                                            fluidRow(
+                                              column(3,  uiOutput("Cluster_Event_controls_1") ),
+                                              column(3,  uiOutput("Cluster_Event_controls_2") ),
+                                              column(3,  uiOutput("Cluster_Event_controls_3") )
+                                            ),
                                             dendroNetworkOutput("dendroClusterResult")
                                    ),
 
 
                                    tabPanel("Select Subset",
-                                            tags$h4("Select and save a subset of any mapping for visualization and comparison."),
+                                            helpText('Select and save a subset of data for visualization and comparison.'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("SelectSubsetControls_1")),
                                               column(3, uiOutput("SelectSubsetControls_2")) ),
@@ -97,6 +110,8 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Find/replace patterns",
+                                            helpText('Find/replace frequently occurring n-grams with the label of your choice'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("Frequent_Ngram_controls_1")),
                                               column(3, uiOutput("Frequent_Ngram_controls_2"),
@@ -110,6 +125,8 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Input your pattern",
+                                            helpText('Enter your own patterns to replace with the label of your choice'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("Regular_Expression_controls_1")),
                                               column(3, uiOutput("Regular_Expression_controls_2")),
@@ -127,6 +144,8 @@ ui <- fluidPage(
 
 
                                    tabPanel("Manage Event Maps",
+                                            helpText('Delete or export event maps'),
+                                            tags$hr(),
                                             uiOutput("Manage_Event_Map_controls"),
                                             verbatimTextOutput("action_confirm")
                                             )
@@ -214,11 +233,9 @@ ui <- fluidPage(
                          column(3,
                               uiOutput("Moving_Window_Tab_Controls_1")),
                          column(4,
+                                uiOutput("Moving_Window_Tab_Controls_3"),
                                 uiOutput("Moving_Window_Tab_Controls_2"))
                        ),
-                       uiOutput("Moving_Window_Tab_Controls_3"),
-
-
                        fluidRow(
                          column(6,"SubsetA",
                                 uiOutput("Moving_Window_Tab_Controls_4_A"),
@@ -240,7 +257,7 @@ ui <- fluidPage(
                           tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
                           tags$p("Antecedents of Complexity in Healthcare Routines"),
                         tags$h4("Code Gurus:"),
-                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson"),
+                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson, Douglas Krum"),
                         tags$h4("Collaborators:"),
                              tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
                         tags$h4("Related Publications:"),

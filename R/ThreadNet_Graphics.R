@@ -8,7 +8,7 @@
 
 # graphic functions used in Shiny App.
 # some plotly, but some from other packages
-
+library(plotly)
 
 ###### Pie charts for context factors  ####
 # It would be nice to display some other helpful information, perhaps (like the % of possible combinations that occur)
@@ -208,6 +208,9 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #'
 threadMap <- function(or, TN, timescale, CF, shape){
 
+
+  # print('in threadMap')
+  # print(head(or))
 
   # setting color palettes
   # first find the number of distinct colors
