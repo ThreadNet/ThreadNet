@@ -691,9 +691,14 @@ server <- shinyServer(function(input, output, session) {
     radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap.1'), selected="seqNum", inline=TRUE)
   })
 
-  output$VisualizeCustomNetwork <- renderVisNetwork({
+  # output$VisualizeCustomNetwork <- renderVisNetwork({
+  #   req(input$Timesplit2)
+  #   eventNetwork(threadedEvents(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
+  # })
+
+  output$VisualizeCustomNetwork <- renderPlotly({
     req(input$Timesplit2)
-    eventNetwork(threadedEvents(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
+    eventNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
   })
 
   output$hover <- renderPrint({
