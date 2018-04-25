@@ -558,31 +558,18 @@ server <- shinyServer(function(input, output, session) {
             # reactive functions for the export and delete buttons
             observeEvent(
               input$DeleteMappingButton,
-<<<<<<< HEAD
-              {delete_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
-                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
-              })
-=======
               {rv$newmap = rv$newmap+1 # trigger reactive value
               delete_event_mapping( input$ManageEventMapInputID )
                 output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
               }, ignoreInit = TRUE)
->>>>>>> better_chunks
 
 
             observeEvent(
-<<<<<<< HEAD
-              input$ExportMappingRData,
-              {export_event_mapping( GlobalEventMappings, input$ManageEventMapInputID )
-                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
-            })
-=======
               input$ExportMappingButton,
               {rv$newmap = rv$newmap+1 # trigger reactive value
               export_event_mapping(  input$ManageEventMapInputID )
                 output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
             }, ignoreInit = TRUE)
->>>>>>> better_chunks
 
             observeEvent(
               input$ExportMappingCsv,
