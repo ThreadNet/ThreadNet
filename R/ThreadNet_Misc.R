@@ -175,14 +175,14 @@ make_subsets <- function(d,n){
 # This function takes a slider value and returns a valid column name for zooming
 # if the argument is null, then use ZM_1
 zoomColumn <- function(z){
-  print(paste("In zoomColumn z=",z))
+  # print(paste("In zoomColumn z=",z))
 
   if (is.null(z))
     {r="ZM_1"}
   else
     {r=paste0("ZM_",z)}
 
-  print(paste("In zoomColumn r=",r))
+  # print(paste("In zoomColumn r=",r))
 
   return(r)
 }

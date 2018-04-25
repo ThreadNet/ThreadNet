@@ -88,16 +88,16 @@ threads_to_network <- function(et,TN,CF,timesplit){
 # here is the original version without all the position stuff, which should be separated out, if possible.
 threads_to_network_original <- function(et,TN,CF){
 
-   print(head(et))
-   print(TN)
-   print(CF)
+   # print(head(et))
+   # print(TN)
+   # print(CF)
 
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
   node_label=str_replace_all(node_label," ","_")
 
-   print("node_label")
-   print(node_label)
+   # print("node_label")
+   # print(node_label)
 
   # set up the data frames we need to draw the network
   nodes = data.frame(
@@ -135,7 +135,7 @@ threads_to_network_original <- function(et,TN,CF){
     label = paste(ngdf$freq)
   ) %>% filter(!from==to)
 
-  print(paste("Edges:",edges))
+  # print(paste("Edges:",edges))
 
   return(list(nodeDF = nodes, edgeDF = edges))
 }

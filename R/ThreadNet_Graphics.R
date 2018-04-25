@@ -208,7 +208,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #'
 threadMap <- function(or,TN, timescale, CF, shape){
 
-  print('in threadMap')
+  # print('in threadMap')
   # print(head(or))
 
   # setting color palettes

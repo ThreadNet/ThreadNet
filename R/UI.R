@@ -22,7 +22,7 @@ ui <- fluidPage(
 
   tabsetPanel(type = "tabs",
               tabPanel("Read Data",
-                       helpText('Select a file that contains your data.  If you have time stamped data, the time stamp must be in the first column named tStamp. If you do not have time stamped data, the first column must be named tStamp and it should contain sequence numbers that will be used to sort the occurrences into threads.'),
+                       helpText('Select a file that contains your data.'),
                        tags$hr(),
                        uiOutput("Data_Tab_Controls_1"),
                        uiOutput("Data_Tab_Controls_2"),
@@ -84,7 +84,8 @@ ui <- fluidPage(
                                             ),
                                             uiOutput("chunk_controls_1"),
                                             uiOutput("chunk_controls_6"),
-                                            verbatimTextOutput("chunk_controls_7")
+                                            verbatimTextOutput("chunk_controls_7"),
+                                            plotlyOutput("chunk_controls_8")
                                    ),
 
                                    tabPanel("Cluster for Zooming",

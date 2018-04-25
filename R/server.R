@@ -249,12 +249,18 @@ server <- shinyServer(function(input, output, session) {
   output$chunk_controls_7 =   renderText({ paste(thread_text_vector(chunkInputEvents(),'threadNum',
                                                 get_Zoom_CHUNK(), ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  })
 
+  # output$chunk_controls_8 = renderPlotly({
+  #   threadMap(chunkInputEvents()[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2], ], "threadNum", "seqNum", get_Zoom_CHUNK(), 15  )
+  # })
+  #
+  output$chunk_controls_8 = renderPlotly({
+    threadMap(chunkInputEvents(), "threadNum", "seqNum", get_Zoom_CHUNK(), 15  )
+  })
 
   # this function runs when you push the button to create a new mapping based on chunks
   observeEvent(
     input$EventButton2,
     {rv$newmap = rv$newmap+1 # trigger reactive value
-    print(paste('threadedChunks newmap=',rv$newmap))
     isolate( OccToEvents_By_Chunk(chunkInputEvents(),
                                  input$Chunks_method_Button, # which method?
                                  input$EventMapName2,
@@ -352,7 +358,6 @@ server <- shinyServer(function(input, output, session) {
       observeEvent(
         input$EventButton3,
        { rv$newmap = rv$newmap+1 # trigger reactive value
-       print(paste('threadedEventsRegEx newmap=',rv$newmap))
         isolate(OccToEvents3(regexInputEvents(),
                              input$EventMapName3,
                              get_EVENT_CF(),
@@ -854,10 +859,6 @@ server <- shinyServer(function(input, output, session) {
   output$Pos_Layout_Controls_0 <- renderUI({
     radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
   })
-
-
-
-
 
   event.data <- reactive({
     event_data("plotly_click", source="A")
