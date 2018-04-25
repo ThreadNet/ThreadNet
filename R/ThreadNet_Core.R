@@ -438,8 +438,9 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
     e[cf] = as.factor(e[,cf])
   }
 
-  # fill in the last column with the row number
-  e$ZM_1 = 1:nrow(e)
+  # fill in the last column with the label (tried using row number...)
+  e$ZM_1 = as.factor(e$label)
+#  e$ZM_1 = 1:nrow(e)
 
   # print(head(e))
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
@@ -523,6 +524,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
       e[[chunkNo, cf]] =  o[[original_row, cf]]
     }
 
+    # this is a chunk that matched one of the patterns
     if (tvrxs[[thread]][sn] %in% rx$label ){
 
       # print(paste('thread sn = ',thread, sn))
@@ -530,6 +532,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+      e$label[chunkNo] =  tvrxs[[thread]][sn]
 
      # need to locate the unique for from the o dataframe and aggregate those V_cf values.
       rxLen = rx$patLength[which( rx$label==tvrxs[[thread]][sn])]
@@ -554,6 +557,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
       # Use the ZM_1 column to store the new labels
       e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+      e$label[chunkNo] =  tvrxs[[thread]][sn]
       e$occurrences[[chunkNo]] = original_row
 
       # copy the rest of the data
@@ -609,7 +613,7 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return
     print(paste('in cluster_events, at first, focalCol=',focalCol))
     print( colnames(e))
     if (! focalCol %in% colnames(e))
-    {focalCol = paste0('ZM_',zoom_upper_limit(e)) }
+    {focalCol = paste0('ZM_',zoom_upper_limit(e))}
     print(paste('in cluster_events, then, focalCol=',focalCol))
     dd = dist_matrix_network(e,focalCol) }
 
