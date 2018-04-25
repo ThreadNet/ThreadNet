@@ -88,16 +88,16 @@ threads_to_network <- function(et,TN,CF,timesplit){
 # here is the original version without all the position stuff, which should be separated out, if possible.
 threads_to_network_original <- function(et,TN,CF){
 
-  # print(head(et))
-  # print(TN)
-  # print(CF)
+   print(head(et))
+   print(TN)
+   print(CF)
 
   # First get the node names & remove the spaces
   node_label = unique(et[[CF]])
   node_label=str_replace_all(node_label," ","_")
 
-  # print("node_label")
-  # print(node_label)
+   print("node_label")
+   print(node_label)
 
   # set up the data frames we need to draw the network
   nodes = data.frame(
@@ -134,6 +134,8 @@ threads_to_network_original <- function(et,TN,CF){
     to,
     label = paste(ngdf$freq)
   ) %>% filter(!from==to)
+
+  print(paste("Edges:",edges))
 
   return(list(nodeDF = nodes, edgeDF = edges))
 }
@@ -180,7 +182,7 @@ count_ngrams <- function(o,TN,CF,n){
 #' @family ThreadNet_Core
 #'
 #' @param  o is the dataframe of cleaned ocurrences
-#' #' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)
+#' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)
 #' @param  EVENT_CF is a list of 1 or more context factors that define events (and change during threads)
 #'
 #' @return dataframe containing the same occurrences sorted from a different point of view
@@ -292,7 +294,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
-  e=clusterEvents(occ, 'OneToOne', 'Network Structure', EVENT_CF,'threads')
+  e=clusterEvents(occ, 'OneToOne', 'Network Proximity', EVENT_CF,'threads')
 
  # eventMap = store_event_mapping('OneToOne', occ)
 
@@ -311,185 +313,19 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 #' @family ThreadNet_Core
 #'
 #' @param  o  a dataframe of occurrences
-#' @param mapping = one-to-one or clustering
 #' @param m = method parameter = one of c('Variable chunks','Uniform chunks')
+#' @param EventMapName = used to store this mapping for visualization and comparison
 #' @param uniform_chunk_size = used to identify breakpoints -- from input slider
 #' @param tThreshold = used to identify breakpoints -- from input slider
-#' @param EventMapName = used to store this mapping in an environment (not used yet)
+#' @param timescale hours, min or sec
 #' @param chunk_CF - context factors used to delineate chunks
 #' @param EVENT_CF - context factors used to define events
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
-#' @param timescale hours, min or sec
 #'
-#' @result event data frame, with occurrences aggregated into events.  Dataframe includes: threadNum, seqNum,
-#' and set of columns E_1, E_2, ..., that indicate the membership of events in clusters of events.
+#' @result event data frame, with occurrences aggregated into events.
 #'
 #' @export
-# OccToEvents1 <- function(o,EventMapName,EVENT_CF, compare_CF){
-#
-#
-#   # Only run if eventMapName is filled in; return empty data frame otherwise
-#   if (EventMapName ==""){return(data.frame())}
-#
-#   # we are mapping one-to-one, so copy the input to the output and then add/rename some other columns as needed
-#   e=o
-#
-#    # occurrences have no duration
-#    e$eventDuration = 0
-#
-#     # rename the threadNum and seqNum columns
-#     names(e)[names(e)=="POVthreadNum"] <- "threadNum"
-#     names(e)[names(e)=="POVseqNum"] <- "seqNum"
-#
-#     #  these are just equal to the row numbers -- one occurrence per event
-#     e["occurrences"] =   1:nrow(e)
-#
-#     # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
-#       for (cf in EVENT_CF){
-#         #make a new column for each CF
-#         VCF = paste0("V_",cf)
-#         e[[VCF]]= vector(mode = "integer",length=nrow(e))
-#
-#         for (r in 1:nrow(e)){
-#         e[[r,VCF]] = list(convert_CF_to_vector(e,cf,r))
-#         }
-#       }
-#
-#
-#     # just add the one column with the combined values
-#   #  e["ZM_1"] = as.factor(e[,newColName(EVENT_CF)])
-#      e["ZM_1"] = as.integer(e[,newColName(EVENT_CF)])
-#
-#     # Add the mapping to the global list of mappings.  No longer storing the cluster solution here.
-#     # map = list(name = paste(EventMapName), threads = e)
-#     #
-#     # GlobalEventMappings <<- append(list(map), GlobalEventMappings )
-#
-#     # store the event map in the GlobalEventMappings
-#     eventMap = store_event_mapping(EventMapName, e)
-#
-#     # print( get_event_mapping_names( GlobalEventMappings ) )
-#     # save(GlobalEventMappings, file="eventMappings.RData")
-#
-#     # for debugging, this is really handy
-#     # save(o,e,file="O_and_E_1.rdata")
-#
-#     return(eventMap)
-#
-# }
 
-# this one creates chunks based on the handoff index
-# OccToEvents2 <- function(o, EventMapName,EVENT_CF, compare_CF){
-#
-#   # put this here for now
-#   timescale='mins'
-#
-#   # Only run if eventMapName is filled in; return empty data frame otherwise
-#   if (EventMapName ==""){return(data.frame())}
-#
-#   #### First get the break points between the events
-#
-#         # whenever there is a zero handoff gap that means everything has changed
-#         breakpoints = which(o$handoffGap == 0)
-#
-#         # Grab the breakpoints from the beginning of the threads as well
-#         threadbreaks = which(o$seqNum == 1)
-#         breakpoints = sort(union(threadbreaks,breakpoints))
-#
-#
-#   ### Use the break points to find the chunks -- just store the index back to the raw data
-#   nChunks = length(breakpoints)
-#
-#   # print(paste("nChunks=",nChunks))
-#
-#   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
-#   e = make_event_df(EVENT_CF, compare_CF, nChunks)
-#
-#   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
-#   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
-#
-#   # counters for assigning thread and sequence numbers
-#   thisThread=1  # just for counting in this loop
-#   lastThread=0
-#   seqNo=0  # resets for each new thread
-#
-#   for (chunkNo in 1:nChunks){
-#
-#     # Chunks start at the current breakpoint
-#     start_idx=breakpoints[chunkNo]
-#
-#     # Chunks end at the next breakpoint, minus one
-#     # for the last chunk,the stop_idx is the last row
-#     if (chunkNo < nChunks){
-#       stop_idx = breakpoints[chunkNo+1] - 1
-#     } else if (chunkNo==nChunks){
-#       stop_idx = nrow(o)
-#     }
-#
-#     # assign the occurrences
-#     e$occurrences[[chunkNo]] = list(start_idx:stop_idx)
-#    # e$eventStop[chunkNo] = as.integer(stop_idx)
-#    # e$eventStart[chunkNo] = as.integer(start_idx)
-#
-#     # assign timestamp and duration
-#     e$tStamp[chunkNo] = o$tStamp[start_idx]
-#     e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
-#
-#     # copy in the threadNum and assign sequence number
-#     e$threadNum[chunkNo] = o$threadNum[start_idx]
-#     thisThread = o$threadNum[start_idx]
-#
-#
-#     # fill in data for each of the context factors
-#     for (cf in compare_CF){
-#       e[chunkNo,cf] = as.character(o[start_idx,cf])
-#      }
-#
-#     for (cf in EVENT_CF){
-#       VCF = paste0("V_",cf)
-#       e[[chunkNo, VCF]] = list(aggregate_VCF_for_event(o,e$occurrences[chunkNo],cf ))
-#     }
-#
-#     # Advance or reset the seq counters
-#     if (thisThread == lastThread){
-#       seqNo = seqNo +1
-#     } else if (thisThread != lastThread){
-#       lastThread = thisThread
-#       seqNo = 1
-#     }
-#     e$seqNum[chunkNo] = seqNo
-#
-#   }
-#
-#   # convert them to factors
-#   for (cf in compare_CF){
-#     e[cf] = as.factor(e[,cf])
-#   }
-#
-#
-#   ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
-#   clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
-#
-#   ## Create a new column for each cluster solution
-#   for (cluster_level in 1:nChunks){
-#
-#     clevelName = paste0("ZM_",cluster_level)
-#     e[clevelName] = cutree(clust, k=cluster_level)
-#
-#       } # for cluster_level
-#
-#   # for debugging, this is really handy
-#   #  save(o,e,file="O_and_E_2.rdata")
-#
-#   # store the event map in the GlobalEventMappings
-#   eventMap = store_event_mapping(EventMapName, e)
-#
-#  # print( get_event_mapping_names(  ) )
-#  # save(GlobalEventMappings, file="eventMappings.RData")
-#
-#   #  need return the threads and also the cluster solution for display
-#   return(eventMap)
-# }
 
 # new version containing more ways to create chunks -- uses concepts from original prototype, but better implementation
 # chunk by handoff, time gap and handoff gap
@@ -562,8 +398,10 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
     # assign the occurrences
     e$occurrences[[chunkNo]] = list(start_idx:stop_idx)
-    # e$eventStop[chunkNo] = as.integer(stop_idx)
-    # e$eventStart[chunkNo] = as.integer(start_idx)
+
+    e$label[[chunkNo]] = paste0('<',
+                                str_replace_all(concatenate(o$label[start_idx:stop_idx]), ' ','++'),
+                                '>')
 
     # assign timestamp and duration
     e$tStamp[chunkNo] = o$tStamp[start_idx]
@@ -600,30 +438,17 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
     e[cf] = as.factor(e[,cf])
   }
 
-# take out the clustering here
-  ### Use optimal string alignment to compare the chunks.  This is O(n^^2)
- # clust = hclust( dist_matrix_seq(e),  method="ward.D2" )
-
-  ## Create a new column for each cluster solution
-  # for (cluster_level in 1:nChunks){
-  #
-  #   clevelName = paste0("ZM_",cluster_level)
-  #   e[clevelName] = cutree(clust, k=cluster_level)
-  #
-  # } # for cluster_level
-
   # fill in the last column with the row number
   e$ZM_1 = 1:nrow(e)
 
-  print(head(e))
+  # print(head(e))
+  # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
+  e=clusterEvents(e, EventMapName, 'Contextual Similarity', event_CF,'threads')
 
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E_2.rdata")
 
-
-  # store the event map in the GlobalEventMappings and return the eventmap
-  eventMap = store_event_mapping(EventMapName, e)
-  return(eventMap[['threads']])
+  return(e)
 
 }
 
@@ -768,12 +593,25 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 # cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
 clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return='cluster'){
 
+  # make sure to cluster on the correct column (one that exists...)
+
+
+
   if (cluster_method=="Sequential similarity")
     { dd = dist_matrix_seq(e) }
   else if (cluster_method=="Contextual Similarity")
     { dd = dist_matrix_context(e,event_CF) }
-  else if (cluster_method=="Network Structure")
-    { dd = dist_matrix_network(e,newColName(event_CF)) }
+  else if (cluster_method=="Network Proximity")
+  {
+    # The focal column is used to trade the network.  It will probably only be present in the OneToOne mapping, but we should check more generally
+    # if it's not present, then use the highest granularity of zooming available.
+    focalCol =newColName(event_CF)
+    print(paste('in cluster_events, at first, focalCol=',focalCol))
+    print( colnames(e))
+    if (! focalCol %in% colnames(e))
+    {focalCol = paste0('ZM_',zoom_upper_limit(e)) }
+    print(paste('in cluster_events, then, focalCol=',focalCol))
+    dd = dist_matrix_network(e,focalCol) }
 
   ### cluster the elements
   clust = hclust( dd,  method="ward.D2" )
@@ -800,7 +638,7 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return
   # append this onto the events to allow zooming
   # need to handle differently for network clusters
   # we are relying on "unique" returning values in the same order whenever it is called on the same data
-  if (cluster_method=="Network Structure")
+  if (cluster_method=="Network Proximity")
     {merge_col_name = newColName(event_CF)
     zm[[merge_col_name]]=unique(e[[merge_col_name]])
     newmap = merge(e, zm, by=merge_col_name)
@@ -851,6 +689,8 @@ dist_matrix_network <- function(e,CF){
   # first get the nodes and edges
   n=threads_to_network_original(e,'threadNum',CF)
 
+  print(paste('in dist_matrix_network, n=', n))
+
   # now get the shortest paths between all nodes in the graph
   d=distances(graph_from_data_frame(n$edgeDF),
               v=n$nodeDF[['label']],
@@ -858,7 +698,6 @@ dist_matrix_network <- function(e,CF){
 
   return( as.dist(d) )
 }
-
 
 
 net_adj_matrix <- function(edges){

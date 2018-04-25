@@ -185,7 +185,7 @@ server <- shinyServer(function(input, output, session) {
 
   output$chunk_controls_0 = renderUI({
     tags$div(align="left",
-             selectizeInput("ChunkInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ))
+             selectizeInput("ChunkInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
   })
 
   # get the data that will be the input for this tab
@@ -227,7 +227,7 @@ server <- shinyServer(function(input, output, session) {
   # fixed size controls
   output$chunk_controls_4 = renderUI({
     # input$fixed_chunk_size,
-    tags$div(sliderInput("fixed_chunk_size", "Select fixed size for chunks:", 1,20,1, ticks=FALSE))
+    tags$div(sliderInput("fixed_chunk_size", "Select fixed size for chunks:", 1,20,10, ticks=FALSE))
     })
 
   # mapping name and go button
@@ -281,7 +281,7 @@ server <- shinyServer(function(input, output, session) {
 
       output$Regular_Expression_controls_1 = renderUI({
         tags$div(align="left",
-                 selectizeInput("RegExInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ))
+                 selectizeInput("RegExInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
       })
 
       # get the data that will be the input for this tab
@@ -291,11 +291,11 @@ server <- shinyServer(function(input, output, session) {
     output$Regular_Expression_controls_2 <- renderUI({
       zoom_limit = zoom_upper_limit(regexInputEvents())
       if (zoom_limit == 1)
-      {tags$h4("Zooming not available with this mapping")}
+      {tags$h4("Zooming not available with this view")}
       else
       {sliderInput("regexZoomID",
                    label=h4("Zoom in and out by event similarity:"),
-                   1,zoom_limit,1, step = 1, ticks=FALSE) }
+                   1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
     })
 
     output$Regular_Expression_controls_3 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
@@ -342,7 +342,7 @@ server <- shinyServer(function(input, output, session) {
 
       output$Regular_Expression_controls_7 = renderUI({
         tags$div(align="left",
-                 textInput("EventMapName3", label = h4("Enter label for result"), value = "RegEx_"),
+                 textInput("EventMapName3", label = h4("Enter label to save result"), value = ""),
                  radioButtons("KeepIrregularEvents",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
                  actionButton("EventButton3", "Create New Mapping")  )
 
@@ -368,7 +368,7 @@ server <- shinyServer(function(input, output, session) {
 
       output$Frequent_Ngram_controls_1 = renderUI({
         tags$div(align="left",
-                 selectizeInput("freqNgramInputMapID",label = h4("Choose input for this mapping:"), get_event_mapping_names()  ))
+                 selectizeInput("freqNgramInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
       })
 
       # get the data that will be the input for this tab
@@ -378,11 +378,11 @@ server <- shinyServer(function(input, output, session) {
       output$Frequent_Ngram_controls_2 <- renderUI({
         zoom_limit = zoom_upper_limit(freqNgramInputEvents())
         if (zoom_limit == 1)
-        {tags$h4("Zooming not available with this mapping")}
+        {tags$h4("Zooming not available with this view")}
         else
         {sliderInput("freqNgramZoomID",
                      label=h4("Zoom in and out by event similarity:"),
-                     1,zoom_limit,1, step = 1, ticks=FALSE) }
+                     1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
       })
       output$Frequent_Ngram_controls_21 <- renderUI({
         tags$div(align="left",
@@ -413,7 +413,7 @@ server <- shinyServer(function(input, output, session) {
     fng_select <-reactive(support_level(thread_text_vector(freqNgramInputEvents(),
                                                     'threadNum',
                                                     get_Zoom_freqNgram(),' ' ),
-                                 frequent_ngrams(freqNgramInputEvents() ,
+                                                frequent_ngrams(freqNgramInputEvents() ,
                                                  'threadNum',
                                                  get_Zoom_freqNgram(),
                                                  input$freqNgramRange[1],
@@ -431,9 +431,9 @@ server <- shinyServer(function(input, output, session) {
                               data.frame(pattern=unlist(lapply(1:length(s),
                                                                   function(i){ str_replace_all(fng_select()[i,'ngrams'],' ',',') })),
                                             label=unlist(lapply(1:length(s),
-                                                                  function(i){paste0("<",
+                                                                  function(i){paste0("{",
                                                                     str_replace_all(fng_select()[i,'ngrams'],' ','_'),
-                                                                    ">")
+                                                                    "}")
                                                                   })),
                                             stringsAsFactors=FALSE)
       })
@@ -441,14 +441,14 @@ server <- shinyServer(function(input, output, session) {
 
       output$Frequent_Ngram_controls_7 = renderUI({
         tags$div(align="left",
-                 textInput("EventMapName4", label = h4("Enter label for result") ),
+                 textInput("EventMapName4", label = h4("Enter label to save result"), value ="" ),
                  radioButtons("KeepIrregularEvents_2",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
                  actionButton("EventButton4", "Create New Mapping")  )
 
       })
 
       # this function runs when you push the button to create a new mapping
-      threadedEventsfreqNgram <- eventReactive(
+      observeEvent(
         input$EventButton4,
         {rv$newmap = rv$newmap+1 # trigger reactive value
         isolate( OccToEvents3(freqNgramInputEvents(),
@@ -480,18 +480,21 @@ server <- shinyServer(function(input, output, session) {
 
           output$Cluster_Event_controls_1 = renderUI({
             tags$div(align="left",
-                     tags$h4("Cluster Events: Group similar events to together to allow zooming"),
-                     selectizeInput("ClusterEventsInputID",label = h4("Choose mapping for clustering:"), get_event_mapping_names() ))
-          })
-            output$Cluster_Event_controls_2 = renderUI({
-              tags$div(align="left",
-                     textInput("EventMapName6", label = h4("Enter new label for this mapping + clustering"), value =""),
-                     radioButtons("ClusterMethodID", "Cluster based on:",
-                                  choices = c("Sequential similarity", "Contextual Similarity", "Network Structure"),
-                                  selected="Sequential similarity", inline=TRUE),
-                     actionButton("EventButton6", "Cluster Events")  )
+                     tags$h4("Group similar events to together to allow zooming"),
+                     selectizeInput("ClusterEventsInputID",label = h4("Start with this view:"), get_event_mapping_names() ))
           })
 
+            output$Cluster_Event_controls_2 = renderUI({
+              tags$div(align="left",
+                     radioButtons("ClusterMethodID", label = h4("Cluster based on:"),
+                                  choices = c("Network Proximity","Contextual Similarity", "Sequential similarity"  ),
+                                  selected="Network Proximity") )
+          })
+            output$Cluster_Event_controls_3 = renderUI({
+              tags$div(align="left",
+                       textInput("EventMapName6", label = h4("Enter label to save this view + new clustering"), value =""),
+                       actionButton("EventButton6", "Cluster Events")  )
+            })
 
             # separate the cluster calculation from the dendrogram display
             cluster_result <- eventReactive(
@@ -500,10 +503,12 @@ server <- shinyServer(function(input, output, session) {
               isolate( clusterEvents( get_event_mapping_threads( input$ClusterEventsInputID),
                                                          input$EventMapName6,
                                                          input$ClusterMethodID,
-                                                         get_EVENT_CF()))}, ignoreInit = TRUE )
+                                                         get_EVENT_CF(),
+                                                        'cluster')
+                                      )}, ignoreInit = TRUE )
 
           output$dendroClusterResult <- renderDendroNetwork({ dendroNetwork(cluster_result(),
-                                                                           treeOrientation = "vertical", textColour = "black" ) })
+                                                                           treeOrientation = "horizontal", textColour = "black" ) })
 
           ######## create subsets tab  ###############
 
@@ -576,7 +581,7 @@ server <- shinyServer(function(input, output, session) {
     else
         {sliderInput("VisualizeTabZoomID",
                "Zoom in and out by event similarity:",
-               1, zoom_limit, 1, step = 1, ticks=FALSE) }
+               1, zoom_limit, zoom_limit, step = 1, ticks=FALSE) }
   })
 
   # Get data for the Visualize tab.  Need parallel functions for the other tabs.
@@ -693,7 +698,7 @@ server <- shinyServer(function(input, output, session) {
     else
     {sliderInput("CompareZoomID_A",
                  label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
     })
 
   # Get data for the COMPARE tab mapping A
@@ -717,7 +722,7 @@ server <- shinyServer(function(input, output, session) {
     else
     {sliderInput("CompareZoomID_B",
                  label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
   })
 
   # Get data for the COMPARE tab mapping B.
@@ -741,7 +746,7 @@ server <- shinyServer(function(input, output, session) {
     else
     {sliderInput("DiaCompareZoomID",
                  label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
   })
 
    output$Diachronic_Comparison_Tab_Controls_3 <- renderUI({
@@ -798,7 +803,7 @@ server <- shinyServer(function(input, output, session) {
     else
     {sliderInput("MovingWindowZoomID",
                  label = h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,1, step = 1, ticks=FALSE) }
+                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
   })
 
   output$Moving_Window_Tab_Controls_3 <- renderUI({

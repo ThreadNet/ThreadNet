@@ -22,12 +22,15 @@ ui <- fluidPage(
 
   tabsetPanel(type = "tabs",
               tabPanel("Read Data",
+                       helpText('Select a file that contains your data.  If you have time stamped data, the time stamp must be in the first column named tStamp. If you do not have time stamped data, the first column must be named tStamp and it should contain sequence numbers that will be used to sort the occurrences into threads.'),
+                       tags$hr(),
                        uiOutput("Data_Tab_Controls_1"),
                        uiOutput("Data_Tab_Controls_2"),
                        DT::dataTableOutput("Data_Tab_Output_2")
               ),
               tabPanel("Choose POV",
-                       tags$h3("Select columns from your data to define your point of view."),
+                       helpText('Select columns from your data to define your point of view. You MUST click on either Preview Threads or Preview Data before proceeding.'),
+                       tags$hr(),
                        tabsetPanel(type = "tabs",
                                    tabPanel("Define Threads",
                                             tags$h4("Threads are defined by contextual features that STAY THE SAME during a thread. At least ONE is required."),
@@ -45,17 +48,20 @@ ui <- fluidPage(
                                             # ** add conditional panels here to choose output **
                                             plotlyOutput("previewThreadMap_1")
                                             ),
-                                   tabPanel("Intermediate Data",
-                                            tags$h5("This table shows the data threaded from your chosen POV"),
+                                   tabPanel("Preview Data",
+                                            tags$h4("This table shows the data threaded from your chosen POV"),
                                             DT::dataTableOutput("Thread_Tab_Output_1")
                                             )
                                    )
               ),
               tabPanel("Occurrences to Events",
-                       tags$h4("Map occurrences into events"),
+                       helpText('This is some help text for this tab...'),
+                       tags$hr(),
                        tabsetPanel(type = "tabs",
 
                                    tabPanel("Contextual Chunks",
+                                            helpText('This is some help text for this tab...'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("chunk_controls_0")),
                                               column(3,
@@ -82,15 +88,20 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Cluster for Zooming",
-                                            tags$h4("Note: Only mappings with sequential chunks can be clustered by sequence."),
-                                            uiOutput("Cluster_Event_controls_1"),
-                                            uiOutput("Cluster_Event_controls_2"),
+                                            helpText('This is some help text for this tab...'),
+                                            tags$hr(),
+                                            fluidRow(
+                                              column(3,  uiOutput("Cluster_Event_controls_1") ),
+                                              column(3,  uiOutput("Cluster_Event_controls_2") ),
+                                              column(3,  uiOutput("Cluster_Event_controls_3") )
+                                            ),
                                             dendroNetworkOutput("dendroClusterResult")
                                    ),
 
 
                                    tabPanel("Select Subset",
-                                            tags$h4("Select and save a subset of any mapping for visualization and comparison."),
+                                            helpText('Select and save a subset of data for visualization and comparison.'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("SelectSubsetControls_1")),
                                               column(3, uiOutput("SelectSubsetControls_2")) ),
@@ -98,6 +109,8 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Find/replace patterns",
+                                            helpText('Find/replace frequently occurring n-grams with the label of your choice'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("Frequent_Ngram_controls_1")),
                                               column(3, uiOutput("Frequent_Ngram_controls_2"),
@@ -111,6 +124,8 @@ ui <- fluidPage(
                                    ),
 
                                    tabPanel("Input your pattern",
+                                            helpText('Enter your own patterns to replace with the label of your choice'),
+                                            tags$hr(),
                                             fluidRow(
                                               column(3, uiOutput("Regular_Expression_controls_1")),
                                               column(3, uiOutput("Regular_Expression_controls_2")),
@@ -128,6 +143,8 @@ ui <- fluidPage(
 
 
                                    tabPanel("Manage Event Maps",
+                                            helpText('Delete or export event maps'),
+                                            tags$hr(),
                                             uiOutput("Manage_Event_Map_controls"),
                                             verbatimTextOutput("delete_confirm")
                                             )
@@ -215,11 +232,9 @@ ui <- fluidPage(
                          column(3,
                               uiOutput("Moving_Window_Tab_Controls_1")),
                          column(4,
+                                uiOutput("Moving_Window_Tab_Controls_3"),
                                 uiOutput("Moving_Window_Tab_Controls_2"))
                        ),
-                       uiOutput("Moving_Window_Tab_Controls_3"),
-
-
                        fluidRow(
                          column(6,"SubsetA",
                                 uiOutput("Moving_Window_Tab_Controls_4_A"),
