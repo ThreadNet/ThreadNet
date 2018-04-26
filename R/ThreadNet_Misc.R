@@ -477,12 +477,8 @@ get_event_mapping_threads <- function( mapname){
 
     # get the index for the mapname
   # print (paste0('mapname',mapname))
-  # print(paste0('get_event_mapping_names', get_event_mapping_names(gem)))
-  # print(paste0('are they equal', mapname==get_event_mapping_names(gem)))
 
-
-  idx=which(mapname==get_event_mapping_names() )
-
+  idx=which(mapname==get_event_mapping_name_list() )
 
   # print(idx)
   if (idx==0) {
@@ -496,7 +492,7 @@ get_event_mapping_threads <- function( mapname){
 delete_event_mapping <- function( mapname){
 
   # get the index for the mapname
-  idx=which(mapname==get_event_mapping_names() )
+  idx=which(mapname==get_event_mapping_name_list() )
 
   GlobalEventMappings[[idx]] <-NULL
   # GlobalEventMappings[[idx]][["threads"]] <-NULL
