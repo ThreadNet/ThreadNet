@@ -193,8 +193,10 @@ ui <- fluidPage(
                                    uiOutput("Network_Tab_Controls_2"),
                                    forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
 
-                          tabPanel("Custom layout",
-                                   uiOutput("Pos_Layout_Controls_0"),
+                          tabPanel("Custom layout", id = "CustomLayout",
+                                   fluidRow(
+                                     column(3, uiOutput("VisualizeCustomNetwork_Controls_0")),
+                                     column(3, uiOutput("VisualizeCustomNetwork_Controls_1")) ),
                                    plotlyOutput("VisualizeCustomNetwork"),
                                    verbatimTextOutput("hover"),
                                    verbatimTextOutput("click"))

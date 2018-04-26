@@ -23,7 +23,6 @@ library(igraph)
 library(DT)
 library(RColorBrewer)
 library(lubridate)
-#library(visNetwork)
 
 # this is another change
 
