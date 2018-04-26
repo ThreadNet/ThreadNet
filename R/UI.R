@@ -197,8 +197,7 @@ ui <- fluidPage(
                                    uiOutput("Pos_Layout_Controls_0"),
                                    plotlyOutput("VisualizeCustomNetwork"),
                                    verbatimTextOutput("hover"),
-                                   verbatimTextOutput("click"),
-                                   dataTableOutput("eventNetworksubset_data"))
+                                   verbatimTextOutput("click"))
                           )
 
               ),
