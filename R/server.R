@@ -910,37 +910,17 @@ server <- shinyServer(function(input, output, session) {
     radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
   })
 
-  event.data <- reactive({
-    event_data("plotly_click", source="A")
-    # click_data = event_data("plotly_click", source="A")
-    # click_data$pointNumber = click_data$pointNumber+1
-    # click_data$click_name = paste(input$EVENT_CF_ID, click_data$pointNumber, sep="")
-    # click_data
-  })
-
   output$hover <- renderPrint({
     d <- event_data("plotly_hover")
     if (is.null(d)) "Hover events appear here (unhover to clear)" else d
   })
 
-  #EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF()) )
-
-  eventNetworksubset <- reactive({
-    req(event.data())
-    TE = threadedEvents()
-    #newColName(get_EVENT_CF()) input$EVENT_CF_ID
-    ENsubset = subset(TE, actor == event.data()$key)
-    #ENsubset = subset(TE,  as.numeric(gsub("\\D", "", actor)) == event.data()$pointNumber)
-    ENsubset
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click events appear here" else d
   })
 
-
-
-  output$eventNetworksubset_data <- renderDataTable({
-    test<-eventNetworksubset()
-    test
-    #event.data()
-  })
+  #EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF())
 
 
 
