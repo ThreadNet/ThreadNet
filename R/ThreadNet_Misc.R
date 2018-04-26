@@ -519,11 +519,10 @@ export_event_mapping_csv <- function( mapname){
 
   output = as.data.frame(get_event_mapping_threads(GlobalEventMappings, mapname))
 
-  output %>%
-    dplyr::mutate_all(as.character()) %>%
-    attributes()
-
-  output[, ] <- lapply(output[, ], as.character)
+  browser()
+  output[grep('V_',colnames(output))]<-NULL
+  mdy_hms(output$tStamp)
+  dplyr::arrange(output, tStamp)
 
   write.csv(output, quote = TRUE, file=choose.files(caption="Save As...",
                     filters = c("Comma Delimited Files (.csv)","*.csv")))
