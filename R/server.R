@@ -687,19 +687,20 @@ server <- shinyServer(function(input, output, session) {
 
   ######## Custom network tab  ###############
 
-  output$Pos_Layout_Controls_0 <- renderUI({
-    radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap.1'), selected="seqNum", inline=TRUE)
+  output$VisualizeCustomNetwork_Controls_0 <- renderUI({
+    radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum','timeGap'='timeGap'), selected="seqNum", inline=TRUE)
   })
 
-  # output$VisualizeCustomNetwork <- renderVisNetwork({
-  #   req(input$Timesplit2)
-  #   eventNetwork(threadedEvents(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
-  # })
+  output$VisualizeCustomNetwork_Controls_1 <- renderUI({
+    selectizeInput("Event",label = "Choose Event:",  get_EVENT_CF() )
+  })
 
   output$VisualizeCustomNetwork <- renderPlotly({
-    req(input$Timesplit2)
-    eventNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
+    req(input$Timesplit2, input$Event)
+    eventNetwork(threadedEventsViz(), "threadNum", input$Event, input$Timesplit2)
   })
+
+
 
   output$hover <- renderPrint({
     d <- event_data("plotly_hover")
@@ -707,31 +708,15 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$click <- renderPrint({
-
-    d <- event_data("plotly_click", source = "A")
-    if (is.null(d)) "Click events appear here (double-click to clear)" else d
-
-  })
-
-  # event.data <- reactive({
-  #   event.data <- event_data("plotly_click", source="A")
-  # })
-  #
-  # eventNetworksubset <- reactive({
-  #   browser()
-  #   TE = threadedEvents()
-  #   TE
-  # })
-
-
-  output$eventNetworksubset_data <- renderDataTable({
-
-    browser()
     d <- event_data("plotly_click")
-
-    ENsubset = subset(eventNetworksubset(), ZM_1 == key)
-    ENsubset
+    if (is.null(d)) "Click events appear here" else d
   })
+
+  # output$VisualizeCustomNetwork <- renderPlotly({
+  #   req(input$Timesplit2)
+  #   eventNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
+  # })
+
 
 
   ######################################################################
@@ -905,22 +890,6 @@ server <- shinyServer(function(input, output, session) {
   #   eventNetwork(w, "threadNum", get_Zoom_MOV(), input$Timesplit3) })
   #
 
-  ######
-  output$Pos_Layout_Controls_0 <- renderUI({
-    radioButtons("Timesplit2", "Time Measure:", choices = c('seqNum'='seqNum.1','timeGap'='timeGap'), selected="seqNum.1", inline=TRUE)
-  })
-
-  output$hover <- renderPrint({
-    d <- event_data("plotly_hover")
-    if (is.null(d)) "Hover events appear here (unhover to clear)" else d
-  })
-
-  output$click <- renderPrint({
-    d <- event_data("plotly_click")
-    if (is.null(d)) "Click events appear here" else d
-  })
-
-  #EVENT_CF_levels = reactive( get_CF_levels( threadedEvents(), get_EVENT_CF())
 
 
 
