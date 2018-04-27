@@ -404,7 +404,7 @@ server <- shinyServer(function(input, output, session) {
       })
 
       output$Frequent_Ngram_controls_4 =   renderText(
-        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram(),',')[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
+        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram(),', ')[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
 
       # or if you prefer HTML
       # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
@@ -436,9 +436,9 @@ server <- shinyServer(function(input, output, session) {
                               data.frame(pattern=unlist(lapply(1:length(s),
                                                                   function(i){ str_replace_all(fng_select()[i,'ngrams'],' ',',') })),
                                             label=unlist(lapply(1:length(s),
-                                                                  function(i){paste0("{",
+                                                                  function(i){paste0("<",
                                                                     str_replace_all(fng_select()[i,'ngrams'],' ','_'),
-                                                                    "}")
+                                                                    ">")
                                                                   })),
                                             stringsAsFactors=FALSE)
       })
@@ -663,10 +663,31 @@ server <- shinyServer(function(input, output, session) {
 
   ######## Circular network tab  ###############
   # use this to select how to color the nodes in force layout
+  output$Circle_Network_Tab_Controls <- renderUI({ sliderInput("circleEdgeTheshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
 
   output$circleVisNetwork <- renderVisNetwork({
     # first convert the threads to the network
     n = threads_to_network_original( threadedEventsViz(), "threadNum", get_Zoom_VIZ() )
+    n=filter_network_edges(n,input$circleEdgeTheshold)
+    circleVisNetwork( n, TRUE )
+  })
+
+  ######## Other network tab  ###############
+  # use this to select how to color the nodes in force layout
+  output$Other_Network_Tab_Controls <- renderUI({
+    button_choices = get_EVENT_CF()
+    tags$div(
+      radioButtons("OtherNetworkCF","Graph co-occurrence relation between:",
+                   choices = button_choices,
+                   selected =  button_choices[1], # always start with the first one
+                   inline=TRUE),
+    sliderInput("otherEdgeTheshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))
+    })
+
+  output$otherVisNetwork <- renderVisNetwork({
+    # first convert the threads to the network
+    n = normalNetwork( threadedEventsViz(), selectOccFilter(), input$OtherNetworkCF )
+    n=filter_network_edges(n,input$otherEdgeTheshold)
     circleVisNetwork( n )
   })
 
@@ -674,9 +695,10 @@ server <- shinyServer(function(input, output, session) {
   ######## Force network tab  ###############
 
   # use this to select how to color the nodes in force layout
-  output$Network_Tab_Controls_2 <- renderUI({
+  output$Force_Network_Tab_Controls <- renderUI({
     button_choices = intersect(colnames(threadedEventsViz()), cfnames(selectOccFilter()))
     tags$div(
+      sliderInput("forceEdgeTheshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ),
     radioButtons("NetworkGroupID","Select a dimension for coloring nodes:",
                  choices = button_choices,
                  selected =  button_choices[1], # always start with the first one
@@ -684,7 +706,9 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$forceNetworkD3 <- renderForceNetwork({
-    forceNetworkD3(threadedEventsViz(), "threadNum", input$NetworkGroupID, get_Zoom_VIZ() )
+    n = threads_to_network_original( threadedEventsViz(), 'threadNum', get_Zoom_VIZ(), input$NetworkGroupID )
+    n = filter_network_edges(n,input$forceEdgeTheshold)
+    forceNetworkD3( n )
   })
 
   ######## Custom network tab  ###############

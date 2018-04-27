@@ -228,8 +228,8 @@ threadMap <- function(or, TN, timescale, CF, shape){
   return( plot_ly(or, x = ~as.integer(or[[timescale]]), y = ~or[[TN]], color= ~as.character(or[,CF]),
              colors=pal,
              name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
-             text = ~or[[CF]],
-             hoverinfo = "x+y+text",
+             text = ~or$label,
+             hoverinfo = "text+x+y",
              symbol= "line-ew", symbols=shape, showlegend=FALSE)
              %>%
                layout(
@@ -367,110 +367,21 @@ eventNetwork <- function(et, TN, CF, timesplit){
 #'
 #' @family ThreadNet_Graphics
 #'
-#' @param et dataframe with the threads to be graphed
-#' @param TN the column with the threadNumber
-#' @param grp used to color some of the nodes
-#' @param zoom_level this is just the contextual factor (column) to be graphed
+#' @param n = list with data frames for nodes and edges
 #'
 #' @return networkD3 object
 #' @export
-#'
-forceNetworkD3 <- function(et,TN, grp, zoom_level){
-  # et is a dataframe of event threads
-  # TN is the column that holds the threadNumber
-  # grp is one of the comparison columns
-  # zoom_level is the column with the event code (node ID)
-
-#   print(paste("TN =", TN))
-#   print(paste("grp =", grp))
-#   print(paste("zoom_level =", zoom_level))
-
-
-  # First get the node names & remove the spaces
-  node_label = levels(factor(et[[zoom_level]]))  # unique(et[[zoom_level]])
-  node_label=str_replace_all(node_label," ","_")
-  nNodes = length(node_label)
-
-  node_group=character()
-  for (n in 1:nNodes){
-    node_group = c(node_group, as.character(unlist( et[which(et[[zoom_level]]==node_label[n]),grp][1]) ) )
-  }
-
-#    print(paste("node_label = ", node_label))
-#    print(paste("node_group = ", node_group))
-
-
-  # set up the data frames we need to draw the network
-  # needs to have name, group, size
-  nodes = data.frame(
-    id = 1:length(node_label),
-    label = node_label,
-    Group = node_group,
-    Title=node_label)
+forceNetworkD3 <- function(n){
 
   # zero indexing
-  nodes$id = nodes$id-1
+  n$nodeDF['id'] =  n$nodeDF['id']-1
+  n$edgeDF['from'] =  n$edgeDF['from']-1
+  n$edgeDF['to'] =  n$edgeDF['to']-1
 
-  # print("nodes")
-  # print(nodes)
 
-
-  # Only count in threads where length is adequate
-  text_vector = vector(mode="character")
-  j=0
-  for (i in unique(et[[TN]])){
-    txt =et[et[[TN]]==i,zoom_level]
-    # length needs to be longer than n
-    if (length(txt)>2){
-      j=j+1
-      text_vector[j] = concatenate(txt,collapse = "|", rm.space = TRUE)
-    }
-  }
-
-  # print("text_vector")
-  # print(text_vector)
-
-  # try using ngram to get edges since it is so fast
-  ngdf = get.phrasetable(ngram(text_vector,2,sep = "|"))
-
-  # need to split 2-grams into from and to
-  from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
-
-  # need to find a better way to do this...
-  nEdges = length(from_to_str)
-  from_labels=matrix(data="", nrow=nEdges,ncol=1)
-  to_labels =matrix(data="", nrow=nEdges,ncol=1)
-
-  from=integer(nEdges)
-  to=integer(nEdges)
-  for (i in 1:length(from_to_str)){
-
-    # Get from and to by spliting the 2-gram
-    from_labels[i] = str_split(from_to_str[[i]]," ")[1]
-    to_labels[i] = str_split(from_to_str[[i]]," ")[2]
-
-    # use match to lookup the nodeID from the label...
-    from[i] = match(from_labels[i], nodes$label)
-    to[i] = match(to_labels[i], nodes$label)
-  }
-
-  # zero indexing for D3
-  from=from-1
-  to=to-1
-
-  # ideally need to have source, target, value
-  edges = data.frame(
-    from,
-    to,
-    Value = paste(ngdf$freq)
-  )
-
-  # print("edges")
-  # print(edges)
-
-    return( forceNetwork(Links = edges, Nodes = nodes, Source = "from",
-                          Target = "to", Value = "Value", NodeID = "label",
-                          Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE))
+  return( forceNetwork(Links = n$edgeDF, Nodes = n$nodeDF, Source = "from",
+                       Target = "to", Value = "Value", NodeID = "label",
+                       Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE))
 }
 
 
@@ -578,12 +489,13 @@ threadLengthBarchart <- function(o, TN){
 
 
 # Basic Network layout - back from the dead
-#       et is a dataframe with the list of events to be graphed
-#       TN is the field with the thread ID
-#       CF is the coded event -- typically a factor with levels
-circleVisNetwork <- function( n ){
+# accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
+circleVisNetwork <- function( n,showTitle=FALSE ){
 
-  title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
+  if (showTitle==TRUE)
+    title_phrase = paste("Estimated complexity index =",round(estimate_network_complexity(n),2))
+  else
+    title_phrase =''
 
   # print("nodes")
   # print(n$nodeDF)
@@ -605,6 +517,7 @@ circleVisNetwork <- function( n ){
 
 }
 
+
 # e is any set of events
 # vcf is the context factor to graph as network for that set of events
 # l is the set of labels = factor levels of original data for that VCF
@@ -623,10 +536,17 @@ normalNetwork <- function(e, o, cf){
     label = node_label,
     title=node_label)
 
+  # get the column name for the vector...
+  vcf=paste0('V_',cf)
+
+  # add up the indicators of co-presence in this set of events
   vcf_sum = colSums( matrix( unlist(e[[vcf]]), nrow = length(e[[vcf]]), byrow = TRUE) )
 
-  a=vcf_sum %o% vcf_sum
-  print(a)
+  # compute outer product to get adjacency matrix and then standardize to 0-1
+  a=sqrt(vcf_sum %o% vcf_sum)
+  a=a/max(a)
+
+  # print(a)
   g=graph_from_adjacency_matrix(a, mode='undirected', weighted=TRUE)
 
   #E = get.edgelist(g, attr='weight')
@@ -634,15 +554,18 @@ normalNetwork <- function(e, o, cf){
 
   colnames(edges)=c('from','to','label')
 
-# edges = data.frame(
-#   from,
-#   to,
-#   label = paste(ngdf$freq)
-# ) %>% filter(!from==to)
-
- print(edges)
- print(nodes)
 
 return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
 }
 
+
+filter_network_edges <- function(n, threshold){
+  # print(head(n$edgeDF))
+  # print(paste('threshold=',threshold))
+
+  n$edgeDF = n$edgeDF %>% filter(label>threshold)
+
+  # print(head(n$edgeDF))
+
+  return(n)
+}

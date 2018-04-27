@@ -85,29 +85,41 @@ threads_to_network <- function(et,TN,CF,timesplit){
   return(list(nodeDF = nodes, edgeDF = edges))
 }
 
-# here is the original version without all the position stuff, which should be separated out, if possible.
-threads_to_network_original <- function(et,TN,CF){
+# here is a version without all the position stuff, which should be separated out, if possible.
+# Added in the "group" for the network graphics - default group is 'threadNum' because it will always be there
+threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
 
-   # print(head(et))
-   # print(TN)
-   # print(CF)
+    # print(head(et))
+    #
+    # print(paste('CF=', CF))
+    # print(paste('grp=', grp))
 
   # First get the node names & remove the spaces
-  node_label = unique(et[[CF]])
+  node_label = levels(factor(et[[CF]]))  # unique(et[[CF]])
   node_label=str_replace_all(node_label," ","_")
+  nNodes = length(node_label)
 
-   # print("node_label")
-   # print(node_label)
+    # print("node_label")
+    # print(node_label)
+    # print(paste('nNodes=', nNodes))
+
+  node_group=character()
+  for (n in 1:nNodes){
+    node_group = c(node_group, as.character(unlist( et[which(et[[CF]]==node_label[n]),grp][1]) ) )
+  }
 
   # set up the data frames we need to draw the network
   nodes = data.frame(
     id = 1:length(node_label),
     label = node_label,
+    Group = node_group,
     title=node_label)
 
   # get the 2 grams for the edges
   ngdf = count_ngrams(et,TN, CF, 2)
 
+  # Adjust the frequency of the edges to 0-1 range
+  ngdf$freq = round(ngdf$freq/max(ngdf$freq),3)
 
   # need to split 2-grams into from and to
   from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
@@ -132,8 +144,8 @@ threads_to_network_original <- function(et,TN,CF){
   edges = data.frame(
     from,
     to,
-    label = paste(ngdf$freq)
-  ) %>% filter(!from==to)
+    label = ngdf$freq,
+    Value =ngdf$freq) %>% filter(!from==to)
 
   # print(paste("Edges:",edges))
 
@@ -611,11 +623,12 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return
     # The focal column is used to trade the network.  It will probably only be present in the OneToOne mapping, but we should check more generally
     # if it's not present, then use the highest granularity of zooming available.
     focalCol =newColName(event_CF)
-    print(paste('in cluster_events, at first, focalCol=',focalCol))
-    print( colnames(e))
+    # print(paste('in cluster_events, at first, focalCol=',focalCol))
+    # print( colnames(e))
+
     if (! focalCol %in% colnames(e))
     {focalCol = paste0('ZM_',zoom_upper_limit(e))}
-    print(paste('in cluster_events, then, focalCol=',focalCol))
+    # print(paste('in cluster_events, then, focalCol=',focalCol))
     dd = dist_matrix_network(e,focalCol) }
 
   ### cluster the elements
@@ -694,7 +707,7 @@ dist_matrix_network <- function(e,CF){
   # first get the nodes and edges
   n=threads_to_network_original(e,'threadNum',CF)
 
-  print(paste('in dist_matrix_network, n=', n))
+  # print(paste('in dist_matrix_network, n=', n))
 
   # now get the shortest paths between all nodes in the graph
   d=distances(graph_from_data_frame(n$edgeDF),
