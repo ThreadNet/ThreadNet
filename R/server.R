@@ -665,7 +665,9 @@ server <- shinyServer(function(input, output, session) {
   # use this to select how to color the nodes in force layout
 
   output$circleVisNetwork <- renderVisNetwork({
-    circleVisNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ() )
+    # first convert the threads to the network
+    n = threads_to_network_original( threadedEventsViz(), "threadNum", get_Zoom_VIZ() )
+    circleVisNetwork( n )
   })
 
 

@@ -581,10 +581,7 @@ threadLengthBarchart <- function(o, TN){
 #       et is a dataframe with the list of events to be graphed
 #       TN is the field with the thread ID
 #       CF is the coded event -- typically a factor with levels
-circleVisNetwork <- function(et,TN, CF){
-
-  # first convert the threads to the network
-  n = threads_to_network_original(et,TN, CF)
+circleVisNetwork <- function( n ){
 
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
@@ -608,4 +605,44 @@ circleVisNetwork <- function(et,TN, CF){
 
 }
 
+# e is any set of events
+# vcf is the context factor to graph as network for that set of events
+# l is the set of labels = factor levels of original data for that VCF
+normalNetwork <- function(e, o, cf){
+
+  # First get the node names & remove the spaces just in case
+  node_label = levels(o[[cf]])
+  node_label=str_replace_all(node_label," ","_")
+
+  # print("node_label")
+  # print(node_label)
+
+  # set up the data frames we need to draw the network
+  nodes = data.frame(
+    id = 1:length(node_label),
+    label = node_label,
+    title=node_label)
+
+  vcf_sum = colSums( matrix( unlist(e[[vcf]]), nrow = length(e[[vcf]]), byrow = TRUE) )
+
+  a=vcf_sum %o% vcf_sum
+  print(a)
+  g=graph_from_adjacency_matrix(a, mode='undirected', weighted=TRUE)
+
+  #E = get.edgelist(g, attr='weight')
+  edges=cbind( get.edgelist(g) , round( E(g)$weight, 3 ))
+
+  colnames(edges)=c('from','to','label')
+
+# edges = data.frame(
+#   from,
+#   to,
+#   label = paste(ngdf$freq)
+# ) %>% filter(!from==to)
+
+ print(edges)
+ print(nodes)
+
+return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
+}
 

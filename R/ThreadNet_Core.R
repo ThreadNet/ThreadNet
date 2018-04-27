@@ -296,7 +296,8 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
   e=clusterEvents(occ, 'OneToOne', 'Network Proximity', EVENT_CF,'threads')
 
- # eventMap = store_event_mapping('OneToOne', occ)
+  # for debugging, this is really handy
+    save(occ,e,file="O_and_E_1.rdata")
 
    print('done converting occurrences...')
 
