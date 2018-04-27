@@ -156,11 +156,15 @@ ui <- fluidPage(
                        fluidRow(
                          column(3,
                                 uiOutput("Visualize_Tab_Controls_1")),
-                       column(4,
-                              uiOutput("Visualize_Tab_Controls_2"))
+                         conditionalPanel(
+                           condition = "input.tabs !== 'Custom'",
+                           column(4,
+                                  uiOutput("Visualize_Tab_Controls_2"))
+                                )
+
                           ),
 
-                       tabsetPanel(type = "tabs",
+                       tabsetPanel(type = "tabs", id="tabs",
                           tabPanel("Basic ngrams",
                                   uiOutput("nGramControls"),
                                   plotlyOutput("nGramBarchart")
@@ -193,7 +197,7 @@ ui <- fluidPage(
                                    uiOutput("Network_Tab_Controls_2"),
                                    forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
 
-                          tabPanel("Custom layout", id = "CustomLayout",
+                          tabPanel("Custom layout", value = 'Custom',
                                    fluidRow(
                                      column(3, uiOutput("VisualizeCustomNetwork_Controls_0")),
                                      column(3, uiOutput("VisualizeCustomNetwork_Controls_1")) ),
