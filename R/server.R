@@ -563,17 +563,15 @@ server <- shinyServer(function(input, output, session) {
                 output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
               }, ignoreInit = TRUE)
 
-
             observeEvent(
-              input$ExportMappingButton,
-              {rv$newmap = rv$newmap+1 # trigger reactive value
-              export_event_mapping(  input$ManageEventMapInputID )
-                output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " exported."))
-            }, ignoreInit = TRUE)
+              input$ExportMappingRData,
+              {export_event_mapping(  input$ManageEventMapInputID )
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
+              })
 
             observeEvent(
               input$ExportMappingCsv,
-              {export_event_mapping_csv( GlobalEventMappings, input$ManageEventMapInputID )
+              {export_event_mapping_csv( input$ManageEventMapInputID )
                 output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
               })
 

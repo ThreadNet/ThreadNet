@@ -503,6 +503,7 @@ delete_event_mapping <- function( mapname){
 
 
 }
+
 export_event_mapping <- function(mapname){
 
   nicename = paste0("EventMap_",mapname)
@@ -517,15 +518,11 @@ export_event_mapping <- function(mapname){
 
 export_event_mapping_csv <- function( mapname){
 
-  output = as.data.frame(get_event_mapping_threads(GlobalEventMappings, mapname))
+  output = as.data.frame(get_event_mapping_threads(mapname))
 
-  browser()
   output[grep('V_',colnames(output))]<-NULL
-  mdy_hms(output$tStamp)
-  dplyr::arrange(output, tStamp)
 
-  write.csv(output, quote = TRUE, file=choose.files(caption="Save As...",
-                    filters = c("Comma Delimited Files (.csv)","*.csv")))
+  write.csv(output, file=file.choose(), quote = TRUE, row.names = FALSE)
 
   print(" EventMapping saved as .csv file")
 
