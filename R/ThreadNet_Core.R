@@ -273,7 +273,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   # then substract that from initiated relativeTime from above
    occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
   # # row bind data frame back together
-   occ_comb= data.frame(do.call(rbind, occ_split))
+   occ= data.frame(do.call(rbind, occ_split))
 
   #  these are just equal to the row numbers -- one occurrence per event
   occ["occurrences"] =   1:nrow(occ)
