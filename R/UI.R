@@ -54,8 +54,59 @@ ui <- fluidPage(
                                             )
                                    )
               ),
-              tabPanel("Occurrences to Events",
-                       helpText('This is some help text for this tab...'),
+              tabPanel("Visualize",
+                       fluidRow(
+                         column(3,
+                                uiOutput("Visualize_Tab_Controls_1")),
+                         column(4,
+                                uiOutput("Visualize_Tab_Controls_2"))
+                       ),
+
+                       tabsetPanel(type = "tabs",
+                                   tabPanel("Basic ngrams",
+                                            uiOutput("nGramControls"),
+                                            plotlyOutput("nGramBarchart")
+                                   ),
+
+                                   # tabPanel("Frequent ngrams",
+                                   #          uiOutput("freqnGramControls"),
+                                   #          plotlyOutput("freqnGramBarchart")
+                                   #         ),
+
+                                   tabPanel("Whole Sequences",
+                                            radioButtons("ChoosePanelButton_1", label = h4("Display threads using:"),
+                                                         choices = c("Event time (sequence)", "Actual time", "Relative time"),
+                                                         inline=TRUE),
+                                            conditionalPanel(
+                                              condition = "input.ChoosePanelButton_1 == 'Event time (sequence)'",
+                                              plotlyOutput("WholeSequenceThreadMap_Sequence")),
+                                            conditionalPanel(
+                                              condition = "input.ChoosePanelButton_1 == 'Actual time'",
+                                              plotlyOutput("WholeSequenceThreadMap_ActualTime")),
+                                            conditionalPanel(
+                                              condition = "input.ChoosePanelButton_1 == 'Relative time'",
+                                              plotlyOutput("WholeSequenceThreadMap_RelativeTime"))
+                                   ),
+
+                                   tabPanel("Circular event network",
+                                            uiOutput("Circle_Network_Tab_Controls"),
+                                            visNetworkOutput("circleVisNetwork", width = "100%", height = "1200px")),
+
+                                   tabPanel("Force event network",
+                                            uiOutput("Force_Network_Tab_Controls"),
+                                            forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
+
+                                   tabPanel("View Events",
+                                            plotlyOutput("VisualizeCustomNetwork")),
+
+                                   tabPanel("Other networks",
+                                            uiOutput("Other_Network_Tab_Controls"),
+                                            visNetworkOutput("otherVisNetwork", width = "100%", height = "1200px"))
+                       )
+
+              ),
+              tabPanel("Subsets and mapping",
+                       helpText('Create subsets of your data and alternative mappings'),
                        tags$hr(),
                        tabsetPanel(type = "tabs",
 
@@ -152,6 +203,7 @@ ui <- fluidPage(
                        )
 
               ),
+<<<<<<< HEAD
               tabPanel("Visualize",
                        fluidRow(
                          column(3,
@@ -207,6 +259,9 @@ ui <- fluidPage(
                           )
 
               ),
+=======
+
+>>>>>>> more_network_graphs
 
               tabPanel("Comparisons",
                        tabsetPanel(type = "tabs",
