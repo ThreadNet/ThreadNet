@@ -310,7 +310,10 @@ ng_bar_chart_freq <- function(ngdf){
 #' @export
 
 eventNetwork <- function(et, TN, CF, timesplit){
+
   n <- threads_to_network(et, TN, CF, timesplit)
+
+
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
   edge_shapes <- list()
@@ -319,7 +322,7 @@ eventNetwork <- function(et, TN, CF, timesplit){
 
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.1),
+      line = list(color = "#030303", width = 0),
       x0 = E[['from_x']],
       x1 = E[['to_x']],
       y0 = E[['from_y']],
@@ -341,6 +344,7 @@ eventNetwork <- function(et, TN, CF, timesplit){
   color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
   size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
   network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
+                     width = 0,
                      mode = "markers",
                      marker = list(size= size_pal,
                                    color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
@@ -384,7 +388,6 @@ forceNetworkD3 <- function(et,TN, grp, zoom_level){
 #   print(paste("TN =", TN))
 #   print(paste("grp =", grp))
 #   print(paste("zoom_level =", zoom_level))
-
 
   # First get the node names & remove the spaces
   node_label = levels(factor(et[[zoom_level]]))  # unique(et[[zoom_level]])
