@@ -647,17 +647,11 @@ server <- shinyServer(function(input, output, session) {
 
 # Whole sequence display -- allow alternatives
 
-  output$WholeSequenceThreadMap_Sequence <- renderPlotly({
-    threadMap(threadedEventsViz(), "threadNum", "seqNum", get_Zoom_VIZ(), 15  )
-  })
+  output$WholeSequenceThreadMap_Sequence <- renderPlotly({ threadMap(threadedEventsViz(), "threadNum", "seqNum", get_Zoom_VIZ(), 15  )  })
 
-  output$WholeSequenceThreadMap_ActualTime <- renderPlotly({
-    threadMap(threadedEventsViz(), "threadNum", "tStamp", get_Zoom_VIZ(), 15 )
-  })
+  output$WholeSequenceThreadMap_ActualTime <- renderPlotly({ threadMap(threadedEventsViz(), "threadNum", "tStamp", get_Zoom_VIZ(), 15 )  })
 
-  output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({
-    threadMap(threadedEventsViz(), "threadNum", "relativeTime", get_Zoom_VIZ(), 15 )
-  })
+  output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({ threadMap(threadedEventsViz(), "threadNum", "relativeTime", get_Zoom_VIZ(), 15 ) })
 
   ######## Circular network tab  ###############
   # use this to select how to color the nodes in force layout
@@ -667,8 +661,7 @@ server <- shinyServer(function(input, output, session) {
     # first convert the threads to the network
     n = threads_to_network_original( threadedEventsViz(), "threadNum", get_Zoom_VIZ() )
     n=filter_network_edges(n,input$circleEdgeTheshold)
-    circleVisNetwork( n, TRUE )
-  })
+    circleVisNetwork( n, TRUE ) })
 
   ######## Other network tab  ###############
   # use this to select how to color the nodes in force layout
@@ -752,7 +745,7 @@ server <- shinyServer(function(input, output, session) {
 
   # ####### SUBSET A   ##########
   output$Comparison_Tab_Controls_A1 <- renderUI({
-    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping:"),  get_event_mapping_names() )
+    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping A:"),  get_event_mapping_names() )
     })
 
   output$Comparison_Tab_Controls_A2 <- renderUI({
@@ -776,7 +769,7 @@ server <- shinyServer(function(input, output, session) {
 
    # ####### SUBSET B   ##########
   output$Comparison_Tab_Controls_B1 <- renderUI({
-    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping:"),  get_event_mapping_names() )
+    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping B:"),  get_event_mapping_names() )
   })
 
   output$Comparison_Tab_Controls_B2 <- renderUI({
@@ -797,6 +790,69 @@ server <- shinyServer(function(input, output, session) {
   output$Comparison_Plots_B <- renderPlotly({
     threadMap(threadedEventsComp_B(), "threadNum", "seqNum", get_Zoom_COMP_B(), 15  )
   })
+
+  #### Put all six here #####
+  output$Comp_A_1 <- renderPlotly({ threadMap(threadedEventsComp_A(), "threadNum", "seqNum", get_Zoom_COMP_A(), 15  ) })
+  output$Comp_B_1 <- renderPlotly({ threadMap(threadedEventsComp_B(), "threadNum", "seqNum", get_Zoom_COMP_B(), 15  ) })
+
+  output$Comp_A_2 <- renderPlotly({ threadMap(threadedEventsComp_A(), "threadNum", "tStamp", get_Zoom_COMP_A(), 15 ) })
+  output$Comp_B_2 <- renderPlotly({ threadMap(threadedEventsComp_B(), "threadNum", "tStamp", get_Zoom_COMP_B(), 15 ) })
+
+  output$Comp_A_3 <- renderPlotly({ threadMap(threadedEventsComp_A(), "threadNum", "relativeTime", get_Zoom_COMP_A(), 15 ) })
+  output$Comp_B_3 <- renderPlotly({ threadMap(threadedEventsComp_B(), "threadNum", "relativeTime", get_Zoom_COMP_B(), 15 ) })
+
+  output$Comp_A_4_controls <- renderUI({sliderInput("A_4_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
+  output$Comp_B_4_controls <- renderUI({sliderInput("B_4_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
+  output$Comp_A_4 <- renderVisNetwork({
+    n = threads_to_network_original( threadedEventsComp_A(), "threadNum", get_Zoom_COMP_A() )
+    n=filter_network_edges(n,input$A_4_Theshold)
+    circleVisNetwork( n ) })
+
+  output$Comp_B_4 <- renderVisNetwork({
+    n = threads_to_network_original( threadedEventsComp_B(), "threadNum", get_Zoom_COMP_B() )
+    n=filter_network_edges(n,input$B_4_Theshold)
+    circleVisNetwork( n  ) })
+
+  output$Comp_A_5_controls <- renderUI({sliderInput("A_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
+  output$Comp_B_5_controls <- renderUI({sliderInput("B_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
+  output$Comp_A_5 <- renderForceNetwork({
+      n = threads_to_network_original( threadedEventsComp_A(), 'threadNum', get_Zoom_COMP_A(), 'threadNum' )
+      n = filter_network_edges(n,input$A_5_Theshold)
+      forceNetworkD3( n )  })
+
+  output$Comp_B_5 <- renderForceNetwork({
+    n = threads_to_network_original( threadedEventsComp_B(), 'threadNum', get_Zoom_COMP_B(), 'threadNum' )
+    n = filter_network_edges(n,input$B_5_Theshold)
+    forceNetworkD3( n )  })
+
+  output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
+  tags$div(
+    radioButtons("A_6_OtherNetworkCF","Graph co-occurrence relation between:",
+                 choices = button_choices,
+                 selected =  button_choices[1], # always start with the first one
+                 inline=TRUE),
+    sliderInput("A_6_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))})
+
+  output$Comp_B_6_controls <- renderUI({button_choices = get_EVENT_CF()
+  tags$div(
+    radioButtons("B_6_OtherNetworkCF","Graph co-occurrence relation between:",
+                 choices = button_choices,
+                 selected =  button_choices[1], # always start with the first one
+                 inline=TRUE),
+    sliderInput("B_6_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))})
+
+  output$Comp_A_6 <- renderVisNetwork({
+    n = normalNetwork( threadedEventsComp_A(), selectOccFilter(), input$A_6_OtherNetworkCF )
+    n=filter_network_edges(n,input$A_6_Theshold)
+    circleVisNetwork( n )  })
+
+  output$Comp_B_6 <- renderVisNetwork({
+    n = normalNetwork( threadedEventsComp_B(), selectOccFilter(), input$B_6_OtherNetworkCF )
+    n=filter_network_edges(n,input$B_6_Theshold)
+    circleVisNetwork( n ) })
+
+
+
 
   # ##########  DIACHRONIC Comparison sub-tab   ###########
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({

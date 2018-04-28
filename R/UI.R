@@ -207,15 +207,66 @@ ui <- fluidPage(
                        tabsetPanel(type = "tabs",
                          tabPanel("Compare Mappings (synchronic)",
                        fluidRow(
-                         column(6, tags$h3("Mapping A"),
-                                uiOutput("Comparison_Tab_Controls_A1"),
-                                uiOutput("Comparison_Tab_Controls_A2"),
-                                plotlyOutput("Comparison_Plots_A")),
-                         column(6,tags$h3("Mapping B"),
-                                uiOutput("Comparison_Tab_Controls_B1"),
-                                uiOutput("Comparison_Tab_Controls_B2"),
-                                plotlyOutput("Comparison_Plots_B"))
-                                )),
+                         column(6,
+                                fluidRow(
+                                  column(3, uiOutput("Comparison_Tab_Controls_A1")),
+                                  column(3, uiOutput("Comparison_Tab_Controls_A2"))) ,
+                                selectizeInput('comparePanelSelect_A','Choose visualization:',
+                                               c('Threads (event time)','Threads (actual time)','Threads (relative time)',
+                                                 'Circle network','Force network','Other network' )),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Threads (event time)'",
+                                  plotlyOutput("Comp_A_1") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Threads (actual time)'",
+                                  plotlyOutput("Comp_A_2") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Threads (relative time)'",
+                                  plotlyOutput("Comp_A_3") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Circle network'",
+                                  uiOutput("Comp_A_4_controls"),
+                                  visNetworkOutput("Comp_A_4") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Force network'",
+                                  uiOutput("Comp_A_5_controls"),
+                                  forceNetworkOutput("Comp_A_5") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Other network'",
+                                  uiOutput("Comp_A_6_controls"),
+                                  visNetworkOutput("Comp_A_6") )
+                                ),
+                         column(6,
+                                fluidRow(
+                                  column(3, uiOutput("Comparison_Tab_Controls_B1")),
+                                  column(3, uiOutput("Comparison_Tab_Controls_B2"))) ,
+                                selectizeInput('comparePanelSelect_B','Choose visualization:',
+                                               c('Threads (event time)','Threads (actual time)','Threads (relative time)',
+                                                 'Circle network','Force network','Other network' )),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Threads (event time)'",
+                                  plotlyOutput("Comp_B_1") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Threads (actual time)'",
+                                  plotlyOutput("Comp_B_2") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Threads (relative time)'",
+                                  plotlyOutput("Comp_B_3") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Circle network'",
+                                  uiOutput("Comp_B_4_controls"),
+                                  visNetworkOutput("Comp_B_4") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Force network'",
+                                  uiOutput("Comp_B_5_controls"),
+                                  forceNetworkOutput("Comp_B_5") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Other network'",
+                                  uiOutput("Comp_B_6_controls"),
+                                  visNetworkOutput("Comp_B_6") )
+                                ))
+                       ),
+
                        tabPanel("Compare time periods (diachronic)",
                                 fluidRow(
                                   column(3,
