@@ -574,3 +574,55 @@ filter_network_edges <- function(n, threshold){
 
   return(n)
 }
+
+# role map will show "who does what" for any set of events
+# cfs contains a list of two contextual factors.
+role_map <- function(e, o, cfs){
+
+  if (!length(cfs)==2)
+    return(plot_ly())
+
+  # Get the context factors
+  vcf_1 = paste0('V_',cfs[1])
+  vcf_2 = paste0('V_',cfs[2])
+
+  # add up the indicators of co-presence in this set of events
+  vcf_1_sum = colSums( matrix( unlist(e[[vcf_1]]), nrow = length(e[[vcf_1]]), byrow = TRUE) )
+  vcf_2_sum = colSums( matrix( unlist(e[[vcf_2]]), nrow = length(e[[vcf_2]]), byrow = TRUE) )
+
+   # compute outer product to get adjacency matrix
+  who_does_what= round(vcf_1_sum %o% vcf_2_sum,0)
+
+  return( plot_ly(
+          x=levels(o[[cfs[2]]]),
+          y=levels(o[[cfs[1]]]),
+          z=who_does_what,
+          type='heatmap',
+          colors= 'Greens') )
+
+}
+
+
+# this shows relative time versus sequential time
+# Inspired by Gergen and Daniger-Schroeder
+threadTrajectory <- function(or, CF){
+
+  # setting color palettes
+  # first find the number of distinct colors
+  nColors = length(unique(or$threadNum))
+  pal <- rainbow_hcl(nColors)
+
+  return( plot_ly(or, x = ~or$relativeTime, y = ~or$seqNum, color= as.character(or$threadNum),
+                  colors=pal,
+                  name = 'threads', type = 'scatter', mode='lines',
+                  text = ~paste(or$threadNum,or$label,sep=':'),
+                  hoverinfo = "text",
+                  showlegend=FALSE)
+          %>%
+            layout(
+              xaxis = list(title='Relative time'),
+              yaxis = list(title='Sequence')
+            ))
+}
+
+
