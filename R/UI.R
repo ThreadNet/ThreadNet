@@ -58,13 +58,11 @@ ui <- fluidPage(
                        fluidRow(
                          column(3,
                                 uiOutput("Visualize_Tab_Controls_1")),
-                         conditionalPanel(
-                           condition = "input.tabs !== 'Custom'",
+                                conditionalPanel(
+                                        condition = "input.tabs !== 'Custom'",
                            column(4,
-                                  uiOutput("Visualize_Tab_Controls_2"))
-                         )
-
-                       ),
+                                  uiOutput("Visualize_Tab_Controls_2") ))
+                           ),
 
                        tabsetPanel(type = "tabs",
                                    tabPanel("N-grams",
@@ -87,11 +85,11 @@ ui <- fluidPage(
                                               plotlyOutput("WholeSequenceThreadMap_RelativeTime"))
                                    ),
 
-                                   tabPanel("Circular event network",
+                                   tabPanel("Event network (circle)",
                                             uiOutput("Circle_Network_Tab_Controls"),
                                             visNetworkOutput("circleVisNetwork", width = "100%", height = "1200px")),
 
-                                   tabPanel("Force event network",
+                                   tabPanel("Event network (force)",
                                             uiOutput("Force_Network_Tab_Controls"),
                                             forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
 
@@ -139,8 +137,7 @@ ui <- fluidPage(
                                             ),
                                             uiOutput("chunk_controls_1"),
                                             uiOutput("chunk_controls_6"),
-                                            verbatimTextOutput("chunk_controls_7"),
-                                            plotlyOutput("chunk_controls_8")
+                                            verbatimTextOutput("chunk_controls_7")
                                    ),
 
                                    tabPanel("Cluster for Zooming",
@@ -250,7 +247,8 @@ ui <- fluidPage(
                                   column(3, uiOutput("Comparison_Tab_Controls_B2"))) ,
                                 selectizeInput('comparePanelSelect_B','Choose visualization:',
                                                c('Threads (event time)','Threads (actual time)','Threads (relative time)',
-                                                 'Circle network','Force network','Other network' )),
+                                                 'Event network (circle)','Event network (force)','Other networks',
+                                                 'Role Maps','Thread Trajectories')),
                                 conditionalPanel(
                                   condition = "input.comparePanelSelect_B == 'Threads (event time)'",
                                   plotlyOutput("Comp_B_1") ),
@@ -301,19 +299,85 @@ ui <- fluidPage(
               tabPanel("Moving Window",
                        fluidRow(
                          column(3,
-                              uiOutput("Moving_Window_Tab_Controls_1")),
-                         column(4,
+                              uiOutput("Moving_Window_Tab_Controls_1"),
+                              selectizeInput('Moving_Window_Viz','Choose visualization:',
+                                             c('Threads (event time)','Threads (actual time)','Threads (relative time)',
+                                               'Event network (circle)','Event network (force)','Other networks',
+                                               'Role Maps','Thread Trajectories')) ),
+                         column(3,
                                 uiOutput("Moving_Window_Tab_Controls_3"),
-                                uiOutput("Moving_Window_Tab_Controls_2"))
+                                uiOutput("Moving_Window_Tab_Controls_2")),
+                         column(3,
+                                # add controls that apply to both subsets here
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Event network (circle)'",
+                                  uiOutput("Moving_4_controls") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Event network (force)'",
+                                  uiOutput("Moving_5_controls") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Other networks'",
+                                  uiOutput("Moving_6_controls") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Role Maps'",
+                                  uiOutput("Moving_7_controls") ) )
                        ),
                        fluidRow(
                          column(6,"SubsetA",
                                 uiOutput("Moving_Window_Tab_Controls_4_A"),
-                                plotlyOutput("MovingWindow_Plot_A")
+
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Threads (event time)'",
+                                  plotlyOutput("Moving_A_1") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Threads (actual time)'",
+                                  plotlyOutput("Moving_A_2") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Threads (relative time)'",
+                                  plotlyOutput("Moving_A_3") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Event network (circle)'",
+                                  visNetworkOutput("Moving_A_4") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Event network (force)'",
+                                  forceNetworkOutput("Moving_A_5") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Other networks'",
+                                  visNetworkOutput("Moving_A_6") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Role Maps'",
+                                  plotlyOutput("Moving_A_7") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Thread Trajectories'",
+                                  plotlyOutput("Moving_A_8") )
+
                          ),
                          column(6,"SubsetB",
                                 uiOutput("Moving_Window_Tab_Controls_4_B"),
-                                plotlyOutput("MovingWindow_Plot_B")
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Threads (event time)'",
+                                  plotlyOutput("Moving_B_1") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Threads (actual time)'",
+                                  plotlyOutput("Moving_B_2") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Threads (relative time)'",
+                                  plotlyOutput("Moving_B_3") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Event network (circle)'",
+                                  visNetworkOutput("Moving_B_4") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Event network (force)'",
+                                  forceNetworkOutput("Moving_B_5") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Other networks'",
+                                  visNetworkOutput("Moving_B_6") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Role Maps'",
+                                  plotlyOutput("Moving_B_7") ),
+                                conditionalPanel(
+                                  condition = "input.Moving_Window_Viz == 'Thread Trajectories'",
+                                  plotlyOutput("Moving_B_8") )
                          )
                        )
 

@@ -791,7 +791,7 @@ server <- shinyServer(function(input, output, session) {
     threadMap(threadedEventsComp_B(), "threadNum", "seqNum", get_Zoom_COMP_B(), 15  )
   })
 
-  #### Put all six here #####
+  #### Put all eight here #####
   output$Comp_A_1 <- renderPlotly({ threadMap(threadedEventsComp_A(), "threadNum", "seqNum", get_Zoom_COMP_A(), 15  ) })
   output$Comp_B_1 <- renderPlotly({ threadMap(threadedEventsComp_B(), "threadNum", "seqNum", get_Zoom_COMP_B(), 15  ) })
 
@@ -944,26 +944,88 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("WindowLocation_B_ID","Window Location", 1,numThreads(threadedEventsMove(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
-  # "Timesplit" appears to be used for the custom network plotly layout
-  # output$Moving_Tab_Controls_5 <- renderUI({
-  #   tags$div(align="center",
-  #   radioButtons("Timesplit3", "Time Measure:", choices = c('seqNum','timeGap'), selected="seqNum", inline=TRUE))
-  # })
-
   # Get data for the Moving Window tab.
-  threadedEventsMove <- reactive({
-    get_event_mapping_threads(  input$MovingWindowMapInputID ) })
+
+  threadedEventsMove <- reactive({get_event_mapping_threads(  input$MovingWindowMapInputID )})
+
+  threadedEventsMove_A <- reactive({
+    get_moving_window(threadedEventsMove() ,
+                      input$MovingWindowSizeID,
+                      input$WindowLocation_A_ID ) })
+
+  threadedEventsMove_B <- reactive({
+    get_moving_window(threadedEventsMove(),
+                      input$MovingWindowSizeID,
+                      input$WindowLocation_B_ID ) })
+
+  ## Conditional controls for both side A and B
+  output$Moving_4_controls <- renderUI({sliderInput("M_4_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
+
+  output$Moving_5_controls <- renderUI({sliderInput("M_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
+
+  output$Moving_6_controls <- renderUI({button_choices = get_EVENT_CF()
+  tags$div(
+    radioButtons("M_6_OtherNetworkCF","Graph co-occurrence relation between:",
+                 choices = button_choices,
+                 selected =  button_choices[1], # always start with the first one
+                 inline=TRUE),
+    sliderInput("M_6_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))})
 
 
-   output$MovingWindow_Plot_A <- renderPlotly({
-     w = get_moving_window(threadedEventsMove(), input$MovingWindowSizeID, input$WindowLocation_A_ID )
-     threadMap(w, "threadNum", "seqNum", get_Zoom_MOVE(), 15  )
-   })
+  output$Moving_7_controls <- renderUI({checkboxGroupInput("M_7_CFs","Pick Two:", get_EVENT_CF() )})
 
-   output$MovingWindow_Plot_B <- renderPlotly({
-     w = get_moving_window(threadedEventsMove(), input$MovingWindowSizeID, input$WindowLocation_B_ID )
-     threadMap(w, "threadNum", "seqNum", get_Zoom_MOVE(), 15  )
-   })
+
+  ##  New moving window outputs
+  #### Put all eight here #####
+  output$Moving_A_1 <- renderPlotly({ threadMap(threadedEventsMove_A(), "threadNum", "seqNum", get_Zoom_MOVE(), 15  ) })
+  output$Moving_B_1 <- renderPlotly({ threadMap(threadedEventsMove_B(), "threadNum", "seqNum", get_Zoom_MOVE(), 15  ) })
+
+  output$Moving_A_2 <- renderPlotly({ threadMap(threadedEventsMove_A(), "threadNum", "tStamp", get_Zoom_MOVE(), 15 ) })
+  output$Moving_B_2 <- renderPlotly({ threadMap(threadedEventsMove_B(), "threadNum", "tStamp", get_Zoom_MOVE(), 15 ) })
+
+  output$Moving_A_3 <- renderPlotly({ threadMap(threadedEventsMove_A(), "threadNum", "relativeTime", get_Zoom_MOVE(), 15 ) })
+  output$Moving_B_3 <- renderPlotly({ threadMap(threadedEventsMove_B(), "threadNum", "relativeTime", get_Zoom_MOVE(), 15 ) })
+
+   output$Moving_A_4 <- renderVisNetwork({
+    n = threads_to_network_original( threadedEventsMove_A(), "threadNum", get_Zoom_MOVE() )
+    n=filter_network_edges(n,input$M_4_Theshold)
+    circleVisNetwork( n ) })
+
+  output$Moving_B_4 <- renderVisNetwork({
+    n = threads_to_network_original( threadedEventsMove_B(), "threadNum", get_Zoom_MOVE() )
+    n=filter_network_edges(n,input$M_4_Theshold)
+    circleVisNetwork( n  ) })
+
+  output$Moving_A_5 <- renderForceNetwork({
+    n = threads_to_network_original( threadedEventsMove_A(), 'threadNum', get_Zoom_MOVE(), 'threadNum' )
+    n = filter_network_edges(n,input$M_5_Theshold)
+    forceNetworkD3( n )  })
+
+  output$Moving_B_5 <- renderForceNetwork({
+    n = threads_to_network_original( threadedEventsMove_B(), 'threadNum', get_Zoom_MOVE(), 'threadNum' )
+    n = filter_network_edges(n,input$M_5_Theshold)
+    forceNetworkD3( n )  })
+
+
+  output$Moving_A_6 <- renderVisNetwork({
+    n = normalNetwork( threadedEventsMove_A(), selectOccFilter(), input$M_6_OtherNetworkCF )
+    n=filter_network_edges(n,input$M_6_Theshold)
+    circleVisNetwork( n )  })
+
+  output$Moving_B_6 <- renderVisNetwork({
+    n = normalNetwork( threadedEventsMove_B(), selectOccFilter(), input$M_6_OtherNetworkCF )
+    n=filter_network_edges(n,input$M_6_Theshold)
+    circleVisNetwork( n ) })
+
+  output$Moving_A_7 <- renderPlotly({ role_map( threadedEventsMove_A(), selectOccFilter(), input$M_7_CFs ) })
+  output$Moving_B_7 <- renderPlotly({ role_map( threadedEventsMove_A(), selectOccFilter(), input$M_7_CFs ) })
+
+  output$Moving_A_8 <- renderPlotly({ threadTrajectory(threadedEventsMove_A() ) })
+  output$Moving_B_8 <- renderPlotly({ threadTrajectory(threadedEventsMove_B() ) })
+
+
+
+
 
   #
   # output$MovingWindow_Plot_A <- renderPlotly({
