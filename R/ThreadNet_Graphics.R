@@ -598,7 +598,7 @@ role_map <- function(e, o, cfs){
           y=levels(o[[cfs[1]]]),
           z=who_does_what,
           type='heatmap',
-          colors= 'Greens') )
+          colors= 'Reds') )
 
 }
 
