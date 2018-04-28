@@ -605,7 +605,7 @@ role_map <- function(e, o, cfs){
 
 # this shows relative time versus sequential time
 # Inspired by Gergen and Daniger-Schroeder
-threadTrajectory <- function(or, CF){
+threadTrajectory <- function(or){
 
   # setting color palettes
   # first find the number of distinct colors

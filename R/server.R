@@ -851,7 +851,13 @@ server <- shinyServer(function(input, output, session) {
     n=filter_network_edges(n,input$B_6_Theshold)
     circleVisNetwork( n ) })
 
+  output$Comp_A_7_controls <- renderUI({checkboxGroupInput("A_7_CFs","Pick Two:", get_EVENT_CF() )})
+  output$Comp_B_7_controls <- renderUI({checkboxGroupInput("B_7_CFs","Pick Two:", get_EVENT_CF() )})
+  output$Comp_A_7 <- renderPlotly({ role_map( threadedEventsComp_A(), selectOccFilter(), input$A_7_CFs ) })
+  output$Comp_B_7 <- renderPlotly({ role_map( threadedEventsComp_A(), selectOccFilter(), input$B_7_CFs ) })
 
+  output$Comp_A_8 <- renderPlotly({ threadTrajectory(threadedEventsComp_A() ) })
+  output$Comp_B_8 <- renderPlotly({ threadTrajectory(threadedEventsComp_B() ) })
 
 
   # ##########  DIACHRONIC Comparison sub-tab   ###########

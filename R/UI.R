@@ -213,7 +213,8 @@ ui <- fluidPage(
                                   column(3, uiOutput("Comparison_Tab_Controls_A2"))) ,
                                 selectizeInput('comparePanelSelect_A','Choose visualization:',
                                                c('Threads (event time)','Threads (actual time)','Threads (relative time)',
-                                                 'Circle network','Force network','Other network' )),
+                                                 'Event network (circle)','Event network (force)','Other networks',
+                                                 'Role Maps','Thread Trajectories')),
                                 conditionalPanel(
                                   condition = "input.comparePanelSelect_A == 'Threads (event time)'",
                                   plotlyOutput("Comp_A_1") ),
@@ -224,17 +225,24 @@ ui <- fluidPage(
                                   condition = "input.comparePanelSelect_A == 'Threads (relative time)'",
                                   plotlyOutput("Comp_A_3") ),
                                 conditionalPanel(
-                                  condition = "input.comparePanelSelect_A == 'Circle network'",
+                                  condition = "input.comparePanelSelect_A == 'Event network (circle)'",
                                   uiOutput("Comp_A_4_controls"),
                                   visNetworkOutput("Comp_A_4") ),
                                 conditionalPanel(
-                                  condition = "input.comparePanelSelect_A == 'Force network'",
+                                  condition = "input.comparePanelSelect_A == 'Event network (force)'",
                                   uiOutput("Comp_A_5_controls"),
                                   forceNetworkOutput("Comp_A_5") ),
                                 conditionalPanel(
-                                  condition = "input.comparePanelSelect_A == 'Other network'",
+                                  condition = "input.comparePanelSelect_A == 'Other networks'",
                                   uiOutput("Comp_A_6_controls"),
-                                  visNetworkOutput("Comp_A_6") )
+                                  visNetworkOutput("Comp_A_6") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Role Maps'",
+                                  uiOutput("Comp_A_7_controls"),
+                                  plotlyOutput("Comp_A_7") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Thread Trajectories'",
+                                  plotlyOutput("Comp_A_8") )
                                 ),
                          column(6,
                                 fluidRow(
@@ -253,17 +261,24 @@ ui <- fluidPage(
                                   condition = "input.comparePanelSelect_B == 'Threads (relative time)'",
                                   plotlyOutput("Comp_B_3") ),
                                 conditionalPanel(
-                                  condition = "input.comparePanelSelect_B == 'Circle network'",
+                                  condition = "input.comparePanelSelect_B == 'Event network (circle)'",
                                   uiOutput("Comp_B_4_controls"),
                                   visNetworkOutput("Comp_B_4") ),
                                 conditionalPanel(
-                                  condition = "input.comparePanelSelect_B == 'Force network'",
+                                  condition = "input.comparePanelSelect_B == 'Event network (force)'",
                                   uiOutput("Comp_B_5_controls"),
                                   forceNetworkOutput("Comp_B_5") ),
                                 conditionalPanel(
-                                  condition = "input.comparePanelSelect_B == 'Other network'",
+                                  condition = "input.comparePanelSelect_B == 'Other networks'",
                                   uiOutput("Comp_B_6_controls"),
-                                  visNetworkOutput("Comp_B_6") )
+                                  visNetworkOutput("Comp_B_6") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Role Maps'",
+                                  uiOutput("Comp_B_7_controls"),
+                                  plotlyOutput("Comp_B_7") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Thread Trajectories'",
+                                  plotlyOutput("Comp_B_8") )
                                 ))
                        ),
 
