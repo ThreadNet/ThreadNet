@@ -290,17 +290,15 @@ ui <- fluidPage(
                        tabPanel("Compare time periods (diachronic)",
                                 fluidRow(
                                   column(3,
-                                         uiOutput("Diachronic_Comparison_Tab_Controls_1")),
-                                  column(4,
-                                         uiOutput("Diachronic_Comparison_Tab_Controls_2"))
-                                ),
-                                uiOutput("Diachronic_Comparison_Tab_Controls_3"),
-                                uiOutput("Diachronic_Comparison_Tab_Controls_4"),
-                                uiOutput("Diachronic_Comparison_Tab_Controls_5"),
-                                plotlyOutput("DiachronicComparisonPlots")
-                                )
-
-                                )
+                                          uiOutput("Diachronic_Comparison_Tab_Controls_1") ),
+                                  column(3,
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_4"),
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_5") ),
+                                  column(3,
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_3") )
+                                      ),
+                                plotlyOutput("DiachronicComparisonPlots") )
+                      )
                ),
 
               tabPanel("Moving Window",

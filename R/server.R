@@ -871,23 +871,25 @@ server <- shinyServer(function(input, output, session) {
 
   # ##########  DIACHRONIC Comparison sub-tab   ###########
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
-    selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() )
-  })
+    tagList(  selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() ),
+              selectizeInput('comparePanelViz',label = h4('Choose visualization:'),
+                   c('Role Maps','Thread Trajectories','Threads (event time)','Ngrams' )))  })
 
-  output$Diachronic_Comparison_Tab_Controls_2 <- renderUI({
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$DiaCompareMapInputID))
-    if (zoom_limit == 1)
-    {tags$h4("Zooming not available with this mapping")}
-    else
-    {sliderInput("DiaCompareZoomID",
-                 label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
-  })
+  # output$Diachronic_Comparison_Tab_Controls_2 <- renderUI({
+  #   zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$DiaCompareMapInputID))
+  #   if (zoom_limit == 1)
+  #   {tags$h4("Zooming not available with this mapping")}
+  #   else
+  #   {sliderInput("DiaCompareZoomID",
+  #                label=h4("Zoom in and out by event similarity:"),
+  #                1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
+  # })
 
    output$Diachronic_Comparison_Tab_Controls_3 <- renderUI({
-     radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE)
-   })
-
+     tagList(
+     radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE),
+     checkboxGroupInput("role_map_cfs","Pick Two for role map:", get_EVENT_CF() ) )
+     })
 
    # Get data for the Diachronic COMPARE tab  .
    threadedEventsDiaComp <- reactive({
@@ -897,30 +899,24 @@ server <- shinyServer(function(input, output, session) {
    # controls for the comparison input panels
    # Use all of the column names here...
    output$Diachronic_Comparison_Tab_Controls_4 <- renderUI({
-     selectizeInput("selectComparisonID","Compare by:", colnames(threadedEventsDiaComp()))
-   })
-   CF_levels = reactive( get_CF_levels( threadedEventsDiaComp(),input$selectComparisonID) )
-
+     selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF() ) })
 
    output$Diachronic_Comparison_Tab_Controls_5 <- renderUI({
-     tagList(
-       selectizeInput("selectComparisonGroupsID","Compare specific groups:",
-                      CF_levels(), multiple=TRUE),
+     selectizeInput("selectComparisonGroupsID","Compare specific groups:",
+                    CF_levels(), multiple=TRUE) })
 
-       sliderInput("nGramLengthCompID","nGram Size", 1,10,2,step=1,ticks=FALSE )
-
-     )
-   })
+   CF_levels = reactive( get_CF_levels( threadedEventsDiaComp(),input$selectComparisonID) )
 
    # Get subsets of events and create sub-plots for them
 
    output$DiachronicComparisonPlots <- renderPlotly(
      Comparison_Plots(threadedEventsDiaComp(),
+                      selectOccFilter(),
                       input$selectComparisonID,
                       input$selectComparisonGroupsID,
                       input$DiaCompareTimeSubsetID,
-                      input$nGramLengthCompID,
-                      get_Zoom_DIA_COMP()) )
+                      input$comparePanelViz,
+                      input$role_map_cfs) )
 
 
   ############################################################################

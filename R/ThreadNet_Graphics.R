@@ -399,17 +399,19 @@ forceNetworkD3 <- function(n){
 #' @family ThreadNet_Graphics
 #'
 #' @param e dataframe with threads to be plotted
+#' @param o dataframe with the original data
 #' @param CF contextul factors
 #' @param CF_levels  list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)
 #' @param nTimePeriods how many time periods to divide the data?
 #' @param ng_size size of ngram
 #' @param zoom_level choose the zoom level, if applicable
+#' @param plot_type a type of plotly plot with a function written
 #'
 #' @return plotly object, including subplots
 #' @export
 #'
 #' @examples
-Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_level){
+Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,role_map_cfs){
 
   # get the first event of each thread, so we can order them consistently by time
   et = e[e$seqNum==1,]
@@ -427,55 +429,39 @@ Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_le
   # Get the subsets, first by time and then by category.  This will just return thread numbers.
   time_buckets = make_subsets(et$threadNum,nTimeBuckets)
 
-  # print("time_buckets")
-  # print(time_buckets)
-
-  # further divide each by context factor
-
-  # plotList <- function(nplots) {
-  #   lapply(seq_len(nplots), function(x) plot_ly())
-
   plot_list = list()
 
   for (tb in 1:nTimeBuckets){
     for (f in 1:nLevels){
 
       plotName = paste0("Time-",tb,"-","CF-",f)
-
-      # print("plotName")
-      # print(plotName)
-      # print("CF")
-      # print(CF)
-
       plot_bucket = et[(is.element(et$threadNum,unlist(time_buckets[tb])) & et[CF]==CF_levels[f]),"threadNum"]
-
-      # print("plot_bucket")
-      # print(plot_bucket)
 
       # then make the subplots
       # this gets all of the events in all of the threads that match the criteria
-
       dfp= e[is.element(e$threadNum,unlist(plot_bucket)),]
       # print("dfp[,1:7]")
       # print(dfp[,1:7])
 
       # ideally make sure at least one thread is long enough to do an ngram...
-      if (nrow(dfp)>ng_size){
+      if (nrow(dfp)>2){
 
-        plot_list[[plotName]] =  ng_bar_chart(dfp,"threadNum", zoom_level, ng_size, 1)
-        #      plot_list[[plotName]] =  eventNetworkD3(dfp,"threadNum", get_COMPARISON_CF(), zoom_level)
-
-      } else
-      {plot_list[[plotName]] =  plotly_empty()}
-
-
+        if (plot_type=='Ngrams')
+        {plot_list[[plotName]] =  ng_bar_chart(dfp,"threadNum", 1, 2, 2)}
+        else if (plot_type=='Role Maps')
+        {plot_list[[plotName]] = role_map( dfp, o, role_map_cfs ) }
+        else if (plot_type=='Thread Trajectories')
+        {plot_list[[plotName]] = threadTrajectory( dfp ) }
+         else if (plot_type=='Threads (event time)')
+         {plot_list[[plotName]] = threadMap(dfp, "threadNum", "seqNum", 1, 15 ) }
+       else
+        {plot_list[[plotName]] =  plotly_empty()}
     }
-  }
+  }}
 
   # create two versions: one that uses ngrams (1-2-3) and one that shows numbers.
   return(subplot(plot_list,nrows=nLevels))
 }
-
 
 
 
