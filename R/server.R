@@ -734,6 +734,15 @@ server <- shinyServer(function(input, output, session) {
   #   eventNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
   # })
 
+  ### Role maps
+  output$Role_map_controls = renderUI({ checkboxGroupInput("Role_map_CFs","Pick Two:", get_EVENT_CF() ) })
+
+  output$Role_map_output = renderPlotly({ role_map( threadedEventsViz(), selectOccFilter(), input$Role_map_CFs ) })
+
+  ### Thread Trajectories
+  output$ThreadTrajectoriesOutput = renderPlotly({ threadTrajectory( threadedEventsViz() )})
+
+
 
 
   ######################################################################
