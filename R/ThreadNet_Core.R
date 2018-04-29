@@ -238,7 +238,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
   # create new column for relative time stamp. Initialize to absolute tStamp and adjust below
-  occ$relativeTime = lubridate::mdy_hms(occ$tStamp)
+  occ$relativeTime = lubridate::ymd_hms(occ$tStamp)
 
   # then get the unique values in that POV
   occ[nPOV] = as.factor(occ[,nPOV])
@@ -271,7 +271,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
       # find the earliest time value for this thread
-      start_time = min(lubridate::mdy_hms(occ$tStamp[start_row:end_row]))
+      start_time = min(lubridate::ymd_hms(occ$tStamp[start_row:end_row]))
       # print(start_time)
 
 
@@ -283,7 +283,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
   # split occ data frame by threadNum to find earliest time value for that thread
   # then substract that from initiated relativeTime from above
-   occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::mdy_hms(x$tStamp)); x})
+   occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
   # # row bind data frame back together
    occ= data.frame(do.call(rbind, occ_split))
 
