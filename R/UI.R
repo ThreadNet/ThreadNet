@@ -311,6 +311,7 @@ ui <- fluidPage(
                                                'Role Maps','Thread Trajectories')) ),
                          column(3,
                                 uiOutput("Moving_Window_Tab_Controls_3"),
+                                uiOutput("Moving_Window_Tab_Controls_3a"),
                                 uiOutput("Moving_Window_Tab_Controls_2")),
                          column(3,
                                 # add controls that apply to both subsets here
@@ -327,6 +328,10 @@ ui <- fluidPage(
                                   condition = "input.Moving_Window_Viz == 'Role Maps'",
                                   uiOutput("Moving_7_controls") ) )
                        ),
+
+
+                        plotlyOutput("moving_window_timeline"),
+
                        fluidRow(
                          column(6,"SubsetA",
                                 uiOutput("Moving_Window_Tab_Controls_4_A"),

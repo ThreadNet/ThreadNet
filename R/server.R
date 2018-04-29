@@ -941,6 +941,10 @@ server <- shinyServer(function(input, output, session) {
     sliderInput("MovingWindowSizeID","Window Size", 1, numThreads(threadedEventsMove(),"threadNum" ),1,step=1,ticks=FALSE )
   })
 
+  output$Moving_Window_Tab_Controls_3a <- renderUI({
+    sliderInput("MovingWindowIncrement","Move window by", 1, input$MovingWindowSizeID, 1, step=1,ticks=FALSE )
+  })
+
   output$Moving_Window_Tab_Controls_4_A <- renderUI({
     sliderInput("WindowLocation_A_ID","Window Location", 1,numThreads(threadedEventsMove(),"threadNum" ),1,step=1,ticks=FALSE )
   })
@@ -962,6 +966,11 @@ server <- shinyServer(function(input, output, session) {
     get_moving_window(threadedEventsMove(),
                       input$MovingWindowSizeID,
                       input$WindowLocation_B_ID ) })
+
+  output$moving_window_timeline = renderPlotly({
+    trace=window_correlation( threadedEventsMove(), input$MovingWindowSizeID, input$MovingWindowIncrement, 2)
+    movingWindowCorrelation( trace )
+  })
 
   ## Conditional controls for both side A and B
   output$Moving_4_controls <- renderUI({sliderInput("M_4_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})

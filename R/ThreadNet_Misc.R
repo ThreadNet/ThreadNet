@@ -408,7 +408,7 @@ convert_TN_to_TramineR <- function(df, TN, CF){
 
 }
 
-# these functions suppose the moving window
+# these functions support the moving window
 #' get_threadList returns a list of all thread numbers
 #'
 #' @family ThreadNet_Misc
@@ -449,6 +449,82 @@ get_moving_window <- function(e, s, l ){
   return(e[e$threadNum %in% w,])
 
 }
+
+# e is the data
+# w = window size
+# s = step (how far to move the window in each step)
+# n is the ngram size
+window_correlation  <- function(e,w,s=1,n=2){
+
+  # make data frame
+  vt=data.frame( ngrams=character(), freq=integer(), wid=integer() )
+
+  # use the finest  granularity
+  zcf = zoom_upper_limit(e)
+
+  # now many threads?
+  nThreads = numThreads(e,'threadNum')
+
+  wcount=0
+  # scan through the data
+  for (wloc in seq( 1, nThreads, s)){
+    wcount= wcount +1
+    # print(paste('wloc =',wloc))
+
+    # get text vector for the whole data set - just keep the first two colomns
+    ngdf = count_ngrams(get_moving_window(e, w, wloc), 'threadNum', zcf, n)[1:2]
+    # print(paste('nrow ngdf =',nrow(ngdf)))
+
+    # add a the row number
+    ngdf$wid = wcount
+
+    # append the columns to the end
+    vt=rbind(vt,ngdf)
+  }
+
+  # convert to factor so that we can compute distances using the factor levels
+  vt$ngrams = factor(vt$ngrams)
+
+  nWindows = length(unique(vt$wid))
+
+  # get the set of unique ngrams for the whole data set
+  vt_unique = data.frame(ngrams=unique(vt$ngrams))
+
+  # put the results here
+  windowFreqMatrix = matrix(0,nrow=nWindows, ncol=nrow(vt_unique))
+
+  for (i in 1:nWindows){
+
+    # get the merged list
+    vtmerge = merge(x=vt_unique, y=vt[vt$wid==i,], by='ngrams', all.x = TRUE)
+
+  # use the wid.y to get the whole vector, but replace the NA with zeros
+   b=vtmerge[vtmerge$wid==i,'freq']
+   b[is.na(b)] <- 0
+
+   windowFreqMatrix[i,]=b
+  }
+
+
+  # correlate one row with the next and stick it in a dataframe
+  df =data.frame(window=1:(nWindows-1),
+                 thread = seq( 1, nThreads-s, s),
+                 correlation= unlist(lapply(1:(nWindows-1),
+                                              function(i){cor(windowFreqMatrix[i,],windowFreqMatrix[i+1,])})))
+ # add the last row explicitly
+  df = rbind( df, data.frame(window=nWindows, thread=nThreads, correlation=0))
+
+  # return( df )
+
+  # get the ngram data and labels
+  b_df=as.data.frame(windowFreqMatrix)
+  colnames(b_df)=vt_unique$ngrams
+
+  # stick the ngram frequencies on the end for good measure
+ return(cbind(df,b_df))
+
+}
+
 
 #####################################################
 # GlobalEventMappings is a global variable
