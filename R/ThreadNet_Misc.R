@@ -44,8 +44,7 @@ read_occurrences <- function(inFile){
 check_file_format = function(o){
 
   if ((colnames(o)[1] == "tStamp"))
-  {return("tStamp")}
-
+    {return("tStamp")}
   else if ((colnames(o)[1] == "sequence"))
   {return("sequence")}
 
@@ -68,7 +67,7 @@ check_file_format = function(o){
 #' @examples
 add_relative_timestamps <- function(o, SN, tstep=1){
 
-  startTime <- as.POSIXlt("2017-01-01 00:00:00")
+  startTime <- as.POSIXct("2017-01-01 00:00:00")
 
   # add the column at the beginning
   o <- cbind(startTime + 60*as.numeric(as.character(o[[SN]])), o)
@@ -110,6 +109,10 @@ cleanOcc = function(o, cfnames){
     o[,cf] = sapply(o[,cf],fixBlanks)
     o[cf] = factor( o[,cf] )
   }
+
+  # force tStamp into a "YMD_HMS" format
+  o$tStamp = as.character(o$tStamp)
+  o$tStamp = parse_date_time(o$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
 
   ## Add the category ">other<" for all of the factors to facilitate recoding later
  # This may not be needed anymore... commented out Dec 3 2017
