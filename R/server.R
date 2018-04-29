@@ -1018,7 +1018,7 @@ server <- shinyServer(function(input, output, session) {
     circleVisNetwork( n ) })
 
   output$Moving_A_7 <- renderPlotly({ role_map( threadedEventsMove_A(), selectOccFilter(), input$M_7_CFs ) })
-  output$Moving_B_7 <- renderPlotly({ role_map( threadedEventsMove_A(), selectOccFilter(), input$M_7_CFs ) })
+  output$Moving_B_7 <- renderPlotly({ role_map( threadedEventsMove_B(), selectOccFilter(), input$M_7_CFs ) })
 
   output$Moving_A_8 <- renderPlotly({ threadTrajectory(threadedEventsMove_A() ) })
   output$Moving_B_8 <- renderPlotly({ threadTrajectory(threadedEventsMove_B() ) })
