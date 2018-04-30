@@ -308,7 +308,11 @@ ui <- fluidPage(
                               selectizeInput('Moving_Window_Viz','Choose visualization:',
                                              c('Threads (event time)','Threads (actual time)','Threads (relative time)',
                                                'Event network (circle)','Event network (force)','Other networks',
-                                               'Role Maps','Thread Trajectories')) ),
+                                               'Role Maps','Thread Trajectories')),
+                              radioButtons("Moving_Window_Type","Moving window type:",
+                                           choices = c('Single Window','Dual Window'),
+                                           selected =  c('Single Window') ) ),
+
                          column(3,
                                 uiOutput("Moving_Window_Tab_Controls_3"),
                                 uiOutput("Moving_Window_Tab_Controls_3a"),
@@ -329,8 +333,13 @@ ui <- fluidPage(
                                   uiOutput("Moving_7_controls") ) )
                        ),
 
+                       conditionalPanel(
+                         condition = "input.Moving_Window_Type == 'Single Window'",
+                         plotlyOutput("single_moving_window_timeline") ),
+                       conditionalPanel(
+                         condition = "input.Moving_Window_Type == 'Dual Window'",
+                         plotlyOutput("dual_moving_window_timeline") ),
 
-                        plotlyOutput("moving_window_timeline"),
 
                        fluidRow(
                          column(6,"SubsetA",

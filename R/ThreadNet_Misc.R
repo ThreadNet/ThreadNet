@@ -506,12 +506,13 @@ window_correlation  <- function(e,w,s=1,n=2){
   }
 
 
-  # correlate one row with the next and stick it in a dataframe
+ # old way: correlate one row with the next and stick it in a dataframe
   df =data.frame(window=1:(nWindows-1),
                  thread = seq( 1, nThreads-s, s),
                  correlation= unlist(lapply(1:(nWindows-1),
-                                              function(i){cor(windowFreqMatrix[i,],windowFreqMatrix[i+1,])})))
- # add the last row explicitly
+                                              function(i){abs( cor(windowFreqMatrix[i,],windowFreqMatrix[i+1,])) })))
+
+  # add the last row explicitly
   df = rbind( df, data.frame(window=nWindows, thread=nThreads, correlation=0))
 
   # return( df )
@@ -525,6 +526,85 @@ window_correlation  <- function(e,w,s=1,n=2){
 
 }
 
+# e is the data
+# w = window size
+# s = step (how far to move the window in each step)
+# n is the ngram size
+# similar as above, except one window on each side of a focal thread.
+dual_window_correlation  <- function(e,w,s=1,n=2){
+
+  # make data frame
+  vt=data.frame( ngrams=character(), freq=integer(), id=integer() )
+
+  # use the finest  granularity
+  zcf = zoom_upper_limit(e)
+
+  # now many threads?
+  nThreads = numThreads(e,'threadNum')
+
+
+  # scan through the threads - treat each thread as a window of one
+  # can probably do with the split and apply much faster
+  for (t in 1:nThreads){
+
+    # print(paste('wloc =',wloc))
+
+    # get text vector for the whole data set - just keep the first two colomns
+    ngdf = count_ngrams(get_moving_window(e, 1, t), 'threadNum', zcf, n)[1:2]
+    # print(paste('nrow ngdf =',nrow(ngdf)))
+
+    # add a the row number
+    ngdf$id = t
+
+    # append the columns to the end
+    vt=rbind(vt,ngdf)
+  }
+
+  # convert to factor
+  vt$ngrams = factor(vt$ngrams)
+
+  # compute number of windows.
+  nWindows = floor(nThreads/w)
+
+  # get the set of unique ngrams for the whole data set
+  vt_unique = data.frame(ngrams=unique(vt$ngrams))
+
+  # put the results here
+  ngramFreqMatrix = matrix(0,nrow=nThreads, ncol=nrow(vt_unique))
+
+  for (i in 1:nThreads){
+
+    # get the merged list
+    vtmerge = merge(x=vt_unique, y=vt[vt$id==i,], by='ngrams', all.x = TRUE)
+
+    # use the wid.y to get the whole vector, but replace the NA with zeros
+    b=vtmerge[vtmerge$id==i,'freq']
+    b[is.na(b)] <- 0
+
+    ngramFreqMatrix[i,]=b
+  }
+
+  # return(ngramFreqMatrix)
+
+  # old way: correlate one row with the next and stick it in a dataframe
+  df =data.frame( thread = seq(w,nThreads-(w+1),s),
+                  correlation= unlist(lapply(seq(w,nThreads-(w+1),s),
+                                            function(i){abs( cor(colSums( ngramFreqMatrix[(i-w):i, ] ),
+                                                                colSums( ngramFreqMatrix[(i+1):(i+w+1), ] )))  })))
+
+  # # add the last row explicitly
+  # df = rbind( df, data.frame( thread=nThreads, correlation=0))
+
+   return( df )
+
+  # # get the ngram data and labels
+  # b_df=as.data.frame(ngramFreqMatrix)
+  # colnames(b_df)=vt_unique$ngrams
+  #
+  # # stick the ngram frequencies on the end for good measure
+  # return(cbind(df,b_df))
+
+}
 
 #####################################################
 # GlobalEventMappings is a global variable

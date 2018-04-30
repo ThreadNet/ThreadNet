@@ -612,15 +612,13 @@ threadTrajectory <- function(or){
 }
 
 
-movingWindowCorrelation <- function(mw_corr){
-
-
-  return( plot_ly(mw_corr, x = ~window, y = ~correlation,
-                  name = 'threads', type = 'scatter', mode='lines+markers',
-                  text = paste('Thread:',mw_corr$thread),
+movingWindowCorrelation <- function( trace ){
+  return( plot_ly(trace, x = ~window, y = ~correlation,
+                  name = 'Window', type = 'scatter', mode='lines+markers',
+                  text = paste('Thread:',trace$thread),
                   marker=list(size=8, opacity=1),
                   hoverinfo = "text",
-                  symbol= "line-ew", symbols=15, showlegend=FALSE  #,height = 200
+                  symbol= "line-ew", symbols=15, showlegend=FALSE
                   )
           %>%
             layout(
@@ -635,5 +633,27 @@ movingWindowCorrelation <- function(mw_corr){
                            tickwidth = 2,
                            showticklabels = TRUE))
             )
+}
+dualmovingWindowCorrelation <- function( trace ){
+  return( plot_ly(trace, x = ~thread, y = ~correlation,
+                  name = 'Window', type = 'scatter', mode='lines+markers',
+      #          text = ~thread,
+                  marker=list(size=8, opacity=1),
+       #           hoverinfo = "text",
+                  symbol= "line-ew", symbols=15, showlegend=FALSE  #,height = 200
+  )
+  %>%
+    layout(
+      xaxis = list(title='Window number'),
+      yaxis = list(title='Correlation',
+                   range = c(0, 1),
+                   autotick = FALSE,
+                   ticks = "outside",
+                   tick0 = 0,
+                   dtick = 0.1,
+                   ticklen = 5,
+                   tickwidth = 2,
+                   showticklabels = TRUE))
+  )
 }
 
