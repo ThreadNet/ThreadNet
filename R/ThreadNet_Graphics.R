@@ -386,7 +386,8 @@ forceNetworkD3 <- function(n){
 
   return( forceNetwork(Links = n$edgeDF, Nodes = n$nodeDF, Source = "from",
                        Target = "to", Value = "Value", NodeID = "label",
-                       Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE))
+                       Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE,
+                       clickAction = 'Shiny.onInputChange("Group", d.name)'))
 }
 
 
