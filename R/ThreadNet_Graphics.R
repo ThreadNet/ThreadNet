@@ -160,15 +160,24 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 
     # make table information for each plot
     # cfData = data.frame(Freq=as.matrix(unlist(e[r,CF[i]])),Var1= letters[seq( from = 1, to = length(unlist(e[r,CF[i]])) )])
-      cfData = make_df_for_one_pie(o,e,CF[i],r,zm)
+    cfData = make_df_for_one_pie(o,e,CF[i],r,zm)
 
-        # take out rows with zero frequency
+    # take out rows with zero frequency
     cfData = cfData[(cfData[,"Freq"]>0),]
 
     #N levels
     CFlevels = length(cfData[,"Freq"])
 
-  # Add the new plots
+    # Add the new plots
+    if(CFlevels==1){
+      pies = pies  %>%
+        add_pie(data = cfData, labels = ~Label, values = ~Freq,
+                textinfo='label',textposition='none', name=as.character(CF[i]),
+                domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
+        add_annotations(text=paste0(CF[i],"<br>",cfData$Label),showarrow=FALSE,xanchor="center",
+                        font=list(size="14",color="white"),
+                        xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+    } else {
     pies = pies  %>%
       add_pie(data = cfData, labels = ~Label, values = ~Freq,
               textinfo='label',textposition='none', name=as.character(CF[i]),
@@ -176,6 +185,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
       add_annotations(text=paste0(CF[i],"<br>N=",CFlevels),showarrow=FALSE,xanchor="center",
                       font=list(size="14",color="white"),
                       xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+    }
   }
 
   pies = pies %>%
@@ -284,7 +294,7 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 ng_bar_chart_freq <- function(ngdf){
 
   # put them in descending order -- tricky (http://stackoverflow.com/questions/40224892/r-plotly-barplot-sort-by-value)
-    ngdf$ngrams = factor(ngdf$ngrams, levels =unique(ngdf$ngrams)[order(ngdf$freq, decreasing = FALSE)])
+  ngdf$ngrams = factor(ngdf$ngrams, levels =unique(ngdf$ngrams)[order(ngdf$freq, decreasing = FALSE)])
 
   ngp <- plot_ly( ngdf, y = ~ngrams, x = ~freq, type = "bar",showlegend=FALSE) %>%
     layout(xaxis= list(showticklabels = TRUE, title='Frequency'))  %>%
@@ -386,7 +396,8 @@ forceNetworkD3 <- function(n){
 
   return( forceNetwork(Links = n$edgeDF, Nodes = n$nodeDF, Source = "from",
                        Target = "to", Value = "Value", NodeID = "label",
-                       Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE))
+                       Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE,
+                       clickAction = 'Shiny.onInputChange("Group", d.name)'))
 }
 
 
@@ -546,7 +557,7 @@ normalNetwork <- function(e, o, cf){
   colnames(edges)=c('from','to','label')
 
 
-return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
+  return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
 }
 
 
@@ -619,20 +630,20 @@ movingWindowCorrelation <- function( trace ){
                   marker=list(size=8, opacity=1),
                   hoverinfo = "text",
                   symbol= "line-ew", symbols=15, showlegend=FALSE
-                  )
-          %>%
-            layout(
-              xaxis = list(title='Window number'),
-              yaxis = list(title='Correlation',
-                           range = c(0, 1),
-                           autotick = FALSE,
-                           ticks = "outside",
-                           tick0 = 0,
-                           dtick = 0.1,
-                           ticklen = 5,
-                           tickwidth = 2,
-                           showticklabels = TRUE))
-            )
+  )
+  %>%
+    layout(
+      xaxis = list(title='Window number'),
+      yaxis = list(title='Correlation',
+                   range = c(0, 1),
+                   autotick = FALSE,
+                   ticks = "outside",
+                   tick0 = 0,
+                   dtick = 0.1,
+                   ticklen = 5,
+                   tickwidth = 2,
+                   showticklabels = TRUE))
+  )
 }
 dualmovingWindowCorrelation <- function( trace ){
   return( plot_ly(trace, x = ~thread, y = ~correlation,
@@ -656,4 +667,3 @@ dualmovingWindowCorrelation <- function( trace ){
                    showticklabels = TRUE))
   )
 }
-

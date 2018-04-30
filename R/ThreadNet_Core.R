@@ -173,8 +173,8 @@ count_ngrams <- function(o,TN,CF,n){
   # use space for the delimiter here
   text_vector = long_enough( thread_text_vector(o,TN,CF,' '), n, ' ')
 
-    # print("text_vector")
-    # print(text_vector)
+  # print("text_vector")
+  # print(text_vector)
 
   ng = get.phrasetable(ngram(text_vector,n))
 
@@ -492,7 +492,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # get the text vector for this set of threaded occurrences, delimited by commas
   tv = thread_text_vector( o, TN, CF, ',' )
 
- # apply regex to tv and split on the commas
+  # apply regex to tv and split on the commas
   tvrx =  replace_regex_list( tv, rx )
 
   tvrxs = lapply(1:length(tvrx), function(i) {unlist(strsplit(tvrx[[i]],','))})
@@ -502,8 +502,8 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # print('tvrxs')
   # print(tvrxs[1:3])
 
-# count the total number of chunks
- nChunks = length(unlist(tvrxs))
+  # count the total number of chunks
+  nChunks = length(unlist(tvrxs))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
@@ -528,67 +528,67 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 
       # print(paste("original_row=",original_row))
 
-    # assign the thread and sequence number
-    e$threadNum[chunkNo] = thread
-    e$seqNum[chunkNo] = sn
+      # assign the thread and sequence number
+      e$threadNum[chunkNo] = thread
+      e$seqNum[chunkNo] = sn
 
-    # Make sure the CFs are factors
-    for (cf in compare_CF){
-      e[[chunkNo, cf]] =  o[[original_row, cf]]
-    }
-
-    # this is a chunk that matched one of the patterns
-    if (tvrxs[[thread]][sn] %in% rx$label ){
-
-      # print(paste('thread sn = ',thread, sn))
-      # print(paste('matched regex label',tvrxs[[thread]][sn]))
-
-      # Use the ZM_1 column to store the new labels
-      e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
-      e$label[chunkNo] =  tvrxs[[thread]][sn]
-
-     # need to locate the unique for from the o dataframe and aggregate those V_cf values.
-      rxLen = rx$patLength[which( rx$label==tvrxs[[thread]][sn])]
-      e$occurrences[[chunkNo]] = list(seq(original_row,original_row+rxLen-1,1))
-
-      original_row = original_row + rxLen-1
-      # compute the V_ based on the occurrences
-       for (cf in EVENT_CF){
-         VCF = paste0("V_",cf)
-         e[[chunkNo, VCF]] = list(aggregate_VCF_for_regex(o,e$occurrences[chunkNo],cf ))
-       }
-
-      # assign timestamp and duration -- use first - last occurrence times
-      # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
-      e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
-
-    }
-    else if (KeepIrregularEvents=='Keep') {
-      # copy data from input structure
-      # print(paste('no match',tvrxs[[thread]][sn]))
-
-
-      # Use the ZM_1 column to store the new labels
-      e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
-      e$label[chunkNo] =  tvrxs[[thread]][sn]
-      e$occurrences[[chunkNo]] = original_row
-
-      # copy the rest of the data
-      for (cf in EVENT_CF){
-      VCF = paste0("V_",cf)
-      e[[chunkNo, VCF]] =  o[[original_row, VCF]]
+      # Make sure the CFs are factors
+      for (cf in compare_CF){
+        e[[chunkNo, cf]] =  o[[original_row, cf]]
       }
 
-      e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
-      e[[chunkNo,'eventDuration']] = o[[original_row,'eventDuration']]
+      # this is a chunk that matched one of the patterns
+      if (tvrxs[[thread]][sn] %in% rx$label ){
 
-    }
+        # print(paste('thread sn = ',thread, sn))
+        # print(paste('matched regex label',tvrxs[[thread]][sn]))
+
+        # Use the ZM_1 column to store the new labels
+        e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+        e$label[chunkNo] =  tvrxs[[thread]][sn]
+
+        # need to locate the unique for from the o dataframe and aggregate those V_cf values.
+        rxLen = rx$patLength[which( rx$label==tvrxs[[thread]][sn])]
+        e$occurrences[[chunkNo]] = list(seq(original_row,original_row+rxLen-1,1))
+
+        original_row = original_row + rxLen-1
+        # compute the V_ based on the occurrences
+        for (cf in EVENT_CF){
+          VCF = paste0("V_",cf)
+          e[[chunkNo, VCF]] = list(aggregate_VCF_for_regex(o,e$occurrences[chunkNo],cf ))
+        }
+
+        # assign timestamp and duration -- use first - last occurrence times
+        # e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
+        e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
+
+      }
+      else if (KeepIrregularEvents=='Keep') {
+        # copy data from input structure
+        # print(paste('no match',tvrxs[[thread]][sn]))
+
+
+        # Use the ZM_1 column to store the new labels
+        e$ZM_1[chunkNo] = tvrxs[[thread]][sn]
+        e$label[chunkNo] =  tvrxs[[thread]][sn]
+        e$occurrences[[chunkNo]] = original_row
+
+        # copy the rest of the data
+        for (cf in EVENT_CF){
+          VCF = paste0("V_",cf)
+          e[[chunkNo, VCF]] =  o[[original_row, VCF]]
+        }
+
+        e[[chunkNo,'tStamp']] = o[[original_row,'tStamp']]
+        e[[chunkNo,'eventDuration']] = o[[original_row,'eventDuration']]
+
+      }
 
     } # sn loop
-    } # thread loop
+  } # thread loop
 
 
-# take out the irregular events (empty rows) if so desired
+  # take out the irregular events (empty rows) if so desired
   if (KeepIrregularEvents=='Drop'){
     # keep the subset where the event is not blank
     e=subset(e, !ZM_1=='')
@@ -597,7 +597,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # # for debugging, this is really handy
   #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
-
+  
     # store the event map in the GlobalEventMappings and return the eventmap
     eventMap = store_event_mapping(EventMapName, e)
     return(eventMap[['threads']])
@@ -615,9 +615,9 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return
 
 
   if (cluster_method=="Sequential similarity")
-    { dd = dist_matrix_seq(e) }
+  { dd = dist_matrix_seq(e) }
   else if (cluster_method=="Contextual Similarity")
-    { dd = dist_matrix_context(e,event_CF) }
+  { dd = dist_matrix_context(e,event_CF) }
   else if (cluster_method=="Network Proximity")
   {
     # The focal column is used to trade the network.  It will probably only be present in the OneToOne mapping, but we should check more generally
@@ -803,14 +803,14 @@ aggregate_VCF_for_regex <- function(o, occList, cf){
   # start with the first one so the dimension of the vector is correct
   aggCF = unlist(o[unlist(occList)[1],VCF])
 
-   # print( aggCF)
+  # print( aggCF)
 
   # now add the rest, if there are any
-   if (length(unlist(occList)) > 1){
-  for (idx in seq(2,length(unlist(occList)),1)){
-    # print( aggCF)
-    aggCF = aggCF+unlist(o[[unlist(occList)[idx],VCF]])
-  }}
+  if (length(unlist(occList)) > 1){
+    for (idx in seq(2,length(unlist(occList)),1)){
+      # print( aggCF)
+      aggCF = aggCF+unlist(o[[unlist(occList)[idx],VCF]])
+    }}
   return(aggCF)
 }
 
@@ -829,11 +829,11 @@ aggregate_VCF_for_cluster <- function(e, cf, eclust, zoom_col){
   # get the matrix for each
 
   # get the subset of events for that cluster  -- just the VCF column
- # s =  e[ which(e[[zoom_col]]==eclust), VCF]   This version uses the
+  # s =  e[ which(e[[zoom_col]]==eclust), VCF]   This version uses the
   s =  e[ which(as.integer(e[[zoom_col]])==eclust), VCF]
 
-   # print (s)
-   # print(paste("length(s)",length(s)))
+  # print (s)
+  # print(paste("length(s)",length(s)))
   if ( is.null(unlist(s) ))
     return(NULL)
   else
@@ -847,9 +847,9 @@ VCF_matrix <- function(e, vcf ){
   m = one_vcf_matrix(e, vcf[1] )
 
   if (length(vcf)>1){
-      for (idx in seq(2,length(vcf),1)){
-         m = cbind( m, one_vcf_matrix(e, vcf[idx] ) )
-      }}
+    for (idx in seq(2,length(vcf),1)){
+      m = cbind( m, one_vcf_matrix(e, vcf[idx] ) )
+    }}
   return(m)
 }
 
@@ -864,18 +864,18 @@ one_vcf_matrix <- function(e, vcf){
 # and with a minimum sequence length (ngram size), but this can be filtered after this function3
 thread_text_vector <- function(o, TN, CF, delimiter){
 
-# Initialize text vector
-tv = vector(mode="character")
+  # Initialize text vector
+  tv = vector(mode="character")
 
-# Loop through the unique thread numbers
-j=0
-for (i in unique(o[[TN]])){
+  # Loop through the unique thread numbers
+  j=0
+  for (i in unique(o[[TN]])){
     txt =o[o[[TN]]==i,CF]
 
     j=j+1
     tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF] ),' ',delimiter)
-}
- return(tv)
+  }
+  return(tv)
 
 }
 
@@ -886,9 +886,9 @@ replace_regex_list <- function(tv, rx ){
 
   for (i in 1:length(tv)) {
     for (j in 1:nrow(rx) ) {
-     tv[i] = str_replace_all(tv[i],rx$pattern[j],rx$label[j])
-      }
+      tv[i] = str_replace_all(tv[i],rx$pattern[j],rx$label[j])
     }
+  }
   return(tv)
 }
 # same function, but with lapply -- but does not work.
@@ -916,11 +916,11 @@ frequent_ngrams <- function(e, TN, CF, minN, maxN, onlyMaximal=TRUE){
   ng = count_ngrams(e,TN, CF,minN)
 
   if (maxN > minN){
-      for (i in seq(minN+1,maxN,1)){
-        ng = rbind(ng,count_ngrams(e,TN, CF,i)) }
+    for (i in seq(minN+1,maxN,1)){
+      ng = rbind(ng,count_ngrams(e,TN, CF,i)) }
   }
   # remove the rows that happen once and only keep the columns we want
-   ng=ng[ng$freq>1,c('ngrams','freq', 'len')]
+  ng=ng[ng$freq>1,c('ngrams','freq', 'len')]
 
   # just take the maximal ones if so desired
   if (onlyMaximal) { ng=maximal_ngrams(ng)  }
@@ -935,12 +935,12 @@ maximal_ngrams <- function(ng){
 
   # find out if each ngram is contained in all the others
   w = lapply(1:nrow(ng), function(i){
-         grep(ng$ngrams[i],ng$ngrams)}
-         )
+    grep(ng$ngrams[i],ng$ngrams)}
+  )
 
   # get howMany times each one appears
   howMany = lapply(1:length(w), function(i){
-                length(w[[i]])}
+    length(w[[i]])}
   )
 
   # return the ones that are unique
@@ -964,7 +964,7 @@ support_level <- function(tv, ng) {
   # find out how many times each ngram is contained in each TV
   ng$support = unlist(lapply(1:nrow(ng), function(i){
     length(grep(ng$ngrams[i],tv)) })
-        )/totalN
+  )/totalN
 
   # toss in the generativity level
   ng = generativity_level(tv,ng)
@@ -1007,17 +1007,17 @@ generativity_level<- function(tv, ng){
     ngplus = get.phrasetable(ngram( long_enough(tv,n+1, ' '), n+1))
 
     # this picks out the ones that match
-  w = lapply(1:nrow(ngn), function(i){
-    grep(ngn$ngrams[i],ngplus$ngrams)} )
+    w = lapply(1:nrow(ngn), function(i){
+      grep(ngn$ngrams[i],ngplus$ngrams)} )
 
-  #print(w)
-  # print('z = ')
-  zplus = lapply(1:nrow(ngn), function(i){
-    str_locate(ngplus$ngrams[w[[i]]],ngn$ngrams[i])  } )
+    #print(w)
+    # print('z = ')
+    zplus = lapply(1:nrow(ngn), function(i){
+      str_locate(ngplus$ngrams[w[[i]]],ngn$ngrams[i])  } )
 
-  # print(z)
+    # print(z)
 
-  z = c(z,zplus)
+    z = c(z,zplus)
 
   }
 
@@ -1039,9 +1039,8 @@ generativity_level<- function(tv, ng){
 # this gets used in various places so need to pass in the delimiter
 long_enough = function(tv,n,delimiter){
 
-return(tv[ unlist(lapply(1:length(tv), function(i) {length(unlist(strsplit(tv[[i]],delimiter)))>=n})) ])
+  return(tv[ unlist(lapply(1:length(tv), function(i) {length(unlist(strsplit(tv[[i]],delimiter)))>=n})) ])
 
 }
 
 # cluster by network path length
-

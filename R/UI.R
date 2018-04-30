@@ -36,7 +36,7 @@ ui <- fluidPage(
                                             tags$h4("Threads are defined by contextual features that STAY THE SAME during a thread. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_2"),
                                             plotlyOutput("ContextFlowers_2")
-                                            ),
+                                   ),
                                    tabPanel("Define Events",
                                             tags$h4("Events are marked by contextual features that CHANGE within the threads. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_3"),
@@ -91,8 +91,9 @@ ui <- fluidPage(
 
                                    tabPanel("Event network (force)",
                                             uiOutput("Force_Network_Tab_Controls"),
-                                            forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
-
+                                            fluidRow(
+                                              column(9, forceNetworkOutput("forceNetworkD3", width = "100%", height = "1200px")),
+                                              column(3, plotlyOutput("networkPie")))),
                                    tabPanel("View events", value = 'Custom',
                                             fluidRow(
                                               column(3, uiOutput("VisualizeCustomNetwork_Controls_0")),
@@ -176,7 +177,7 @@ ui <- fluidPage(
                                               column(3, uiOutput("Frequent_Ngram_controls_2"),
                                                      uiOutput("Frequent_Ngram_controls_21")),
                                               column(3, uiOutput("Frequent_Ngram_controls_7"))
-                                              ),
+                                            ),
                                             uiOutput("Frequent_Ngram_controls_3"),
                                             verbatimTextOutput("Frequent_Ngram_controls_4"),
                                             tags$h4("Select patterns by clicking on the table:"),
@@ -420,5 +421,4 @@ ui <- fluidPage(
                         )
              )
   )
-
-
+)
