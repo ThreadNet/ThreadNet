@@ -169,6 +169,15 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
     CFlevels = length(cfData[,"Freq"])
 
     # Add the new plots
+    if(CFlevels==1){
+      pies = pies  %>%
+        add_pie(data = cfData, labels = ~Label, values = ~Freq,
+                textinfo='label',textposition='none', name=as.character(CF[i]),
+                domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
+        add_annotations(text=paste0(CF[i],"<br>",cfData$Label),showarrow=FALSE,xanchor="center",
+                        font=list(size="14",color="white"),
+                        xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+    } else {
     pies = pies  %>%
       add_pie(data = cfData, labels = ~Label, values = ~Freq,
               textinfo='label',textposition='none', name=as.character(CF[i]),
@@ -176,6 +185,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
       add_annotations(text=paste0(CF[i],"<br>N=",CFlevels),showarrow=FALSE,xanchor="center",
                       font=list(size="14",color="white"),
                       xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+    }
   }
 
   pies = pies %>%
