@@ -46,29 +46,29 @@ server <- shinyServer(function(input, output, session) {
                                               "ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
 
   get_Zoom_COMP_A <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_A))==1 ,
-                                                 "ZM_1", paste0("ZM_",input$CompareZoomID_A))) })
+                                               "ZM_1", paste0("ZM_",input$CompareZoomID_A))) })
 
   get_Zoom_COMP_B <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_B))==1 ,
-                                                 "ZM_1", paste0("ZM_",input$CompareZoomID_B))) })
+                                               "ZM_1", paste0("ZM_",input$CompareZoomID_B))) })
 
   get_Zoom_DIA_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$DiaCompareMapInputID))==1 ,
-                                                   "ZM_1", paste0("ZM_",input$DiaCompareZoomID))) })
+                                                 "ZM_1", paste0("ZM_",input$DiaCompareZoomID))) })
 
   get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$MovingWindowMapInputID))==1 ,
-                                               "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
+                                              "ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
 
   get_Zoom_REGEX <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$RegExInputMapID))==1 ,
-                                                "ZM_1", paste0("ZM_",input$regexZoomID))) })
+                                               "ZM_1", paste0("ZM_",input$regexZoomID))) })
 
   get_Zoom_freqNgram <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$freqNgramInputMapID))==1 ,
                                                     "ZM_1", paste0("ZM_",input$freqNgramZoomID))) })
 
   get_Zoom_CHUNK <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(  input$ChunkInputMapID))==1 ,
-                                                "ZM_1", paste0("ZM_",input$chunkZoomID))) })
+                                                    "ZM_1", paste0("ZM_",input$chunkZoomID))) })
 
   # add reactive value to force update
   get_event_mapping_names <- reactive({rv$newmap
-    get_event_mapping_name_list() })
+                                      get_event_mapping_name_list() })
 
   #################################################################
   ################## 1.READ DATA TAB ##############################
@@ -112,7 +112,7 @@ server <- shinyServer(function(input, output, session) {
   # The POV tabs reconstruct the data into threads by sorting by tStamp and
   # adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 
-  threadedOcc = reactive({ ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID ) })
+   threadedOcc = reactive({ ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID ) })
 
 
   ########  define threads tab  ###############
@@ -190,7 +190,7 @@ server <- shinyServer(function(input, output, session) {
 
   # get the data that will be the input for this tab
   chunkInputEvents <- reactive({rv$newmap
-    get_event_mapping_threads( input$ChunkInputMapID) })
+                                get_event_mapping_threads( input$ChunkInputMapID) })
 
   output$chunk_controls_1 <- renderUI({
     zoom_limit = zoom_upper_limit( chunkInputEvents())
@@ -208,7 +208,7 @@ server <- shinyServer(function(input, output, session) {
     tags$div(checkboxGroupInput("chunk_CFs","Start new event when ALL of these change:",
                                 intersect(colnames(chunkInputEvents()), union(get_EVENT_CF(),get_COMPARISON_CF())),
                                 inline=TRUE))
-  })
+    })
 
   # time gap controls
   output$chunk_controls_3 = renderUI({
@@ -222,13 +222,13 @@ server <- shinyServer(function(input, output, session) {
                 threshold_slider_selected(chunkInputEvents()),
                 step = 1, ticks=FALSE)
 
-  })
+    })
 
   # fixed size controls
   output$chunk_controls_4 = renderUI({
     # input$fixed_chunk_size,
     tags$div(sliderInput("fixed_chunk_size", "Select fixed size for chunks:", 1,20,10, ticks=FALSE))
-  })
+    })
 
   # mapping name and go button
   output$chunk_controls_5 = renderUI({
@@ -237,7 +237,7 @@ server <- shinyServer(function(input, output, session) {
              textInput("EventMapName2", label = h4("Enter label to save result") ),
              actionButton("EventButton2", "Create New Mapping")  )
 
-  })
+    })
 
   output$chunk_controls_6 <- renderUI({ maxrows=length(unique(chunkInputEvents()[['threadNum']]))
   sliderInput("chunkVerbatimRows",
@@ -247,7 +247,7 @@ server <- shinyServer(function(input, output, session) {
 
   # show the results
   output$chunk_controls_7 =   renderText({ paste(thread_text_vector(chunkInputEvents(),'threadNum',
-                                                                    get_Zoom_CHUNK(), ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  })
+                                                get_Zoom_CHUNK(), ',')[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2] ], '\n' )  })
 
   # output$chunk_controls_8 = renderPlotly({
   #   threadMap(chunkInputEvents()[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2], ], "threadNum", "seqNum", get_Zoom_CHUNK(), 15  )
@@ -262,14 +262,14 @@ server <- shinyServer(function(input, output, session) {
     input$EventButton2,
     {rv$newmap = rv$newmap+1 # trigger reactive value
     isolate( OccToEvents_By_Chunk(chunkInputEvents(),
-                                  input$Chunks_method_Button, # which method?
-                                  input$EventMapName2,
-                                  input$fixed_chunk_size,
-                                  input$chunk_time_gap_threshold,
-                                  'mins',
-                                  input$chunk_CFs,
-                                  get_EVENT_CF(),
-                                  get_COMPARISON_CF() ) )}, ignoreInit = TRUE)
+                                 input$Chunks_method_Button, # which method?
+                                 input$EventMapName2,
+                                 input$fixed_chunk_size,
+                                 input$chunk_time_gap_threshold,
+                                 'mins',
+                                 input$chunk_CFs,
+                                 get_EVENT_CF(),
+                                 get_COMPARISON_CF() ) )}, ignoreInit = TRUE)
 
 
   # Need to suppress some columns that contain lists that do not display correctly in the DT
@@ -282,133 +282,28 @@ server <- shinyServer(function(input, output, session) {
 
 
 
-  ########  regular expression tab  ###############
 
 
-  output$Regular_Expression_controls_1 = renderUI({
-    tags$div(align="left",
-             selectizeInput("RegExInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
-  })
+      output$Regular_Expression_controls_1 = renderUI({
+        tags$div(align="left",
+                 selectizeInput("RegExInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
+      })
 
-  # get the data that will be the input for this tab
-  regexInputEvents <- reactive( get_event_mapping_threads( input$RegExInputMapID) )
-
-
-  output$Regular_Expression_controls_2 <- renderUI({
-    zoom_limit = zoom_upper_limit(regexInputEvents())
-    if (zoom_limit == 1)
-    {tags$h4("Zooming not available with this view")}
-    else
-    {sliderInput("regexZoomID",
-                 label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
-  })
-
-  output$Regular_Expression_controls_3 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
-  sliderInput("regexVerbatimRows",
-              label=h4("How many threads to view:"),
-              min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
-  })
-
-  output$Regular_Expression_controls_4 =   renderText(
-    paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
-
-  # or if you prefer HTML
-  # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-  #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
-  output$Regular_Expression_controls_5 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
-  sliderInput("numRegexInputRows",
-              label=h4("How many ngrams/labels to make:"),
-              min=1,max=10, 3, step = 1, ticks=FALSE) })
-
-  # create several rows of inputs
-  output$Regular_Expression_controls_6 = renderUI({
-
-    # create some select inputs
-    lapply(1:input$numRegexInputRows, function(i) {
-      fluidRow(
-        column(2,textInput(paste0('regex', i), paste0('Ngram-', i) ), offset=1),
-        column(2,textInput(paste0('regexLabel', i), paste0('Label-', i) ))
-
-      ) })
-  })
-
-  # need to add commas and probably add slider for upper/lower bound and threshold
-  # freqNgramSelections <- reactive({ selectize_frequent_ngrams(regexInputEvents() , 'threadNum', get_Zoom_REGEX(), 2, 5, 3)  })
-
-  # get the input values and return data frame with regex & label
-  regexInput = reactive({
-    data.frame(pattern=unlist(lapply(1:input$numRegexInputRows,
-                                     function(i){input[[paste0('regex', i)]]}
-    )),
-    label=unlist(lapply(1:input$numRegexInputRows,
-                        function(i){input[[paste0('regexLabel', i)]]}
-    )), stringsAsFactors=FALSE )
-  })
-
-  output$Regular_Expression_controls_7 = renderUI({
-    tags$div(align="left",
-             textInput("EventMapName3", label = h4("Enter label to save result"), value = ""),
-             radioButtons("KeepIrregularEvents",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
-             actionButton("EventButton3", "Create New Mapping")  )
-
-  })
-
-  # this function runs when you push the button to create a new mapping
-  observeEvent(
-    input$EventButton3,
-    { rv$newmap = rv$newmap+1 # trigger reactive value
-    isolate(OccToEvents3(regexInputEvents(),
-                         input$EventMapName3,
-                         get_EVENT_CF(),
-                         get_COMPARISON_CF(),
-                         'threadNum',
-                         get_Zoom_REGEX(),
-                         regexInput(),
-                         input$KeepIrregularEvents))}, ignoreInit = TRUE)
-
-
-  ########  Frequent n-gram tab  ###############
-  # This code is similar to the regex tab except for the data table
-
-  output$Frequent_Ngram_controls_1 = renderUI({
-    tags$div(align="left",
-             selectizeInput("freqNgramInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
-  })
-
-  # get the data that will be the input for this tab
-  freqNgramInputEvents <- reactive( get_event_mapping_threads( input$freqNgramInputMapID) )
-
-
-  output$Frequent_Ngram_controls_2 <- renderUI({
-    zoom_limit = zoom_upper_limit(freqNgramInputEvents())
-    if (zoom_limit == 1)
-    {tags$h4("Zooming not available with this view")}
-    else
-    {sliderInput("freqNgramZoomID",
-                 label=h4("Zoom in and out by event similarity:"),
-                 1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
-  })
-  output$Frequent_Ngram_controls_21 <- renderUI({
-    tags$div(align="left",
-             sliderInput("freqNgramRange",
-                         label=h4("Size of nGrams between:"),
-                         min=2,max=10, c(2,5), step = 1, ticks=FALSE)
-    )
-  })
-
-  output$Frequent_Ngram_controls_3 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
-  sliderInput("freqNgramVerbatimRows",
-              label=h4("How many threads to view:"),
-              min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
-  })
+      # get the data that will be the input for this tab
+    regexInputEvents <- reactive( get_event_mapping_threads( input$RegExInputMapID) )
 
   output$Frequent_Ngram_controls_4 =   renderText(
     paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram(),', ')[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
 
-  # or if you prefer HTML
-  # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
-  #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+    output$Regular_Expression_controls_2 <- renderUI({
+      zoom_limit = zoom_upper_limit(regexInputEvents())
+      if (zoom_limit == 1)
+      {tags$h4("Zooming not available with this view")}
+      else
+      {sliderInput("regexZoomID",
+                   label=h4("Zoom in and out by event similarity:"),
+                   1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
+    })
 
   output$Frequent_Ngram_controls_5 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
   sliderInput("numfreqNgramInputRows",
@@ -540,40 +435,272 @@ server <- shinyServer(function(input, output, session) {
     store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
     }, ignoreInit = TRUE)
 
+     output$Regular_Expression_controls_4 =   renderText(
+       paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '\n' )  )
 
-  ######## manage event mappings tab  ###############
+    # or if you prefer HTML
+    # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
+    #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+     output$Regular_Expression_controls_5 <- renderUI({ maxrows=length(unique(regexInputEvents()[['threadNum']]))
+     sliderInput("numRegexInputRows",
+                 label=h4("How many ngrams/labels to make:"),
+                 min=1,max=10, 3, step = 1, ticks=FALSE) })
+
+    # create several rows of inputs
+     output$Regular_Expression_controls_6 = renderUI({
+
+       # create some select inputs
+       lapply(1:input$numRegexInputRows, function(i) {
+         fluidRow(
+         column(2,textInput(paste0('regex', i), paste0('Ngram-', i) ), offset=1),
+         column(2,textInput(paste0('regexLabel', i), paste0('Label-', i) ))
+
+         ) })
+       })
+
+    # need to add commas and probably add slider for upper/lower bound and threshold
+    # freqNgramSelections <- reactive({ selectize_frequent_ngrams(regexInputEvents() , 'threadNum', get_Zoom_REGEX(), 2, 5, 3)  })
+
+     # get the input values and return data frame with regex & label
+    regexInput = reactive({
+      data.frame(pattern=unlist(lapply(1:input$numRegexInputRows,
+                                   function(i){input[[paste0('regex', i)]]}
+                                   )),
+                    label=unlist(lapply(1:input$numRegexInputRows,
+                                 function(i){input[[paste0('regexLabel', i)]]}
+                    )), stringsAsFactors=FALSE )
+      })
+
+      output$Regular_Expression_controls_7 = renderUI({
+        tags$div(align="left",
+                 textInput("EventMapName3", label = h4("Enter label to save result"), value = ""),
+                 radioButtons("KeepIrregularEvents",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
+                 actionButton("EventButton3", "Create New Mapping")  )
+
+      })
+
+      # this function runs when you push the button to create a new mapping
+      observeEvent(
+        input$EventButton3,
+       { rv$newmap = rv$newmap+1 # trigger reactive value
+        isolate(OccToEvents3(regexInputEvents(),
+                             input$EventMapName3,
+                             get_EVENT_CF(),
+                             get_COMPARISON_CF(),
+                             'threadNum',
+                             get_Zoom_REGEX(),
+                             regexInput(),
+                             input$KeepIrregularEvents))}, ignoreInit = TRUE)
+
+
+      ########  Frequent n-gram tab  ###############
+      # This code is similar to the regex tab except for the data table
+
+      output$Frequent_Ngram_controls_1 = renderUI({
+        tags$div(align="left",
+                 selectizeInput("freqNgramInputMapID",label = h4("Start with this view:"), get_event_mapping_names()  ))
+      })
+
+      # get the data that will be the input for this tab
+      freqNgramInputEvents <- reactive( get_event_mapping_threads( input$freqNgramInputMapID) )
+
+
+      output$Frequent_Ngram_controls_2 <- renderUI({
+        zoom_limit = zoom_upper_limit(freqNgramInputEvents())
+        if (zoom_limit == 1)
+        {tags$h4("Zooming not available with this view")}
+        else
+        {sliderInput("freqNgramZoomID",
+                     label=h4("Zoom in and out by event similarity:"),
+                     1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
+      })
+      output$Frequent_Ngram_controls_21 <- renderUI({
+        tags$div(align="left",
+        sliderInput("freqNgramRange",
+                    label=h4("Size of nGrams between:"),
+                    min=2,max=10, c(2,5), step = 1, ticks=FALSE)
+        )
+      })
+
+      output$Frequent_Ngram_controls_3 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
+      sliderInput("freqNgramVerbatimRows",
+                  label=h4("How many threads to view:"),
+                  min=1,max=maxrows, c(1,min(maxrows,10)), step = 1, ticks=FALSE)
+      })
+
+      output$Frequent_Ngram_controls_4 =   renderText(
+        paste(thread_text_vector(freqNgramInputEvents(),'threadNum',get_Zoom_freqNgram(),', ')[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2] ], '\n' )  )
+
+      # or if you prefer HTML
+      # output$Regular_Expression_controls_4 =   renderUI(HTML(c("<h4>Threads in text form</h4><br>",
+      #                                         paste(thread_text_vector(regexInputEvents(),'threadNum',get_Zoom_REGEX(),',')[input$regexVerbatimRows[1]:input$regexVerbatimRows[2] ], '<br>' )) ))
+
+    output$Frequent_Ngram_controls_5 <- renderUI({ maxrows=length(unique(freqNgramInputEvents()[['threadNum']]))
+      sliderInput("numfreqNgramInputRows",
+                  label=h4("How many ngrams/labels to make:"),
+                  min=1,max=10, 3, step = 1, ticks=FALSE) })
+
+    fng_select <-reactive(support_level(thread_text_vector(freqNgramInputEvents(),
+                                                    'threadNum',
+                                                    get_Zoom_freqNgram(),' ' ),
+                                                frequent_ngrams(freqNgramInputEvents() ,
+                                                 'threadNum',
+                                                 get_Zoom_freqNgram(),
+                                                 input$freqNgramRange[1],
+                                                 input$freqNgramRange[2],
+                                                 TRUE)))
+
+
+    output$freqnGramTable <- DT::renderDataTable( fng_select() , filter = "top")
+
+
+    # The bottom example shows a server-side table. Make sure you have included row names in the table (as the first column of the table).
+    # In the case of server-side processing, the row names of the selected rows are available in input$x3_rows_selected as a character vector.
+    #
+    selected_ngrams <-reactive({s=as.integer(input$freqnGramTable_rows_selected)
+                              data.frame(pattern=unlist(lapply(1:length(s),
+                                                                  function(i){ str_replace_all(fng_select()[i,'ngrams'],' ',',') })),
+                                            label=unlist(lapply(1:length(s),
+                                                                  function(i){paste0("<",
+                                                                    str_replace_all(fng_select()[i,'ngrams'],' ','_'),
+                                                                    ">")
+                                                                  })),
+                                            stringsAsFactors=FALSE)
+      })
+
+
+      output$Frequent_Ngram_controls_7 = renderUI({
+        tags$div(align="left",
+                 textInput("EventMapName4", label = h4("Enter label to save result"), value ="" ),
+                 radioButtons("KeepIrregularEvents_2",label=h4("Keep irregular events:"), choices=c('Keep', 'Drop'), inline=TRUE),
+                 actionButton("EventButton4", "Create New Mapping")  )
+
+      })
+
+      # this function runs when you push the button to create a new mapping
+      observeEvent(
+        input$EventButton4,
+        {rv$newmap = rv$newmap+1 # trigger reactive value
+        isolate( OccToEvents3(freqNgramInputEvents(),
+                              input$EventMapName4,
+                              get_EVENT_CF(),
+                              get_COMPARISON_CF(),
+                              'threadNum',
+                              get_Zoom_freqNgram(),
+                              selected_ngrams(),
+                              input$KeepIrregularEvents_2) )}, ignoreInit = TRUE)
+
+
+
+      ########  maximal pattern tab  ###############
+
+          # output$Maximal_Pattern_controls = renderUI({
+          #   tags$div(align="left",
+          #            tags$h4("Maximal patterns: Form events based on maximal patterns-- Not implemented yet"),
+          #
+          #            selectizeInput("MaximalPatternInputID",label = h4("Choose input for this mapping:"), get_event_mapping_names(  ) ),
+          #
+          #            textInput("EventMapName5", label = h4("Enter label for this mapping"), value = "Maximal_"),
+          #
+          #            actionButton("EventButton5", "Create New Mapping")  )
+          #
+          # })
+
+      ########  clustering tab  ###############
+
+          output$Cluster_Event_controls_1 = renderUI({
+            tags$div(align="left",
+                     tags$h4("Group similar events to together to allow zooming"),
+                     selectizeInput("ClusterEventsInputID",label = h4("Start with this view:"), get_event_mapping_names() ))
+          })
+
+            output$Cluster_Event_controls_2 = renderUI({
+              tags$div(align="left",
+                     radioButtons("ClusterMethodID", label = h4("Cluster based on:"),
+                                  choices = c("Network Proximity","Contextual Similarity", "Sequential similarity"  ),
+                                  selected="Network Proximity") )
+          })
+            output$Cluster_Event_controls_3 = renderUI({
+              tags$div(align="left",
+                       textInput("EventMapName6", label = h4("Enter label to save this view + new clustering"), value =""),
+                       actionButton("EventButton6", "Cluster Events")  )
+            })
+
+            # separate the cluster calculation from the dendrogram display
+            cluster_result <- eventReactive(
+              input$EventButton6,
+              {rv$newmap = rv$newmap+1 # trigger reactive value
+              isolate( clusterEvents( get_event_mapping_threads( input$ClusterEventsInputID),
+                                                         input$EventMapName6,
+                                                         input$ClusterMethodID,
+                                                         get_EVENT_CF(),
+                                                        'cluster')
+                                      )}, ignoreInit = TRUE )
+
+          output$dendroClusterResult <- renderDendroNetwork({ dendroNetwork(cluster_result(),
+                                                                           treeOrientation = "horizontal", textColour = "black" ) })
+
+          ######## create subsets tab  ###############
+
+          # Controls for the whole set of tabs
+          output$SelectSubsetControls_1 = renderUI({
+            selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),  get_event_mapping_names()  )
+          })
+
+          output$SelectSubsetControls_2 <- renderUI({
+            tags$div(align="left",
+                     textInput("SelectSubsetMapName", label = h4(paste("Enter label for this subset of the", input$SelectSubsetMapInputID," mapping")),
+                               value = ""),
+                     actionButton("SelectSubsetButton", "Save Subset") )
+          })
+
+          # Get data for the Visualize tab.  Need parallel functions for the other tabs.
+          subsetEventsViz <- reactive({  get_event_mapping_threads( input$SelectSubsetMapInputID ) })
+
+          output$SelectSubsetDataTable  = DT::renderDataTable({ subsetEventsViz() }, filter = "top")
+
+          observeEvent(
+            input$SelectSubsetButton,
+            {rv$newmap = rv$newmap+1 # trigger reactive value
+            store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
+            }, ignoreInit = TRUE)
+
+
+          ######## manage event mappings tab  ###############
 
   output$Manage_Event_Map_controls= renderUI({
     tags$div(align="left",
              tags$h4("Select event mapping to export or delete"),
 
-             selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() ),
+                       selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() ),
+
+                       actionButton("ExportMappingRData", "Export RData file"),
+                       actionButton("ExportMappingCsv", "Export to csv"),
+                       actionButton("DeleteMappingButton", "Delete") )
 
              actionButton("ExportMappingRData", "Export RData file"),
              actionButton("ExportMappingCsv", "Export to csv"),
              actionButton("DeleteMappingButton", "Delete") )
 
-  })
+            # reactive functions for the export and delete buttons
+            observeEvent(
+              input$DeleteMappingButton,
+              {rv$newmap = rv$newmap+1 # trigger reactive value
+              delete_event_mapping( input$ManageEventMapInputID )
+                output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
+              }, ignoreInit = TRUE)
 
-  # reactive functions for the export and delete buttons
-  observeEvent(
-    input$DeleteMappingButton,
-    {rv$newmap = rv$newmap+1 # trigger reactive value
-    delete_event_mapping( input$ManageEventMapInputID )
-    output$delete_confirm = renderText(paste(input$ManageEventMapInputID, " deleted."))
-    }, ignoreInit = TRUE)
+            observeEvent(
+              input$ExportMappingRData,
+              {export_event_mapping(  input$ManageEventMapInputID )
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
+              })
 
-  observeEvent(
-    input$ExportMappingRData,
-    {export_event_mapping(  input$ManageEventMapInputID )
-      output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
-    })
-
-  observeEvent(
-    input$ExportMappingCsv,
-    {export_event_mapping_csv( input$ManageEventMapInputID )
-      output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
-    })
+            observeEvent(
+              input$ExportMappingCsv,
+              {export_event_mapping_csv( input$ManageEventMapInputID )
+                output$action_confirm = renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
+              })
 
 
   ########################################################################
@@ -582,7 +709,7 @@ server <- shinyServer(function(input, output, session) {
 
   # Controls for the whole set of tabs
   output$Visualize_Tab_Controls_1 = renderUI({
-    selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names(), selected='OneToOne' )
+        selectizeInput("VisualizeEventMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names(), selected='OneToOne' )
   })
 
   output$Visualize_Tab_Controls_2 = renderUI({
@@ -590,9 +717,9 @@ server <- shinyServer(function(input, output, session) {
     if ( zoom_limit == 1)
     {tags$h4("Zooming not available for this mapping")}
     else
-    {sliderInput("VisualizeTabZoomID",
-                 "Zoom in and out by event similarity:",
-                 1, zoom_limit, zoom_limit, step = 1, ticks=FALSE) }
+        {sliderInput("VisualizeTabZoomID",
+               "Zoom in and out by event similarity:",
+               1, zoom_limit, zoom_limit, step = 1, ticks=FALSE) }
   })
 
   # Get data for the Visualize tab.  Need parallel functions for the other tabs.
@@ -672,8 +799,8 @@ server <- shinyServer(function(input, output, session) {
                    choices = button_choices,
                    selected =  button_choices[1], # always start with the first one
                    inline=TRUE),
-      sliderInput("otherEdgeTheshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))
-  })
+    sliderInput("otherEdgeTheshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))
+    })
 
   output$otherVisNetwork <- renderVisNetwork({
     # first convert the threads to the network
@@ -690,10 +817,10 @@ server <- shinyServer(function(input, output, session) {
     button_choices = intersect(colnames(threadedEventsViz()), cfnames(selectOccFilter()))
     tags$div(
       sliderInput("forceEdgeTheshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ),
-      radioButtons("NetworkGroupID","Select a dimension for coloring nodes:",
-                   choices = button_choices,
-                   selected =  button_choices[1], # always start with the first one
-                   inline=TRUE))
+    radioButtons("NetworkGroupID","Select a dimension for coloring nodes:",
+                 choices = button_choices,
+                 selected =  button_choices[1], # always start with the first one
+                 inline=TRUE))
   })
 
   output$forceNetworkD3 <- renderForceNetwork({
@@ -750,6 +877,33 @@ server <- shinyServer(function(input, output, session) {
 
 
 
+
+  output$hover <- renderPrint({
+    d <- event_data("plotly_hover")
+    if (is.null(d)) "Hover events appear here (unhover to clear)" else d
+  })
+
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click events appear here" else d
+  })
+
+  # output$VisualizeCustomNetwork <- renderPlotly({
+  #   req(input$Timesplit2)
+  #   eventNetwork(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$Timesplit2)
+  # })
+
+  ### Role maps
+  output$Role_map_controls = renderUI({ checkboxGroupInput("Role_map_CFs","Pick Two:", get_EVENT_CF() ) })
+
+  output$Role_map_output = renderPlotly({ role_map( threadedEventsViz(), selectOccFilter(), input$Role_map_CFs ) })
+
+  ### Thread Trajectories
+  output$ThreadTrajectoriesOutput = renderPlotly({ threadTrajectory( threadedEventsViz() )})
+
+
+
+
   ######################################################################
   ##################### 5. COMPARE  tab ################################
   ######################################################################
@@ -760,7 +914,7 @@ server <- shinyServer(function(input, output, session) {
   # ####### SUBSET A   ##########
   output$Comparison_Tab_Controls_A1 <- renderUI({
     selectizeInput("CompareMapInputID_A",label = h4("Choose mapping A:"),  get_event_mapping_names() )
-  })
+    })
 
   output$Comparison_Tab_Controls_A2 <- renderUI({
     zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_A))
@@ -770,7 +924,7 @@ server <- shinyServer(function(input, output, session) {
     {sliderInput("CompareZoomID_A",
                  label=h4("Zoom in and out by event similarity:"),
                  1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
-  })
+    })
 
   # Get data for the COMPARE tab mapping A
   threadedEventsComp_A <- reactive({
@@ -830,9 +984,9 @@ server <- shinyServer(function(input, output, session) {
   output$Comp_A_5_controls <- renderUI({sliderInput("A_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
   output$Comp_B_5_controls <- renderUI({sliderInput("B_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
   output$Comp_A_5 <- renderForceNetwork({
-    n = threads_to_network_original( threadedEventsComp_A(), 'threadNum', get_Zoom_COMP_A(), 'threadNum' )
-    n = filter_network_edges(n,input$A_5_Theshold)
-    forceNetworkD3( n )  })
+      n = threads_to_network_original( threadedEventsComp_A(), 'threadNum', get_Zoom_COMP_A(), 'threadNum' )
+      n = filter_network_edges(n,input$A_5_Theshold)
+      forceNetworkD3( n )  })
 
   output$Comp_B_5 <- renderForceNetwork({
     n = threads_to_network_original( threadedEventsComp_B(), 'threadNum', get_Zoom_COMP_B(), 'threadNum' )
@@ -878,7 +1032,7 @@ server <- shinyServer(function(input, output, session) {
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
     tagList(  selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() ),
               selectizeInput('comparePanelViz',label = h4('Choose visualization:'),
-                             c('Role Maps','Thread Trajectories','Threads (event time)','Ngrams' )))  })
+                   c('Role Maps','Thread Trajectories','Threads (event time)','Ngrams' )))  })
 
   # output$Diachronic_Comparison_Tab_Controls_2 <- renderUI({
   #   zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$DiaCompareMapInputID))
@@ -890,38 +1044,43 @@ server <- shinyServer(function(input, output, session) {
   #                1,zoom_limit,zoom_limit, step = 1, ticks=FALSE) }
   # })
 
-  output$Diachronic_Comparison_Tab_Controls_3 <- renderUI({
-    tagList(
-      radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE),
-      checkboxGroupInput("role_map_cfs","Pick Two for role map:", get_EVENT_CF() ) )
-  })
+   output$Diachronic_Comparison_Tab_Controls_3 <- renderUI({
+     tagList(
+     radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE),
+     checkboxGroupInput("role_map_cfs","Pick Two for role map:", get_EVENT_CF() ) )
+     })
 
-  # Get data for the Diachronic COMPARE tab  .
-  threadedEventsDiaComp <- reactive({
-    get_event_mapping_threads(  input$DiaCompareMapInputID ) })
+   # Get data for the Diachronic COMPARE tab  .
+   threadedEventsDiaComp <- reactive({
+     get_event_mapping_threads(  input$DiaCompareMapInputID ) })
 
+  output$Comp_A_8 <- renderPlotly({ threadTrajectory(threadedEventsComp_A() ) })
+  output$Comp_B_8 <- renderPlotly({ threadTrajectory(threadedEventsComp_B() ) })
+
+   # controls for the comparison input panels
+   # Use all of the column names here...
+   output$Diachronic_Comparison_Tab_Controls_4 <- renderUI({
+     selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF() ) })
+
+   output$Diachronic_Comparison_Tab_Controls_5 <- renderUI({
+     selectizeInput("selectComparisonGroupsID","Compare specific groups:",
+                    CF_levels(), multiple=TRUE) })
+
+   CF_levels = reactive( get_CF_levels( threadedEventsDiaComp(),input$selectComparisonID) )
 
   # controls for the comparison input panels
   # Use all of the column names here...
   output$Diachronic_Comparison_Tab_Controls_4 <- renderUI({
     selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF() ) })
 
-  output$Diachronic_Comparison_Tab_Controls_5 <- renderUI({
-    selectizeInput("selectComparisonGroupsID","Compare specific groups:",
-                   CF_levels(), multiple=TRUE) })
-
-  CF_levels = reactive( get_CF_levels( threadedEventsDiaComp(),input$selectComparisonID) )
-
-  # Get subsets of events and create sub-plots for them
-
-  output$DiachronicComparisonPlots <- renderPlotly(
-    Comparison_Plots(threadedEventsDiaComp(),
-                     selectOccFilter(),
-                     input$selectComparisonID,
-                     input$selectComparisonGroupsID,
-                     input$DiaCompareTimeSubsetID,
-                     input$comparePanelViz,
-                     input$role_map_cfs) )
+   output$DiachronicComparisonPlots <- renderPlotly(
+     Comparison_Plots(threadedEventsDiaComp(),
+                      selectOccFilter(),
+                      input$selectComparisonID,
+                      input$selectComparisonGroupsID,
+                      input$DiaCompareTimeSubsetID,
+                      input$comparePanelViz,
+                      input$role_map_cfs) )
 
 
   ############################################################################
@@ -1008,7 +1167,7 @@ server <- shinyServer(function(input, output, session) {
   output$Moving_A_3 <- renderPlotly({ threadMap(threadedEventsMove_A(), "threadNum", "relativeTime", get_Zoom_MOVE(), 15 ) })
   output$Moving_B_3 <- renderPlotly({ threadMap(threadedEventsMove_B(), "threadNum", "relativeTime", get_Zoom_MOVE(), 15 ) })
 
-  output$Moving_A_4 <- renderVisNetwork({
+   output$Moving_A_4 <- renderVisNetwork({
     n = threads_to_network_original( threadedEventsMove_A(), "threadNum", get_Zoom_MOVE() )
     n=filter_network_edges(n,input$M_4_Theshold)
     circleVisNetwork( n ) })

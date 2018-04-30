@@ -236,17 +236,17 @@ threadMap <- function(or, TN, timescale, CF, shape){
   }
 
   return( plot_ly(or, x = ~as.integer(or[[timescale]]), y = ~or[[TN]], color= ~as.character(or[,CF]),
-                  colors=pal,
-                  name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
-                  text = ~or$label,
-                  hoverinfo = "text+x+y",
-                  symbol= "line-ew", symbols=shape, showlegend=FALSE)
-          %>%
-            layout(
-              xaxis = list(title = xaxis),
-              yaxis = list(title = knitr::combine_words(get_THREAD_CF(), sep = ", "))
-            )
-  )
+             colors=pal,
+             name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
+             text = ~or$label,
+             hoverinfo = "text+x+y",
+             symbol= "line-ew", symbols=shape, showlegend=FALSE)
+             %>%
+               layout(
+                 xaxis = list(title = xaxis),
+                 yaxis = list(title = knitr::combine_words(get_THREAD_CF(), sep = ", "))
+               )
+        )
 }
 
 
@@ -463,12 +463,12 @@ Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,rol
         {plot_list[[plotName]] = role_map( dfp, o, role_map_cfs ) }
         else if (plot_type=='Thread Trajectories')
         {plot_list[[plotName]] = threadTrajectory( dfp ) }
-        else if (plot_type=='Threads (event time)')
-        {plot_list[[plotName]] = threadMap(dfp, "threadNum", "seqNum", 1, 15 ) }
-        else
+         else if (plot_type=='Threads (event time)')
+         {plot_list[[plotName]] = threadMap(dfp, "threadNum", "seqNum", 1, 15 ) }
+       else
         {plot_list[[plotName]] =  plotly_empty()}
-      }
-    }}
+    }
+  }}
 
   # create two versions: one that uses ngrams (1-2-3) and one that shows numbers.
   return(subplot(plot_list,nrows=nLevels))
@@ -587,15 +587,15 @@ role_map <- function(e, o, cfs){
   vcf_1_sum = colSums( matrix( unlist(e[[vcf_1]]), nrow = length(e[[vcf_1]]), byrow = TRUE) )
   vcf_2_sum = colSums( matrix( unlist(e[[vcf_2]]), nrow = length(e[[vcf_2]]), byrow = TRUE) )
 
-  # compute outer product to get adjacency matrix
+   # compute outer product to get adjacency matrix
   who_does_what= round(vcf_1_sum %o% vcf_2_sum,0)
 
   return( plot_ly(
-    x=levels(o[[cfs[2]]]),
-    y=levels(o[[cfs[1]]]),
-    z=who_does_what,
-    type='heatmap',
-    colors= 'Reds') )
+          x=levels(o[[cfs[2]]]),
+          y=levels(o[[cfs[1]]]),
+          z=who_does_what,
+          type='heatmap',
+          colors= 'Reds') )
 
 }
 
@@ -648,9 +648,9 @@ movingWindowCorrelation <- function( trace ){
 dualmovingWindowCorrelation <- function( trace ){
   return( plot_ly(trace, x = ~thread, y = ~correlation,
                   name = 'Window', type = 'scatter', mode='lines+markers',
-                  #          text = ~thread,
+      #          text = ~thread,
                   marker=list(size=8, opacity=1),
-                  #           hoverinfo = "text",
+       #           hoverinfo = "text",
                   symbol= "line-ew", symbols=15, showlegend=FALSE  #,height = 200
   )
   %>%

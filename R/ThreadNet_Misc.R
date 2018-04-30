@@ -44,7 +44,7 @@ read_occurrences <- function(inFile){
 check_file_format = function(o){
 
   if ((colnames(o)[1] == "tStamp"))
-  {return("tStamp")}
+    {return("tStamp")}
   else if ((colnames(o)[1] == "sequence"))
   {return("sequence")}
 
@@ -498,19 +498,19 @@ window_correlation  <- function(e,w,s=1,n=2){
     # get the merged list
     vtmerge = merge(x=vt_unique, y=vt[vt$wid==i,], by='ngrams', all.x = TRUE)
 
-    # use the wid.y to get the whole vector, but replace the NA with zeros
-    b=vtmerge[vtmerge$wid==i,'freq']
-    b[is.na(b)] <- 0
+  # use the wid.y to get the whole vector, but replace the NA with zeros
+   b=vtmerge[vtmerge$wid==i,'freq']
+   b[is.na(b)] <- 0
 
-    windowFreqMatrix[i,]=b
+   windowFreqMatrix[i,]=b
   }
 
 
-  # old way: correlate one row with the next and stick it in a dataframe
+ # old way: correlate one row with the next and stick it in a dataframe
   df =data.frame(window=1:(nWindows-1),
                  thread = seq( 1, nThreads-s, s),
                  correlation= unlist(lapply(1:(nWindows-1),
-                                            function(i){abs( cor(windowFreqMatrix[i,],windowFreqMatrix[i+1,])) })))
+                                              function(i){abs( cor(windowFreqMatrix[i,],windowFreqMatrix[i+1,])) })))
 
   # add the last row explicitly
   df = rbind( df, data.frame(window=nWindows, thread=nThreads, correlation=0))
@@ -522,7 +522,7 @@ window_correlation  <- function(e,w,s=1,n=2){
   colnames(b_df)=vt_unique$ngrams
 
   # stick the ngram frequencies on the end for good measure
-  return(cbind(df,b_df))
+ return(cbind(df,b_df))
 
 }
 
@@ -589,13 +589,13 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
   # old way: correlate one row with the next and stick it in a dataframe
   df =data.frame( thread = seq(w,nThreads-(w+1),s),
                   correlation= unlist(lapply(seq(w,nThreads-(w+1),s),
-                                             function(i){abs( cor(colSums( ngramFreqMatrix[(i-w):i, ] ),
-                                                                  colSums( ngramFreqMatrix[(i+1):(i+w+1), ] )))  })))
+                                            function(i){abs( cor(colSums( ngramFreqMatrix[(i-w):i, ] ),
+                                                                colSums( ngramFreqMatrix[(i+1):(i+w+1), ] )))  })))
 
   # # add the last row explicitly
   # df = rbind( df, data.frame( thread=nThreads, correlation=0))
 
-  return( df )
+   return( df )
 
   # # get the ngram data and labels
   # b_df=as.data.frame(ngramFreqMatrix)
@@ -605,7 +605,6 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
   # return(cbind(df,b_df))
 
 }
-
 #####################################################
 # GlobalEventMappings is a global variable
 get_event_mapping_name_list <- function(){
@@ -618,7 +617,7 @@ get_event_mapping_name_list <- function(){
   # print(n)
 
   return(n)
-}
+  }
 
 
 store_event_mapping <- function(EventMapName, e){
@@ -645,7 +644,7 @@ get_event_mapping_threads <- function( mapname){
     return(NULL)
   }
   else
-    return(GlobalEventMappings[[idx]][["threads"]])
+  return(GlobalEventMappings[[idx]][["threads"]])
 }
 
 delete_event_mapping <- function( mapname){

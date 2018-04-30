@@ -41,28 +41,28 @@ ui <- fluidPage(
                                             tags$h4("Events are marked by contextual features that CHANGE within the threads. At least ONE is required."),
                                             uiOutput("POV_Tab_Controls_3"),
                                             plotlyOutput("ContextFlowers_3")
-                                   ),
+                                            ),
                                    tabPanel("Preview Threads",
                                             tags$h4("Threads based on selected POV"),
                                             verbatimTextOutput("Preview_Thread_Output_1" ),
                                             # ** add conditional panels here to choose output **
                                             plotlyOutput("previewThreadMap_1")
-                                   ),
+                                            ),
                                    tabPanel("Preview Data",
                                             tags$h4("This table shows the data threaded from your chosen POV"),
                                             DT::dataTableOutput("Thread_Tab_Output_1")
+                                            )
                                    )
-                       )
               ),
               tabPanel("Visualize",
                        fluidRow(
                          column(3,
                                 uiOutput("Visualize_Tab_Controls_1")),
-                         conditionalPanel(
-                           condition = "input.tabs !== 'Custom'",
+                                conditionalPanel(
+                                        condition = "input.tabs !== 'Custom'",
                            column(4,
                                   uiOutput("Visualize_Tab_Controls_2") ))
-                       ),
+                           ),
 
                        tabsetPanel(type = "tabs",
                                    tabPanel("N-grams",
@@ -128,18 +128,18 @@ ui <- fluidPage(
                                               column(3,
                                                      # add method for RLE -- remove sequential runs
                                                      radioButtons("Chunks_method_Button", label = h4("Choose method for chunking:"),
-                                                                  choices = c( "Changes", "Time Gap","Fixed Size"),
-                                                                  inline=TRUE),
-                                                     conditionalPanel(
-                                                       condition = "input.Chunks_method_Button == 'Changes'",
-                                                       uiOutput("chunk_controls_2") ),
-                                                     conditionalPanel(
-                                                       condition = "input.Chunks_method_Button == 'Time Gap'",
-                                                       uiOutput("chunk_controls_3") ),
-                                                     conditionalPanel(
-                                                       condition = "input.Chunks_method_Button == 'Fixed Size'",
-                                                       uiOutput("chunk_controls_4") )
-                                              ),
+                                                                                        choices = c( "Changes", "Time Gap","Fixed Size"),
+                                                                                        inline=TRUE),
+                                                                           conditionalPanel(
+                                                                             condition = "input.Chunks_method_Button == 'Changes'",
+                                                                             uiOutput("chunk_controls_2") ),
+                                                                           conditionalPanel(
+                                                                              condition = "input.Chunks_method_Button == 'Time Gap'",
+                                                                              uiOutput("chunk_controls_3") ),
+                                                                          conditionalPanel(
+                                                                              condition = "input.Chunks_method_Button == 'Fixed Size'",
+                                                                              uiOutput("chunk_controls_4") )
+                                                        ),
 
                                               column(3, uiOutput("chunk_controls_5"))
                                             ),
@@ -196,123 +196,123 @@ ui <- fluidPage(
                                             verbatimTextOutput("Regular_Expression_controls_4"),
                                             uiOutput("Regular_Expression_controls_5"),  # how many rows?
                                             uiOutput("Regular_Expression_controls_6")
-                                   ),
+                                          ),
 
                                    tabPanel("Manage Event Maps",
                                             helpText('Delete or export event maps'),
                                             tags$hr(),
                                             uiOutput("Manage_Event_Map_controls"),
                                             verbatimTextOutput("action_confirm")
-                                   )
+                                            )
                        )
 
               ),
 
               tabPanel("Comparisons",
                        tabsetPanel(type = "tabs",
-                                   tabPanel("Compare Mappings (synchronic)",
-                                            fluidRow(
-                                              column(6,
-                                                     fluidRow(
-                                                       column(3, uiOutput("Comparison_Tab_Controls_A1")),
-                                                       column(3, uiOutput("Comparison_Tab_Controls_A2"))) ,
-                                                     selectizeInput('comparePanelSelect_A','Choose visualization:',
-                                                                    c('Threads (event time)','Threads (actual time)','Threads (relative time)',
-                                                                      'Event network (circle)','Event network (force)','Other networks',
-                                                                      'Role Maps','Thread Trajectories')),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Threads (event time)'",
-                                                       plotlyOutput("Comp_A_1") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Threads (actual time)'",
-                                                       plotlyOutput("Comp_A_2") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Threads (relative time)'",
-                                                       plotlyOutput("Comp_A_3") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Event network (circle)'",
-                                                       uiOutput("Comp_A_4_controls"),
-                                                       visNetworkOutput("Comp_A_4") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Event network (force)'",
-                                                       uiOutput("Comp_A_5_controls"),
-                                                       forceNetworkOutput("Comp_A_5") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Other networks'",
-                                                       uiOutput("Comp_A_6_controls"),
-                                                       visNetworkOutput("Comp_A_6") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Role Maps'",
-                                                       uiOutput("Comp_A_7_controls"),
-                                                       plotlyOutput("Comp_A_7") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_A == 'Thread Trajectories'",
-                                                       plotlyOutput("Comp_A_8") )
-                                              ),
-                                              column(6,
-                                                     fluidRow(
-                                                       column(3, uiOutput("Comparison_Tab_Controls_B1")),
-                                                       column(3, uiOutput("Comparison_Tab_Controls_B2"))) ,
-                                                     selectizeInput('comparePanelSelect_B','Choose visualization:',
-                                                                    c('Threads (event time)','Threads (actual time)','Threads (relative time)',
-                                                                      'Event network (circle)','Event network (force)','Other networks',
-                                                                      'Role Maps','Thread Trajectories')),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Threads (event time)'",
-                                                       plotlyOutput("Comp_B_1") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Threads (actual time)'",
-                                                       plotlyOutput("Comp_B_2") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Threads (relative time)'",
-                                                       plotlyOutput("Comp_B_3") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Event network (circle)'",
-                                                       uiOutput("Comp_B_4_controls"),
-                                                       visNetworkOutput("Comp_B_4") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Event network (force)'",
-                                                       uiOutput("Comp_B_5_controls"),
-                                                       forceNetworkOutput("Comp_B_5") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Other networks'",
-                                                       uiOutput("Comp_B_6_controls"),
-                                                       visNetworkOutput("Comp_B_6") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Role Maps'",
-                                                       uiOutput("Comp_B_7_controls"),
-                                                       plotlyOutput("Comp_B_7") ),
-                                                     conditionalPanel(
-                                                       condition = "input.comparePanelSelect_B == 'Thread Trajectories'",
-                                                       plotlyOutput("Comp_B_8") )
-                                              ))
-                                   ),
+                         tabPanel("Compare Mappings (synchronic)",
+                       fluidRow(
+                         column(6,
+                                fluidRow(
+                                  column(3, uiOutput("Comparison_Tab_Controls_A1")),
+                                  column(3, uiOutput("Comparison_Tab_Controls_A2"))) ,
+                                selectizeInput('comparePanelSelect_A','Choose visualization:',
+                                               c('Threads (event time)','Threads (actual time)','Threads (relative time)',
+                                                 'Event network (circle)','Event network (force)','Other networks',
+                                                 'Role Maps','Thread Trajectories')),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Threads (event time)'",
+                                  plotlyOutput("Comp_A_1") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Threads (actual time)'",
+                                  plotlyOutput("Comp_A_2") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Threads (relative time)'",
+                                  plotlyOutput("Comp_A_3") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Event network (circle)'",
+                                  uiOutput("Comp_A_4_controls"),
+                                  visNetworkOutput("Comp_A_4") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Event network (force)'",
+                                  uiOutput("Comp_A_5_controls"),
+                                  forceNetworkOutput("Comp_A_5") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Other networks'",
+                                  uiOutput("Comp_A_6_controls"),
+                                  visNetworkOutput("Comp_A_6") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Role Maps'",
+                                  uiOutput("Comp_A_7_controls"),
+                                  plotlyOutput("Comp_A_7") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_A == 'Thread Trajectories'",
+                                  plotlyOutput("Comp_A_8") )
+                                ),
+                         column(6,
+                                fluidRow(
+                                  column(3, uiOutput("Comparison_Tab_Controls_B1")),
+                                  column(3, uiOutput("Comparison_Tab_Controls_B2"))) ,
+                                selectizeInput('comparePanelSelect_B','Choose visualization:',
+                                               c('Threads (event time)','Threads (actual time)','Threads (relative time)',
+                                                 'Event network (circle)','Event network (force)','Other networks',
+                                                 'Role Maps','Thread Trajectories')),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Threads (event time)'",
+                                  plotlyOutput("Comp_B_1") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Threads (actual time)'",
+                                  plotlyOutput("Comp_B_2") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Threads (relative time)'",
+                                  plotlyOutput("Comp_B_3") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Event network (circle)'",
+                                  uiOutput("Comp_B_4_controls"),
+                                  visNetworkOutput("Comp_B_4") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Event network (force)'",
+                                  uiOutput("Comp_B_5_controls"),
+                                  forceNetworkOutput("Comp_B_5") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Other networks'",
+                                  uiOutput("Comp_B_6_controls"),
+                                  visNetworkOutput("Comp_B_6") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Role Maps'",
+                                  uiOutput("Comp_B_7_controls"),
+                                  plotlyOutput("Comp_B_7") ),
+                                conditionalPanel(
+                                  condition = "input.comparePanelSelect_B == 'Thread Trajectories'",
+                                  plotlyOutput("Comp_B_8") )
+                                ))
+                       ),
 
-                                   tabPanel("Compare time periods (diachronic)",
-                                            fluidRow(
-                                              column(3,
-                                                     uiOutput("Diachronic_Comparison_Tab_Controls_1") ),
-                                              column(3,
-                                                     uiOutput("Diachronic_Comparison_Tab_Controls_4"),
-                                                     uiOutput("Diachronic_Comparison_Tab_Controls_5") ),
-                                              column(3,
-                                                     uiOutput("Diachronic_Comparison_Tab_Controls_3") )
-                                            ),
-                                            plotlyOutput("DiachronicComparisonPlots") )
-                       )
-              ),
+                       tabPanel("Compare time periods (diachronic)",
+                                fluidRow(
+                                  column(3,
+                                          uiOutput("Diachronic_Comparison_Tab_Controls_1") ),
+                                  column(3,
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_4"),
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_5") ),
+                                  column(3,
+                                         uiOutput("Diachronic_Comparison_Tab_Controls_3") )
+                                      ),
+                                plotlyOutput("DiachronicComparisonPlots") )
+                      )
+               ),
 
               tabPanel("Moving Window",
                        fluidRow(
                          column(3,
-                                uiOutput("Moving_Window_Tab_Controls_1"),
-                                selectizeInput('Moving_Window_Viz','Choose visualization:',
-                                               c('Threads (event time)','Threads (actual time)','Threads (relative time)',
-                                                 'Event network (circle)','Event network (force)','Other networks',
-                                                 'Role Maps','Thread Trajectories')),
-                                radioButtons("Moving_Window_Type","Moving window type:",
-                                             choices = c('Single Window','Dual Window'),
-                                             selected =  c('Single Window') ) ),
+                              uiOutput("Moving_Window_Tab_Controls_1"),
+                              selectizeInput('Moving_Window_Viz','Choose visualization:',
+                                             c('Threads (event time)','Threads (actual time)','Threads (relative time)',
+                                               'Event network (circle)','Event network (force)','Other networks',
+                                               'Role Maps','Thread Trajectories')),
+                              radioButtons("Moving_Window_Type","Moving window type:",
+                                           choices = c('Single Window','Dual Window'),
+                                           selected =  c('Single Window') ) ),
 
                          column(3,
                                 uiOutput("Moving_Window_Tab_Controls_3"),
@@ -404,20 +404,21 @@ ui <- fluidPage(
               ),
 
               tabPanel("Parameter Settings",
-                       tableOutput("currentParameterSettings")
-              ),
-              tabPanel("Acknowledgements",
-                       tags$h4("Support:"),
-                       tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
-                       tags$p("Antecedents of Complexity in Healthcare Routines"),
-                       tags$h4("Code Gurus:"),
-                       tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson, Douglas Krum"),
-                       tags$h4("Collaborators:"),
-                       tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
-                       tags$h4("Related Publications:"),
-                       tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ),
-                       tags$h4("ThreadNet 2 (MatLab version):"),
-                       tags$a(href="http://routines.broad.msu.edu/ThreadNet/","http://routines.broad.msu.edu/ThreadNet/" )
-              )
+                        tableOutput("currentParameterSettings")
+                       ),
+               tabPanel("Acknowledgements",
+                        tags$h4("Support:"),
+                          tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237"),
+                          tags$p("Antecedents of Complexity in Healthcare Routines"),
+                        tags$h4("Code Gurus:"),
+                              tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson, Douglas Krum"),
+                        tags$h4("Collaborators:"),
+                             tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
+                        tags$h4("Related Publications:"),
+                        tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ),
+                        tags$h4("ThreadNet 2 (MatLab version):"),
+                        tags$a(href="http://routines.broad.msu.edu/ThreadNet/","http://routines.broad.msu.edu/ThreadNet/" )
+                        )
+             )
   )
 )
