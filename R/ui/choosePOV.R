@@ -16,15 +16,15 @@ tabPanel(
             uiOutput("POV_Tab_Controls_3"),
             plotlyOutput("ContextFlowers_3")
         ),
+        # tabPanel(
+        #     "Preview Threads",
+        #     tags$h4("Threads based on selected POV"),
+        #     verbatimTextOutput("Preview_Thread_Output_1" ),
+        #     # ** add conditional panels here to choose output **
+        #     plotlyOutput("previewThreadMap_1")
+        # ),
         tabPanel(
-            "Preview Threads",
-            tags$h4("Threads based on selected POV"),
-            verbatimTextOutput("Preview_Thread_Output_1" ),
-            # ** add conditional panels here to choose output **
-            plotlyOutput("previewThreadMap_1")
-        ),
-        tabPanel(
-            "Preview Data",
+            "*** CLICK HERE TO PROCEED ***",
             tags$h4("This table shows the data threaded from your chosen POV"),
             DT::dataTableOutput("Thread_Tab_Output_1")
         )
