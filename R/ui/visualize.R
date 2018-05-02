@@ -10,6 +10,7 @@ tabPanel(
     ),
     tabsetPanel(
         type = "tabs",
+        tabPanel("Thread Trajectories", plotlyOutput("ThreadTrajectoriesOutput") ),
          tabPanel(
             "Whole Sequences",
             radioButtons(
@@ -33,7 +34,7 @@ tabPanel(
         ),
         tabPanel(
           "Contextual Factors",
-          plotlyOutput("visualizePieCharts", width = "100%", height = "1200px")
+          plotlyOutput("visualizePieCharts")
         ),
         tabPanel("N-grams", uiOutput("nGramControls"), plotlyOutput("nGramBarchart")),
         tabPanel(
@@ -65,7 +66,7 @@ tabPanel(
             uiOutput("Other_Network_Tab_Controls"),
             visNetworkOutput("otherVisNetwork", width = "100%", height = "1200px")
         ),
-        tabPanel("Role Maps",uiOutput("Role_map_controls"), plotlyOutput("Role_map_output") ),
-        tabPanel("Thread Trajectories", plotlyOutput("ThreadTrajectoriesOutput") )
+        tabPanel("Role Maps",uiOutput("Role_map_controls"), plotlyOutput("Role_map_output") )
+
     )
 )
