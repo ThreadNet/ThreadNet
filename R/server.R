@@ -529,7 +529,7 @@ server <- shinyServer(function(input, output, session) {
              actionButton("SelectSubsetButton", "Save Subset") )
   })
 
-  # Get data for the Visualize tab.  Need parallel functions for the other tabs.
+  # Get data for this  tab.  Need parallel functions for the other tabs.
   subsetEventsViz <- reactive({  get_event_mapping_threads( input$SelectSubsetMapInputID ) })
 
   output$SelectSubsetDataTable  = DT::renderDataTable({ subsetEventsViz() }, filter = "top")
@@ -591,12 +591,26 @@ server <- shinyServer(function(input, output, session) {
     {tags$h4("Zooming not available for this mapping")}
     else
     {sliderInput("VisualizeTabZoomID",
-                 "Zoom in and out by event similarity:",
+                 label=h4("Zoom in and out by event similarity:"),
                  1, zoom_limit, zoom_limit, step = 1, ticks=FALSE) }
   })
 
+  output$Visualize_Tab_Controls_3 = renderUI({
+    nThreads = numThreads(threadedEventsViz_ALL(),'threadNum')
+    sliderInput("VisualizeRangeID",
+                label=h4("Range of threads to include:"),
+                1, nThreads, c(1,nThreads),step = 1, ticks=FALSE)
+  })
+
   # Get data for the Visualize tab.  Need parallel functions for the other tabs.
-  threadedEventsViz <- reactive({  get_event_mapping_threads( input$VisualizeEventMapInputID ) })
+  threadedEventsViz_ALL <- reactive({  get_event_mapping_threads( input$VisualizeEventMapInputID ) })
+
+  threadedEventsViz <- reactive({
+    loc = input$VisualizeRangeID[1]
+    width=input$VisualizeRangeID[2] - input$VisualizeRangeID[1]
+    get_moving_window(threadedEventsViz_ALL(),width,loc) })
+
+
 
 
   ######## Basic ngrams tab  ###############
@@ -612,6 +626,12 @@ server <- shinyServer(function(input, output, session) {
   #  NGRAM  display #
   output$nGramBarchart = renderPlotly({
     ng_bar_chart(threadedEventsViz(), "threadNum", get_Zoom_VIZ(), input$nGramLengthID, input$nGramDisplayThresholdID)
+  })
+
+  # pie chart display #
+
+  output$visualizePieCharts = renderPlotly({
+    CF_multi_pie(threadedEventsViz(), get_EVENT_CF())
   })
 
   ######## Repetitive Sub-sequences tab  ###############

@@ -2,6 +2,7 @@ tabPanel(
     "Visualize",
     fluidRow(
         column(3,uiOutput("Visualize_Tab_Controls_1")),
+        column(3,uiOutput("Visualize_Tab_Controls_3")),
         conditionalPanel(
             condition = "input.tabs !== 'Custom'",
             column(4,uiOutput("Visualize_Tab_Controls_2") )
@@ -9,8 +10,7 @@ tabPanel(
     ),
     tabsetPanel(
         type = "tabs",
-        tabPanel("N-grams", uiOutput("nGramControls"), plotlyOutput("nGramBarchart")),
-        tabPanel(
+         tabPanel(
             "Whole Sequences",
             radioButtons(
                 "ChoosePanelButton_1",
@@ -32,6 +32,11 @@ tabPanel(
             )
         ),
         tabPanel(
+          "Contextual Factors",
+          plotlyOutput("visualizePieCharts", width = "100%", height = "1200px")
+        ),
+        tabPanel("N-grams", uiOutput("nGramControls"), plotlyOutput("nGramBarchart")),
+        tabPanel(
             "Event network (circle)",
             uiOutput("Circle_Network_Tab_Controls"),
             visNetworkOutput("circleVisNetwork", width = "100%", height = "1200px")
@@ -45,15 +50,15 @@ tabPanel(
             )
         ),
         tabPanel(
-            "View events",
+            "Event Frequency",
             value = 'Custom',
             fluidRow(
                 column(3, uiOutput("VisualizeCustomNetwork_Controls_0")),
                 column(3, uiOutput("VisualizeCustomNetwork_Controls_1"))
             ),
-            plotlyOutput("VisualizeCustomNetwork"),
-            verbatimTextOutput("hover"),
-            verbatimTextOutput("click")
+            plotlyOutput("VisualizeCustomNetwork")
+            # verbatimTextOutput("hover"),
+            # verbatimTextOutput("click")
         ),
         tabPanel(
             "Other networks",
@@ -62,5 +67,5 @@ tabPanel(
         ),
         tabPanel("Role Maps",uiOutput("Role_map_controls"), plotlyOutput("Role_map_output") ),
         tabPanel("Thread Trajectories", plotlyOutput("ThreadTrajectoriesOutput") )
-    )                    
+    )
 )
