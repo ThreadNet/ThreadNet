@@ -124,3 +124,9 @@ compute_entropy <- function(freq){
   plnp = p*log(p)
   return(-sum(plnp))
 }
+
+# code to plot entropy as a function of zoom_level
+# need to get the zoom levels -- grep out the 'Z_' column names...
+plot_entropy <- function(e){
+ plot(unlist(lapply(grep('ZM_',colnames(e)),function(i){compute_entropy(table(e[[i]]))})))
+}
