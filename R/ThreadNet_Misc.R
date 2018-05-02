@@ -29,8 +29,8 @@ read_occurrences <- function(inFile){
 
 
   # check the file format.  Put in humorous example if the format is bad
-   if (check_file_format(o)=="badformat")
-   {o=make_example_DF() }
+  if (check_file_format(o)=="badformat")
+  {o=make_example_DF() }
   else if (check_file_format(o)=="sequence")
   {o=add_relative_timestamps(o,"sequence", 1) }
 
@@ -115,8 +115,8 @@ cleanOcc = function(o, cfnames){
   o$tStamp = parse_date_time(o$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
 
   ## Add the category ">other<" for all of the factors to facilitate recoding later
- # This may not be needed anymore... commented out Dec 3 2017
- # o <- as.data.frame(lapply(o, addOther))
+  # This may not be needed anymore... commented out Dec 3 2017
+  # o <- as.data.frame(lapply(o, addOther))
 
   # add weekday and month
   o$weekday = as.factor(weekdays(as.Date(o$tStamp)))
@@ -181,9 +181,9 @@ zoomColumn <- function(z){
   # print(paste("In zoomColumn z=",z))
 
   if (is.null(z))
-    {r="ZM_1"}
+  {r="ZM_1"}
   else
-    {r=paste0("ZM_",z)}
+  {r=paste0("ZM_",z)}
 
   # print(paste("In zoomColumn r=",r))
 
@@ -239,12 +239,12 @@ combineContextFactors <- function(o,CF,newCol){
   # Use the old column if there is one
   if (!(newCol %in% names(o))) {
 
-  # Need to get the CF parameters into the right format for tidyr::unite function
-  cfn= sapply(CF, as.character)
-  newCol = as.character(newCol)
+    # Need to get the CF parameters into the right format for tidyr::unite function
+    cfn= sapply(CF, as.character)
+    newCol = as.character(newCol)
 
-#  unite the columns, but keep the old ones
- o= unite_(o, newCol, cfn, sep="+", remove=FALSE)
+    #  unite the columns, but keep the old ones
+    o= unite_(o, newCol, cfn, sep="+", remove=FALSE)
 
   }
 
@@ -261,16 +261,16 @@ newColName <- function(CF_list){
 
 # These were used on the occ-to-event tab to configure the slider
 threshold_slider_min <- function(o){
-     return(floor(min(o$timeGap)))
- }
+  return(floor(min(o$timeGap)))
+}
 
- threshold_slider_max <- function(o){
-     return(ceiling(max(o$timeGap)))
- }
+threshold_slider_max <- function(o){
+  return(ceiling(max(o$timeGap)))
+}
 
- threshold_slider_selected <- function(o){
-     return(min(o$timeGap))
- }
+threshold_slider_selected <- function(o){
+  return(min(o$timeGap))
+}
 
 
 
@@ -281,7 +281,7 @@ diff_handoffs <- function(o){
   # initialize the previous row
   previous_row <<- o[1,]
 
-return(apply(o,1, row_diff_handoff))
+  return(apply(o,1, row_diff_handoff))
 
 }
 row_diff_handoff <- function(this_row){
@@ -313,7 +313,7 @@ row_diff_tStamp <- function(this_row){
 
 
   # just add up the differences.
-   d <-max(0,difftime(this_row, previous_row, units="secs"))
+  d <-max(0,difftime(this_row, previous_row, units="secs"))
 
   # store the previous row
   previous_row <<-this_row
@@ -605,7 +605,6 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
   # return(cbind(df,b_df))
 
 }
-
 #####################################################
 # GlobalEventMappings is a global variable
 get_event_mapping_name_list <- function(){
@@ -634,7 +633,7 @@ store_event_mapping <- function(EventMapName, e){
 
 get_event_mapping_threads <- function( mapname){
 
-    # get the index for the mapname
+  # get the index for the mapname
   # print (paste0('mapname',mapname))
 
   idx=which(mapname==get_event_mapping_name_list() )
@@ -762,4 +761,3 @@ rr_grams <- function(o,TN, CF, N, R) {
 #   }
 # }
 ## [1] 1 4 2
-
