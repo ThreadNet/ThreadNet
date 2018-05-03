@@ -104,7 +104,7 @@ output$Force_Network_Tab_Controls <- renderUI({
 			inline=TRUE
 		),
 		sliderInput("forceEdgeTheshold","Display edges above",0,1,0,step = 0.01,ticks = FALSE)
-	)	
+	)
 })
 
 output$forceNetworkD3 <- renderForceNetwork({
@@ -114,6 +114,7 @@ output$forceNetworkD3 <- renderForceNetwork({
 })
 
 output$networkPie <- renderPlotly({
+  req(input$Group)
 	get_group <- input$Group
 	CF_multi_pie_event(threadedOcc(), threadedEventsViz(), get_EVENT_CF(), get_group, get_Zoom_VIZ())
 })
