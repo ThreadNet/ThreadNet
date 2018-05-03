@@ -10,9 +10,7 @@ tabPanel(
     ),
     tabsetPanel(
         type = "tabs",
-
          tabPanel("Thread Trajectories", plotlyOutput("ThreadTrajectoriesOutput") ),
-
          tabPanel(
             "Whole Sequences",
             radioButtons(
