@@ -8,6 +8,7 @@
 
 server <- shinyServer(function(input, output, session) {
 
+
 	options(warn=-1)
 	options(shiny.maxRequestSize=30*1024^2)
 
@@ -29,25 +30,25 @@ server <- shinyServer(function(input, output, session) {
 	# they are grouoped here because hopefully they can be replaced by a single function... except that reactive functions don't take parameters
 	get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$VisualizeEventMapInputID))==1 ,
 												"ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
-	
+
 	get_Zoom_COMP_A <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$CompareMapInputID_A))==1 ,
 													"ZM_1", paste0("ZM_",input$CompareZoomID_A))) })
-	
+
 	get_Zoom_COMP_B <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$CompareMapInputID_B))==1 ,
 													"ZM_1", paste0("ZM_",input$CompareZoomID_B))) })
-	
+
 	get_Zoom_DIA_COMP <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$DiaCompareMapInputID))==1 ,
 													"ZM_1", paste0("ZM_",input$DiaCompareZoomID))) })
-	
+
 	get_Zoom_MOVE <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$MovingWindowMapInputID))==1 ,
 												"ZM_1", paste0("ZM_",input$MovingWindowZoomID))) })
-	
+
 	get_Zoom_REGEX <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$RegExInputMapID))==1 ,
 													"ZM_1", paste0("ZM_",input$regexZoomID))) })
-	
+
 	get_Zoom_freqNgram <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$freqNgramInputMapID))==1 ,
 														"ZM_1", paste0("ZM_",input$freqNgramZoomID))) })
-	
+
 	get_Zoom_CHUNK <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$ChunkInputMapID))==1 ,
 											"ZM_1", paste0("ZM_",input$chunkZoomID))) })
 
@@ -56,16 +57,16 @@ server <- shinyServer(function(input, output, session) {
 		rv$newmap
 		get_event_mapping_name_list()
 	})
-	
+
 	#dataframe for occurrences that are read in from file1
 	occ <- eventReactive(input$file1,read_occurrences(input$file1))
-	
+
 	# selected columns from the raw data
 	selectOcc <- reactive(occ()[c("tStamp", input$CFcolumnsID)] )
-	
+
 	# select rows using the nice DT input
 	selectOccFilter <- reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
-	
+
 	# The POV tabs reconstruct the data into threads by sorting by tStamp and
 	# adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 	threadedOcc <- reactive({ ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID ) })
@@ -214,7 +215,18 @@ server <- shinyServer(function(input, output, session) {
 	}, ignoreInit = TRUE)
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
-	threadedEventsViz <- reactive({get_event_mapping_threads( input$VisualizeEventMapInputID ) })
+#	threadedEventsViz <- reactive({get_event_mapping_threads( input$VisualizeEventMapInputID ) })
+
+
+	# Get data for the Visualize tab.  Need parallel functions for the other tabs.
+	threadedEventsViz_ALL <- reactive({  get_event_mapping_threads( input$VisualizeEventMapInputID ) })
+
+	threadedEventsViz <- reactive({
+	  loc = input$VisualizeRangeID[1]
+	  width=input$VisualizeRangeID[2] - input$VisualizeRangeID[1]
+	  get_moving_window(threadedEventsViz_ALL(),width,loc) })
+
+
 
 	# Get data for the COMPARE tab mapping A
 	threadedEventsComp_A <- reactive({get_event_mapping_threads(input$CompareMapInputID_A ) })

@@ -25,6 +25,13 @@ output$Visualize_Tab_Controls_2 <- renderUI({
 	}
 })
 
+output$Visualize_Tab_Controls_3 = renderUI({
+  nThreads = numThreads(threadedEventsViz_ALL(),'threadNum')
+  sliderInput("VisualizeRangeID",
+              label=h4("Range of threads to include:"),
+              1, nThreads, c(1,nThreads),step = 1, ticks=FALSE)
+})
+
 #### N-Grams sub-tab ####
 
 # controls for ngrams display
@@ -104,7 +111,7 @@ output$Force_Network_Tab_Controls <- renderUI({
 			inline=TRUE
 		),
 		sliderInput("forceEdgeTheshold","Display edges above",0,1,0,step = 0.01,ticks = FALSE)
-	)	
+	)
 })
 
 output$forceNetworkD3 <- renderForceNetwork({
@@ -149,3 +156,9 @@ output$Role_map_output   <- renderPlotly({role_map(threadedEventsViz(), selectOc
 
 #### Thread Trajectories sub-tab ####
 output$ThreadTrajectoriesOutput <- renderPlotly({threadTrajectory(threadedEventsViz())})
+
+
+#####  pie chart display #####
+output$visualizePieCharts = renderPlotly({
+  CF_multi_pie(threadedEventsViz(), get_EVENT_CF())
+})
