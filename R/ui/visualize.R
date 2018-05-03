@@ -10,7 +10,9 @@ tabPanel(
     ),
     tabsetPanel(
         type = "tabs",
+
          tabPanel("Thread Trajectories", plotlyOutput("ThreadTrajectoriesOutput") ),
+
          tabPanel(
             "Whole Sequences",
             radioButtons(
@@ -34,7 +36,7 @@ tabPanel(
         ),
         tabPanel(
           "Contextual Factors",
-          plotlyOutput("visualizePieCharts", width = "100%")
+          plotlyOutput("visualizePieCharts")
         ),
         tabPanel("N-grams", uiOutput("nGramControls"), plotlyOutput("nGramBarchart")),
         tabPanel(
