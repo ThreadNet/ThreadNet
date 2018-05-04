@@ -121,6 +121,7 @@ output$forceNetworkD3 <- renderForceNetwork({
 })
 
 output$networkPie <- renderPlotly({
+	req(input$Group)
 	get_group <- input$Group
 	CF_multi_pie_event(threadedOcc(), threadedEventsViz(), get_EVENT_CF(), get_group, get_Zoom_VIZ())
 })
