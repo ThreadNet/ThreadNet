@@ -37,6 +37,12 @@ read_occurrences <- function(inFile){
   # clean up the data -- remove blanks, etc.
   o = cleanOcc(o,cfnames(o))
 
+  shinyjs::show(selector = "#navbar li a[data-value=choosePOV]")
+  shinyjs::hide(selector = "#navbar li a[data-value=visualize]")
+  shinyjs::hide(selector = "#navbar li a[data-value=subsets]")
+  shinyjs::hide(selector = "#navbar li a[data-value=comparisons]")
+  shinyjs::hide(selector = "#navbar li a[data-value=movingWindow]")
+  shinyjs::hide(selector = "#navbar li a[data-value=parameterSettings]")
   return(o)}
 
 # This could be improved but is an important logical checkpoint
@@ -104,12 +110,20 @@ make_example_DF = function(){
 #' @examples
 cleanOcc = function(o, cfnames){
 
+  withProgress(message = "Cleaning Data", value = 0,{
+
+  'denominator for loop'
+  n = length(o)
+
   ## clean up the spaces here and make it back into a factor
   for (cf in cfnames){
+    i = 1
     o[,cf] = sapply(o[,cf],fixBlanks)
     o[cf] = factor( o[,cf] )
+    incProgress(i/n)
+     i = i + 1
   }
-
+  })
   # force tStamp into a "YMD_HMS" format
   o$tStamp = as.character(o$tStamp)
   o$tStamp = parse_date_time(o$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
@@ -121,6 +135,7 @@ cleanOcc = function(o, cfnames){
   # add weekday and month
   o$weekday = as.factor(weekdays(as.Date(o$tStamp)))
   o$month = as.factor(months(as.Date(o$tStamp)))
+
 
   return(o)
 }

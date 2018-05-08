@@ -1,4 +1,4 @@
-tabPanel(
+tabPanel(value = "comparisons",
     "Comparisons",
     tabsetPanel(
         type = "tabs",
@@ -21,7 +21,7 @@ tabPanel(
                     conditionalPanel(
                         condition = "input.comparePanelSelect_A == 'Event network (circle)'",
                         uiOutput("Comp_A_4_controls"),
-                        visNetworkOutput("Comp_A_4") 
+                        visNetworkOutput("Comp_A_4")
                     ),
                     conditionalPanel(
                         condition = "input.comparePanelSelect_A == 'Event network (force)'",
@@ -54,7 +54,7 @@ tabPanel(
                         ),
                         conditionalPanel(
                             condition = "input.comparePanelSelect_B == 'Threads (event time)'",
-                            plotlyOutput("Comp_B_1") 
+                            plotlyOutput("Comp_B_1")
                         ),
                         conditionalPanel(
                             condition = "input.comparePanelSelect_B == 'Threads (actual time)'",
@@ -99,7 +99,7 @@ tabPanel(
                     column(3,uiOutput("Diachronic_Comparison_Tab_Controls_4"),uiOutput("Diachronic_Comparison_Tab_Controls_5") ),
                     column(3,uiOutput("Diachronic_Comparison_Tab_Controls_3") )
                 ),
-                plotlyOutput("DiachronicComparisonPlots") 
+                plotlyOutput("DiachronicComparisonPlots")
             )
         )
     )
