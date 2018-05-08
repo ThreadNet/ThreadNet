@@ -1,4 +1,4 @@
-tabPanel(
+tabPanel(value = "choosePOV",
     "Choose POV",
     helpText('Select columns from your data to define your point of view. You MUST click on either Preview Threads or Preview Data before proceeding.'),
     tags$hr(),

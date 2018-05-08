@@ -1,4 +1,4 @@
-tabPanel(
+tabPanel(value = "subsets",
     "Subsets and mapping",
     helpText('Create subsets of your data and alternative mappings'),
     tags$hr(),

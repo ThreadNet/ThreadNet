@@ -1,4 +1,4 @@
-tabPanel(
+tabPanel(value = "movingWindow",
     "Moving Window",
     fluidRow(
         column(3,

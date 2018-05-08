@@ -1,4 +1,4 @@
-tabPanel(
+tabPanel(value = "visualize",
     "Visualize",
     fluidRow(
         column(3,uiOutput("Visualize_Tab_Controls_1")),

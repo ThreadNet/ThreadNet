@@ -8,6 +8,16 @@
 
 server <- shinyServer(function(input, output, session) {
 
+  observe({
+    hide(selector = "#navbar li a[data-value=choosePOV]")
+    hide(selector = "#navbar li a[data-value=visualize]")
+    hide(selector = "#navbar li a[data-value=subsets]")
+    hide(selector = "#navbar li a[data-value=comparisons]")
+    hide(selector = "#navbar li a[data-value=movingWindow]")
+    hide(selector = "#navbar li a[data-value=parameterSettings]")
+  })
+
+
 	options(warn=-1)
 	options(shiny.maxRequestSize=30*1024^2)
 
