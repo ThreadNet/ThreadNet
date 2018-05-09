@@ -8,6 +8,16 @@
 
 server <- shinyServer(function(input, output, session) {
 
+  observe({
+    hide(selector = "#navbar li a[data-value=choosePOV]")
+    hide(selector = "#navbar li a[data-value=visualize]")
+    hide(selector = "#navbar li a[data-value=subsets]")
+    hide(selector = "#navbar li a[data-value=comparisons]")
+    hide(selector = "#navbar li a[data-value=movingWindow]")
+    hide(selector = "#navbar li a[data-value=parameterSettings]")
+  })
+
+
 	options(warn=-1)
 	options(shiny.maxRequestSize=30*1024^2)
 
@@ -68,12 +78,20 @@ server <- shinyServer(function(input, output, session) {
 
 	# The POV tabs reconstruct the data into threads by sorting by tStamp and
 	# adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
-	threadedOcc <- reactive({ ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID ) })
+	threadedOcc <- reactive({
+	  validate(need(input$THREAD_CF_ID != "", "You must select at least one Thread"))
+	  validate(need(input$EVENT_CF_ID != "", "You must select at least one Event"))
+	  ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID )
+	  })
 
 	# get the data that will be the input for this tab
 	chunkInputEvents <- reactive({
 		rv$newmap
 		get_event_mapping_threads(input$ChunkInputMapID)
+	})
+
+	observeEvent(input$tabs, {
+
 	})
 
 	# this function runs when you push the button to create a new mapping based on chunks

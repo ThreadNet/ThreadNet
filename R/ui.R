@@ -11,11 +11,12 @@
 
 # pdf(NULL) # prevent plotly errors
 library(shiny)
+library(shinyjs)
 library(networkD3)
 library(visNetwork)
 
 ui <- fluidPage(
-
+    useShinyjs(),
     visualizations <- c(
         'Threads (event time)',
         'Threads (actual time)',
@@ -34,6 +35,7 @@ ui <- fluidPage(
 
     # tab definitions are under "ui" directory
     tabsetPanel(
+      id="navbar",
         type = "tabs",
         source(file.path("ui", "readData.R"),          local = TRUE)$value,
         source(file.path("ui", "choosePOV.R"),         local = TRUE)$value,
