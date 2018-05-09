@@ -164,7 +164,7 @@ bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
     ngdf$id = win_num
 
     # filter and convert to 0/1
-    ngdf$freq = (ngdf$freq>5)  * 1
+    ngdf$freq = (ngdf$freq>0)  * 1
 
     # append the columns to the end
     vt=rbind(vt,ngdf)
@@ -196,7 +196,7 @@ bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
     ngramFreqMatrix[i,]=b
   }
 
-  # return(ngramFreqMatrix)
+   return(ngramFreqMatrix)
 
   # old way: correlate one row with the next and stick it in a dataframe
   # df =data.frame( id = 1:nWindows,
@@ -205,19 +205,19 @@ bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
   #                                            function(i){cor( ngramFreqMatrix[1, ] ,
   #                                                             ngramFreqMatrix[i, ] )  })))
 
-  for (j in seq(30,410,15)) {
+
 
   #use hamming distance = haw many edges are different?
   df =data.frame( id = 1:nWindows,
                   vday = unique(e$vday),
                   correlation= unlist(lapply(1:nWindows,
-                                             function(i){sum( ngramFreqMatrix[j, ] !=
+                                             function(i){sum( ngramFreqMatrix[1, ] !=
                                                               ngramFreqMatrix[i, ] ) })))
 
   plot(smooth(df$correlation),xlab='Days',ylab='Distance')
    lines(smooth(df$correlation),xlab='Days',ylab='Distance')
 
-  }
+
 
   return( df )
 
@@ -356,5 +356,31 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
   print('done converting occurrences...')
 
   return( occ )
+
+}
+
+map_networks_onto_integers <- function(edge_matrix ){
+
+  # each row in the edge_matrix is a vector of edges for one network
+  # convert them to a list of strings
+  f=unlist(lapply(1:nrow(edge_matrix), function(i){concatenate(edge_matrix[i,])}))
+
+  # initialize the result
+  nf = integer(nrow(edge_matrix))
+
+  nf[1]=1
+  for (i in 2:nrow(edge_matrix)){
+
+    ind = grep(f[i], f[1:(i-1)])
+    print(ind)
+    if (identical(ind, integer(0))){ind=0}
+
+    if (ind >0)
+      {nf[i] = ind[1]}
+    else
+      {nf[i] = i}
+  }
+
+return(nf)
 
 }
