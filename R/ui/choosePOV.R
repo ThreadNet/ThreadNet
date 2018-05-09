@@ -3,14 +3,14 @@ tabPanel(value = "choosePOV",
     helpText('Select columns from your data to define your point of view. You MUST click on either Preview Threads or Preview Data before proceeding.'),
     tags$hr(),
     tabsetPanel(
-        type = "tabs",
-        tabPanel(
+        id = "tabs",
+        tabPanel(value = "defineThreads",
             "Define Threads",
             tags$h4("Threads are defined by contextual features that STAY THE SAME during a thread. At least ONE is required."),
             uiOutput("POV_Tab_Controls_2"),
             plotlyOutput("ContextFlowers_2")
         ),
-        tabPanel(
+        tabPanel(value = "defineEvents",
             "Define Events",
             tags$h4("Events are marked by contextual features that CHANGE within the threads. At least ONE is required."),
             uiOutput("POV_Tab_Controls_3"),
@@ -23,7 +23,7 @@ tabPanel(value = "choosePOV",
         #     # ** add conditional panels here to choose output **
         #     plotlyOutput("previewThreadMap_1")
         # ),
-        tabPanel(
+        tabPanel(value = "showThreads",
             "*** CLICK HERE TO PROCEED ***",
             tags$h4("This table shows the data threaded from your chosen POV"),
             DT::dataTableOutput("Thread_Tab_Output_1")
