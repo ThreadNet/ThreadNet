@@ -249,7 +249,7 @@ combineContextFactors <- function(o,CF,newCol){
   }
 
   # Coerce the new column into a factor
-  o[newCol] = as.factor(o[,newCol])
+  # o[newCol] = as.factor(o[,newCol])
 
   return(o)
 }
