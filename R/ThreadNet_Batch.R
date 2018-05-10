@@ -239,8 +239,8 @@ bucket_correlation_sliding  <- function(e,w,s=1,n=2,zcf='Role'){
   # zcf = zoom_upper_limit(e)
 
   # now many threads?
-  nThreads = numThreads(e,'threadNum')
-
+ # nThreads = numThreads(e,'threadNum')
+  nThreads = nrow(e)
 
   # treat each day as a bucket
   win_num = 0
@@ -250,15 +250,14 @@ bucket_correlation_sliding  <- function(e,w,s=1,n=2,zcf='Role'){
     print(paste('wloc =',wloc ))
     print(paste('w =',w ))
     # get text vector for the whole data set - just keep the first two colomns
-    ngdf = count_ngrams(get_moving_window(e, w, wloc), 'threadNum', zcf, n)[1:2]
+    ngdf = count_ngrams(e[wloc:(wloc+w),], 'threadNum', zcf, n)[1:2]
   #  print(paste('nrow ngdf =',nrow(ngdf)))
-     print(paste('wloc =',wloc ))
 
     # add an ID
     ngdf$id = win_num
 
     # filter and convert to 0/1
-    ngdf$freq = (ngdf$freq>10)  * 1
+    ngdf$freq = (ngdf$freq>50)  * 1
 
     # append the columns to the end
     vt=rbind(vt,ngdf)

@@ -422,7 +422,8 @@ convert_TN_to_TramineR <- function(df, TN, CF){
 get_threadList <- function(e,TN,SN){
 
   # for the current data structure for events, you just pick all of the threads where seqNum == 1
-  return(e[e[[SN]]==1,TN])
+ # return(e[e[[SN]]==1,TN])
+  return(unique(e[[TN]]))
 }
 
 #' get_moving_window returns a set of threads for a moving window
@@ -442,7 +443,7 @@ get_moving_window <- function(e, s, l ){
   w=get_threadList(e,"threadNum","seqNum")
 
   # get get the appropriate subset of threads for the window
-  w=w[l:(l+s-1)]
+  w=w[l:(l+s-1),]
 
   # and now subset the rows for those threads
 
