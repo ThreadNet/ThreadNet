@@ -138,7 +138,7 @@ make_buckets <- function(o, criteria){
 # n is the ngram size
 # Use one day per bucket
 # zcf is just the role for now
-bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
+bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role',threshold){
 
   # make data frame
   vt=data.frame( ngrams=character(), freq=integer(), id=integer() )
@@ -164,7 +164,7 @@ bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
     ngdf$id = win_num
 
     # filter and convert to 0/1
-    ngdf$freq = (ngdf$freq>50)  * 1
+    ngdf$freq = (ngdf$freq>threshold)  * 1
 
     # append the columns to the end
     vt=rbind(vt,ngdf)
@@ -414,29 +414,12 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
     } # tlen>0
   }
 
-  # split occ data frame by threadNum to find earliest time value for that thread
-  # then substract that from initiated relativeTime from above
- # occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+  # split occ data frame by days
+  # occ_split = lapply(split(occ, occ$vday), function(x) {
+  #   x})
+
   # # row bind data frame back together
- # occ= data.frame(do.call(rbind, occ_split))
-
-  #  these are just equal to the row numbers -- one occurrence per event
- # occ["occurrences"] =   1:nrow(occ)
-
-  # now go through and change each of the CF values to a vector (0,0,0,1,0,0,0,0)
-  # for (cf in EVENT_CF){
-  #   #make a new column for each CF
-  #   VCF = paste0("V_",cf)
-  #   occ[[VCF]]= vector(mode = "integer",length=nrow(occ))
-  #
-  #   for (r in 1:nrow(occ)){
-  #     occ[[r,VCF]] = list(convert_CF_to_vector(occ,cf,r))
-  #   }
-  # }
-  #
-  # just add the one column with the combined values
-  # occ["ZM_1"] = as.integer(occ[,newColName(EVENT_CF)])
-
+  #occ= data.frame(do.call(rbind, occ_split))
 
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
   # e=clusterEvents(occ, 'OneToOne', 'Network Proximity', EVENT_CF,'threads')
