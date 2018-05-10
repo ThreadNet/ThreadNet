@@ -173,28 +173,27 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
       pies = pies  %>%
         add_pie(data = cfData, labels = ~Label, values = ~Freq,
                 textinfo='label',textposition='none', name=as.character(CF[i]),
-                domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
+                domain = list(y = c(plotDomainUB[i], plotDomainLB[i])) ) %>%
         add_annotations(text=paste0(CF[i],"<br>",cfData$Label),showarrow=FALSE,xanchor="center",
                         font=list(size="14",color="white"),
-                        xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+                        xref="paper",yref="paper",y=ctrPlot[i],x=.5)
     } else {
     pies = pies  %>%
       add_pie(data = cfData, labels = ~Label, values = ~Freq,
               textinfo='label',textposition='none', name=as.character(CF[i]),
-              domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
+              domain = list(y = c(plotDomainUB[i], plotDomainLB[i])) ) %>%
       add_annotations(text=paste0(CF[i],"<br>N=",CFlevels),showarrow=FALSE,xanchor="center",
                       font=list(size="14",color="white"),
-                      xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+                      xref="paper",yref="paper",y=ctrPlot[i],x=.5)
     }
   }
-
   pies = pies %>%
-    layout(showlegend=FALSE,
-           xaxis = list(showgrid = FALSE,zeroline = FALSE, showticklabels = FALSE),
-           yaxis = list(showgrid = FALSE, zeroline = FALSE,showticklabels = FALSE)
-           # ,
-           # autosize = F, width = "100%", height = "100px")
-    )
+     layout(showlegend=FALSE,
+            xaxis = list(showgrid = FALSE,zeroline = FALSE, showticklabels = FALSE),
+            yaxis = list(showgrid = FALSE, zeroline = FALSE,showticklabels = FALSE)
+            # ,
+            # autosize = F, width = "100%", height = "100px")
+     )
   return(pies)
 }
 
