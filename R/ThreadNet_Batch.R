@@ -164,7 +164,7 @@ bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
     ngdf$id = win_num
 
     # filter and convert to 0/1
-    ngdf$freq = (ngdf$freq>0)  * 1
+    ngdf$freq = (ngdf$freq>50)  * 1
 
     # append the columns to the end
     vt=rbind(vt,ngdf)
@@ -230,7 +230,98 @@ bucket_correlation  <- function(e,w,s=1,n=2,zcf='Role'){
 
 }
 
+bucket_correlation_sliding  <- function(e,w,s=1,n=2,zcf='Role'){
 
+  # make data frame
+  vt=data.frame( ngrams=character(), freq=integer(), id=integer() )
+
+  # use the finest  granularity
+  # zcf = zoom_upper_limit(e)
+
+  # now many threads?
+  nThreads = numThreads(e,'threadNum')
+
+
+  # treat each day as a bucket
+  win_num = 0
+  for (wloc in seq( 1, nThreads, s)){
+
+    win_num = win_num +1
+
+    # get text vector for the whole data set - just keep the first two colomns
+    ngdf = count_ngrams(get_moving_window(e, w, wloc), 'threadNum', zcf, n)[1:2]
+  #  print(paste('nrow ngdf =',nrow(ngdf)))
+     print(paste('wloc =',wloc ))
+
+    # add an ID
+    ngdf$id = win_num
+
+    # filter and convert to 0/1
+    ngdf$freq = (ngdf$freq>10)  * 1
+
+    # append the columns to the end
+    vt=rbind(vt,ngdf)
+  }
+
+  # convert to factor
+  vt$ngrams = factor(vt$ngrams)
+
+  # compute number of windows.
+  nWindows = win_num
+
+  print(paste('nWindows=',nWindows))
+
+  # get the set of unique ngrams for the whole data set
+  vt_unique = data.frame(ngrams=unique(vt$ngrams))
+
+  # put the results here
+  ngramFreqMatrix = matrix(0,nrow=nWindows, ncol=nrow(vt_unique))
+
+  for (i in 1:nWindows){
+
+    # get the merged list
+    vtmerge = merge(x=vt_unique, y=vt[vt$id==i,], by='ngrams', all.x = TRUE)
+
+    # use the wid.y to get the whole vector, but replace the NA with zeros
+    b=vtmerge[vtmerge$id==i,'freq']
+    b[is.na(b)] <- 0
+
+    ngramFreqMatrix[i,]=b
+  }
+
+  return(ngramFreqMatrix)
+
+  # old way: correlate one row with the next and stick it in a dataframe
+  # df =data.frame( id = 1:nWindows,
+  #                 vday = unique(e$vday),
+  #                 correlation= unlist(lapply(1:nWindows,
+  #                                            function(i){cor( ngramFreqMatrix[1, ] ,
+  #                                                             ngramFreqMatrix[i, ] )  })))
+
+
+
+  #use hamming distance = haw many edges are different?
+  df =data.frame( id = 1:nWindows,
+                  vday = unique(e$vday),
+                  correlation= unlist(lapply(1:nWindows,
+                                             function(i){sum( ngramFreqMatrix[1, ] !=
+                                                                ngramFreqMatrix[i, ] ) })))
+
+  plot(smooth(df$correlation),xlab='Days',ylab='Distance')
+  lines(smooth(df$correlation),xlab='Days',ylab='Distance')
+
+
+
+  return( df )
+
+  # # get the ngram data and labels
+  # b_df=as.data.frame(ngramFreqMatrix)
+  # colnames(b_df)=vt_unique$ngrams
+  #
+  # # stick the ngram frequencies on the end for good measure
+  # return(cbind(df,b_df))
+
+}
 
 
 # borrowed and adapted from threadnet_core.r
