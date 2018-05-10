@@ -247,7 +247,8 @@ bucket_correlation_sliding  <- function(e,w,s=1,n=2,zcf='Role'){
   for (wloc in seq( 1, nThreads, s)){
 
     win_num = win_num +1
-
+    print(paste('wloc =',wloc ))
+    print(paste('w =',w ))
     # get text vector for the whole data set - just keep the first two colomns
     ngdf = count_ngrams(get_moving_window(e, w, wloc), 'threadNum', zcf, n)[1:2]
   #  print(paste('nrow ngdf =',nrow(ngdf)))
