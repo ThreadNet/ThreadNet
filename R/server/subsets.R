@@ -28,7 +28,6 @@ output$chunk_controls_1 <- renderUI({
 
 # handoff controls
 output$chunk_controls_2 <- renderUI({
-	# input$chunk_CFs
 	tags$div(
 		checkboxGroupInput(
 			"chunk_CFs",
@@ -77,6 +76,7 @@ output$chunk_controls_6 <- renderUI({
 
 # show the results
 output$chunk_controls_7 <- renderText({
+  req(input$chunkVerbatimRows[1])
 	paste(
 		thread_text_vector(
 			chunkInputEvents(),
@@ -84,7 +84,7 @@ output$chunk_controls_7 <- renderText({
 			get_Zoom_CHUNK(),
 			','
 		)[input$chunkVerbatimRows[1]:input$chunkVerbatimRows[2]],
-		'\n' 
+		'\n'
 	)
 })
 
@@ -127,7 +127,8 @@ output$Regular_Expression_controls_3 <- renderUI({
 	)
 })
 
-output$Regular_Expression_controls_4 <- renderText(
+output$Regular_Expression_controls_4 <- renderText({
+  req(input$regexVerbatimRows[1])
 	paste(
 		thread_text_vector(
 			regexInputEvents(),
@@ -137,7 +138,7 @@ output$Regular_Expression_controls_4 <- renderText(
 		)[input$regexVerbatimRows[1]:input$regexVerbatimRows[2]],
 		'\n'
 	)
-)
+})
 
 output$Regular_Expression_controls_5 <- renderUI({
 	maxrows <- length(unique(regexInputEvents()[['threadNum']]))
@@ -150,6 +151,7 @@ output$Regular_Expression_controls_5 <- renderUI({
 
 # create several rows of inputs
 output$Regular_Expression_controls_6 <- renderUI({
+  req(input$numRegexInputRows)
 	# create some select inputs
 	lapply(1:input$numRegexInputRows, function(i) {
 		fluidRow(
@@ -213,7 +215,8 @@ output$Frequent_Ngram_controls_3 <- renderUI({
 	)
 })
 
-output$Frequent_Ngram_controls_4 <- renderText(
+output$Frequent_Ngram_controls_4 <- renderText({
+  req(freqNgramInputEvents(), input$freqNgramVerbatimRows[1])
 	paste(
 		thread_text_vector(
 			freqNgramInputEvents(),
@@ -223,7 +226,7 @@ output$Frequent_Ngram_controls_4 <- renderText(
 		)[input$freqNgramVerbatimRows[1]:input$freqNgramVerbatimRows[2]],
 		'\n'
 	)
-)
+})
 
 output$Frequent_Ngram_controls_5 <- renderUI({
 	maxrows <- length(unique(freqNgramInputEvents()[['threadNum']]))

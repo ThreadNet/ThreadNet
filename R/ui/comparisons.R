@@ -26,7 +26,7 @@ tabPanel(value = "comparisons",
                     conditionalPanel(
                         condition = "input.comparePanelSelect_A == 'Event network (force)'",
                         uiOutput("Comp_A_5_controls"),
-                        forceNetworkOutput("Comp_A_5"
+                        forceNetworkOutput("Comp_A_5")
                     ),
                     conditionalPanel(
                         condition = "input.comparePanelSelect_A == 'Other networks'",
@@ -103,4 +103,3 @@ tabPanel(value = "comparisons",
             )
         )
     )
-)

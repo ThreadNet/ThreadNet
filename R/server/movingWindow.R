@@ -5,6 +5,7 @@
   })
 
   output$Moving_Window_Tab_Controls_2 <- renderUI({
+    req(input$MovingWindowMapInputID)
     zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$MovingWindowMapInputID))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
@@ -31,6 +32,7 @@
   })
 
 output$single_moving_window_timeline = renderPlotly({
+    req(input$MovingWindowSizeID, input$MovingWindowIncrement)
     trace = window_correlation( threadedEventsMove(), input$MovingWindowSizeID, input$MovingWindowIncrement, 2)
     movingWindowCorrelation(  trace )  })
 
@@ -67,32 +69,38 @@ output$single_moving_window_timeline = renderPlotly({
   output$Moving_B_3 <- renderPlotly({ threadMap(threadedEventsMove_B(), "threadNum", "relativeTime", get_Zoom_MOVE(), 15 ) })
 
   output$Moving_A_4 <- renderVisNetwork({
+    req(input$M_4_Theshold)
     n = threads_to_network_original( threadedEventsMove_A(), "threadNum", get_Zoom_MOVE() )
     n=filter_network_edges(n,input$M_4_Theshold)
     circleVisNetwork( n ) })
 
   output$Moving_B_4 <- renderVisNetwork({
+    req(input$M_4_Theshold)
     n = threads_to_network_original( threadedEventsMove_B(), "threadNum", get_Zoom_MOVE() )
     n=filter_network_edges(n,input$M_4_Theshold)
     circleVisNetwork( n  ) })
 
   output$Moving_A_5 <- renderForceNetwork({
+    req(input$M_5_Theshold)
     n = threads_to_network_original( threadedEventsMove_A(), 'threadNum', get_Zoom_MOVE(), 'threadNum' )
     n = filter_network_edges(n,input$M_5_Theshold)
     forceNetworkD3( n )  })
 
   output$Moving_B_5 <- renderForceNetwork({
+    req(input$M_5_Theshold)
     n = threads_to_network_original( threadedEventsMove_B(), 'threadNum', get_Zoom_MOVE(), 'threadNum' )
     n = filter_network_edges(n,input$M_5_Theshold)
     forceNetworkD3( n )  })
 
 
   output$Moving_A_6 <- renderVisNetwork({
+    req(input$M_6_Theshold)
     n = normalNetwork( threadedEventsMove_A(), selectOccFilter(), input$M_6_OtherNetworkCF )
     n=filter_network_edges(n,input$M_6_Theshold)
     circleVisNetwork( n )  })
 
   output$Moving_B_6 <- renderVisNetwork({
+    req(input$M_6_Theshold)
     n = normalNetwork( threadedEventsMove_B(), selectOccFilter(), input$M_6_OtherNetworkCF )
     n=filter_network_edges(n,input$M_6_Theshold)
     circleVisNetwork( n ) })
