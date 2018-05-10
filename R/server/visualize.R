@@ -13,6 +13,7 @@ output$Visualize_Tab_Controls_1 <- renderUI({
 })
 
 output$Visualize_Tab_Controls_2 <- renderUI({
+  req(input$VisualizeEventMapInputID)
 	zoom_limit = zoom_upper_limit(get_event_mapping_threads(input$VisualizeEventMapInputID))
 	if(zoom_limit == 1) {
 		tags$h4("Zooming not available for this mapping")
@@ -44,6 +45,7 @@ output$nGramControls <- renderUI({
 
 # NGRAMdisplay
 output$nGramBarchart <- renderPlotly({
+  req(input$nGramLengthID)
 	ng_bar_chart(
 		threadedEventsViz(),
 		"threadNum",
@@ -66,6 +68,7 @@ output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({ threadMap(threadedE
 output$Circle_Network_Tab_Controls <- renderUI({ sliderInput("circleEdgeTheshold","Display edges above", 0,1,0,step = 0.01,ticks = FALSE )})
 
 output$circleVisNetwork <- renderVisNetwork({
+  req(input$circleEdgeTheshold)
 	# first convert the threads to the network
 	n <- threads_to_network_original(threadedEventsViz(), "threadNum", get_Zoom_VIZ())
 	n <- filter_network_edges(n,input$circleEdgeTheshold)
@@ -90,6 +93,7 @@ output$Other_Network_Tab_Controls <- renderUI({
 })
 
 output$otherVisNetwork <- renderVisNetwork({
+  req(input$otherEdgeTheshold)
 	# first convert the threads to the network
 	n <- normalNetwork(threadedEventsViz(), selectOccFilter(), input$OtherNetworkCF)
 	n <- filter_network_edges(n,input$otherEdgeTheshold)
@@ -115,6 +119,7 @@ output$Force_Network_Tab_Controls <- renderUI({
 })
 
 output$forceNetworkD3 <- renderForceNetwork({
+  req(input$forceEdgeTheshold)
 	n <- threads_to_network_original(threadedEventsViz(), 'threadNum', get_Zoom_VIZ(), input$NetworkGroupID)
 	n <- filter_network_edges(n,input$forceEdgeTheshold)
 	forceNetworkD3(n)
