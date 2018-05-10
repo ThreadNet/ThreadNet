@@ -102,11 +102,13 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
     sliderInput("B_6_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))})
 
   output$Comp_A_6 <- renderVisNetwork({
+    req(input$A_6_Theshold)
     n = normalNetwork( threadedEventsComp_A(), selectOccFilter(), input$A_6_OtherNetworkCF )
     n=filter_network_edges(n,input$A_6_Theshold)
     circleVisNetwork( n )  })
 
   output$Comp_B_6 <- renderVisNetwork({
+    req(input$B_6_Theshold)
     n = normalNetwork( threadedEventsComp_B(), selectOccFilter(), input$B_6_OtherNetworkCF )
     n=filter_network_edges(n,input$B_6_Theshold)
     circleVisNetwork( n ) })
