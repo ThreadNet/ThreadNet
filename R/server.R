@@ -291,7 +291,7 @@ server <- shinyServer(function(input, output, session) {
 
 	# Get data for the Diachronic COMPARE tab.
 	threadedEventsDiaComp <- reactive({
-	  req(input$DiaCompreMapInputID)
+	  req(input$DiaCompareMapInputID)
 	  get_event_mapping_threads(input$DiaCompareMapInputID )
 	  })
 

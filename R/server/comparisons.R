@@ -145,11 +145,12 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
 
  # Get subsets of events and create sub-plots for them
 
-  output$DiachronicComparisonPlots <- renderPlotly(
+  output$DiachronicComparisonPlots <- renderPlotly({
+    req(input$selectComparisonGroupsID)
     Comparison_Plots(threadedEventsDiaComp(),
                      selectOccFilter(),
                      input$selectComparisonID,
                      input$selectComparisonGroupsID,
                      input$DiaCompareTimeSubsetID,
                      input$comparePanelViz,
-                     input$role_map_cfs) )
+                     input$role_map_cfs)})
