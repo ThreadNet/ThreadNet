@@ -17,16 +17,6 @@ library(visNetwork)
 
 ui <- fluidPage(
     useShinyjs(),
-    visualizations <- c(
-        'Threads (event time)',
-        'Threads (actual time)',
-        'Threads (relative time)',
-        'Event network (circle)',
-        'Event network (force)',
-        'Other networks',
-        'Role Maps',
-        'Thread Trajectories'
-    ),
 
     # Application title
     tags$h3(align='center', "ThreadNet 3 Development"),

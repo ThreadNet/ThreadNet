@@ -24,8 +24,20 @@ library(DT)
 library(RColorBrewer)
 library(lubridate)
 
-# this is another change
+# visualization types for UI dropdowns
+visualizations <- c(
+        'Threads (event time)',
+        'Threads (actual time)',
+        'Threads (relative time)',
+        'Event network (circle)',
+        'Event network (force)',
+        'Other networks',
+        'Role Maps',
+        'Thread Trajectories'
+    ),
 
+
+# load functions
 source("ThreadNet_Core.R")
 source("ThreadNet_Misc.R")
 source("ThreadNet_Graphics.R")
@@ -34,5 +46,4 @@ source("ThreadNet_Metrics.R")
 # Global variables, config settings, etc. can be defined here
 
 # This is where we store the list of event mappings.  Reactive bindings are added in server.R
-GlobalEventMappings <<-list()
-
+GlobalEventMappings <- list()
