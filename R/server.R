@@ -110,24 +110,29 @@ server <- shinyServer(function(input, output, session) {
 	  req(input$ChunkInputMapID)
 		get_event_mapping_threads(input$ChunkInputMapID)
 	})
-
+	
 	# this function runs when you push the button to create a new mapping based on chunks
-	observeEvent( input$EventButton2,{
-		rv$newmap <- rv$newmap+1 # trigger reactive value
-		isolate(
-			OccToEvents_By_Chunk(
-				chunkInputEvents(),
-				input$Chunks_method_Button, # which method?
-				input$EventMapName2,
-				input$fixed_chunk_size,
-				input$chunk_time_gap_threshold,
-				'mins',
-				input$chunk_CFs,
-				get_EVENT_CF(),
-				get_COMPARISON_CF()
-			)
-		)
-	}, ignoreInit = TRUE )
+    observeEvent( input$EventButton2,
+    if (check_map_name(input$EventMapName2)){
+      mapName2 = input$EventMapName2
+      output$EventValidate2 = renderText(paste('Map Name', mapName2 , 'already exists, please select a different name'))
+    } else {
+        rv$newmap <- rv$newmap+1 # trigger reactive value
+        isolate(
+            OccToEvents_By_Chunk(
+                chunkInputEvents(),
+                input$Chunks_method_Button, # which method?
+                input$EventMapName2,
+                input$fixed_chunk_size,
+                input$chunk_time_gap_threshold,
+                'mins',
+                input$chunk_CFs,
+                get_EVENT_CF(),
+                get_COMPARISON_CF()
+            )
+        )
+        output$EventValidate2 = renderText(paste('New map named', input$EventMapName2 ,'has been created'))
+    }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
 	regexInputEvents <- reactive({
@@ -146,21 +151,26 @@ server <- shinyServer(function(input, output, session) {
 	})
 
 	# this function runs when you push the button to create a new mapping
-	observeEvent(input$EventButton3,{
-		rv$newmap <- rv$newmap+1 # trigger reactive value
-		isolate(
-			OccToEvents3(
-				regexInputEvents(),
-				input$EventMapName3,
-				get_EVENT_CF(),
-				get_COMPARISON_CF(),
-				'threadNum',
-				get_Zoom_REGEX(),
-				regexInput(),
-				input$KeepIrregularEvents
-			)
-		)
-	}, ignoreInit = TRUE )
+    observeEvent(input$EventButton3,
+      if (check_map_name(input$EventMapName3)){
+        mapName3 = input$EventMapName3
+      output$EventValidate3 = renderText(paste('Map Name', mapName3 , 'already exists, please select a different name'))
+    } else {
+        rv$newmap <- rv$newmap+1 # trigger reactive value
+        isolate(
+            OccToEvents3(
+                regexInputEvents(),
+                input$EventMapName3,
+                get_EVENT_CF(),
+                get_COMPARISON_CF(),
+                'threadNum',
+                get_Zoom_REGEX(),
+                regexInput(),
+                input$KeepIrregularEvents
+            )
+        )
+      output$EventValidate3 = renderText(paste('New map named', input$EventMapName3 ,'has been created'))
+    }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
 	freqNgramInputEvents <- reactive({
@@ -201,35 +211,41 @@ server <- shinyServer(function(input, output, session) {
 	})
 
 	# this function runs when you push the button to create a new mapping
-	observeEvent(input$EventButton4,{
-		rv$newmap <- rv$newmap+1 # trigger reactive value
-		isolate(
-			OccToEvents3(
-				freqNgramInputEvents(),
-				input$EventMapName4,
-				get_EVENT_CF(),
-				get_COMPARISON_CF(),
-				'threadNum',
-				get_Zoom_freqNgram(),
-				selected_ngrams(),
-				input$KeepIrregularEvents_2
-			)
-		)
-	}, ignoreInit = TRUE)
+    observeEvent(input$EventButton4,
+      if (check_map_name(input$EventMapName4)){
+        mapName4 = input$EventMapName4
+        output$EventValidate4 = renderText(paste('Map Name', mapName4 , 'already exists, please select a different name'))
+      } else {
+        rv$newmap <- rv$newmap+1 # trigger reactive value
+        isolate(
+            OccToEvents3(
+                freqNgramInputEvents(),
+                input$EventMapName4,
+                get_EVENT_CF(),
+                get_COMPARISON_CF(),
+                'threadNum',
+                get_Zoom_freqNgram(),
+                selected_ngrams(),
+                input$KeepIrregularEvents_2
+            )
+        )
+        output$EventValidate4 = renderText(paste('New map named', input$EventMapName4 ,'has been created'))
+    }, ignoreInit = TRUE)
 
 	# separate the cluster calculation from the dendrogram display
-	cluster_result <- eventReactive(input$EventButton6,{
-		rv$newmap <- rv$newmap+1 # trigger reactive value
-		isolate(
-			clusterEvents(
-				get_event_mapping_threads(input$ClusterEventsInputID),
-				input$EventMapName6,
-				input$ClusterMethodID,
-				get_EVENT_CF(),
-				'cluster'
-			)
-		)
-	}, ignoreInit = TRUE )
+    cluster_result <- eventReactive(input$EventButton6,{
+        validate(need(!(check_map_name(input$EventMapName6)), paste0('Map Name ',input$EventMapName6,' already exists. Please select a different name.')))
+        rv$newmap <- rv$newmap+1 # trigger reactive value
+        isolate(
+            clusterEvents(
+                get_event_mapping_threads(input$ClusterEventsInputID),
+                input$EventMapName6,
+                input$ClusterMethodID,
+                get_EVENT_CF(),
+                'cluster'
+            )
+        )
+    }, ignoreInit = TRUE )
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
 	subsetEventsViz <- reactive({
@@ -254,10 +270,16 @@ server <- shinyServer(function(input, output, session) {
 		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
 	})
 
-	observeEvent(input$SelectSubsetButton,{
-		rv$newmap <- rv$newmap+1 # trigger reactive value
-		store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
-	}, ignoreInit = TRUE)
+	observeEvent(input$SelectSubsetButton,
+                 if (check_map_name(input$SelectSubsetMapName)){
+                   SubsetMapName = input$SelectSubsetMapName
+                   output$SelectSubsetValidate = renderText(paste('Map Name', SubsetMapName , 'already exists, please select a different name'))
+                 } else {
+                   rv$newmap <- rv$newmap+1 # trigger reactive value
+                   store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
+                   output$SelectSubsetValidate = renderText(paste('New map named', input$SelectSubsetMapName ,'has been created'))
+                 }, ignoreInit = TRUE)
+
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
 #	threadedEventsViz <- reactive({get_event_mapping_threads( input$VisualizeEventMapInputID ) })

@@ -622,6 +622,22 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
 }
 #####################################################
 # GlobalEventMappings is a global variable
+
+#' Checks the name attempting to be create against the list of
+#' map names in memory and forces the creation of a new name.
+#'
+#' @param mapname name of map attempting to be created
+
+check_map_name = function(mapname){
+    if (mapname %in% get_event_mapping_name_list()){
+      existingMap = TRUE
+    } else {
+      existingMap = FALSE
+    }
+    return(existingMap)
+  }
+
+
 get_event_mapping_name_list <- function(){
 
   # print(paste('length of gem:',length(GlobalEventMappings)))
