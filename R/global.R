@@ -26,16 +26,15 @@ library(lubridate)
 
 # visualization types for UI dropdowns
 visualizations <- c(
-        'Threads (event time)',
-        'Threads (actual time)',
-        'Threads (relative time)',
-        'Event network (circle)',
-        'Event network (force)',
-        'Other networks',
-        'Role Maps',
-        'Thread Trajectories'
-    ),
-
+	'Threads (event time)',
+	'Threads (actual time)',
+	'Threads (relative time)',
+	'Event network (circle)',
+	'Event network (force)',
+	'Other networks',
+	'Role Maps',
+	'Thread Trajectories'
+)
 
 # load functions
 source("ThreadNet_Core.R")
