@@ -371,7 +371,7 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
      x})
 
   # row bind data frame back together
-  occ= data.frame(do.call(rbind, occ_split))
+  occ= rbindlist( occ_split )
 
 return(occ)
 
