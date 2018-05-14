@@ -338,11 +338,9 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
   nPOV = newColName(THREAD_CF)
   occ = combineContextFactors(o,THREAD_CF, nPOV )
 
-   print("nPOV")
-   print(nPOV)
-  #
-   print("THREAD_CF")
-   print(THREAD_CF)
+   print(paste("nPOV=",nPOV))
+
+   print(paste('THREAD_CF=',THREAD_CF))
 
   # The event context factors define the new category of events within those threads
   occ = combineContextFactors(occ,EVENT_CF,newColName(EVENT_CF))
@@ -355,6 +353,15 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
   # add two columns to the data frame
   occ$threadNum = integer(nrow(occ))
   occ$seqNum =   integer(nrow(occ))
+
+  # Use this strategy to break out the threads...
+  # split occ data frame by thread
+  # occ_split = lapply(split(occ, occ$vday), function(x) {
+  #   x})
+
+  # # row bind data frame back together
+  #occ= data.frame(do.call(rbind, occ_split))
+
 
   # add new column called label - just copy the new combined event_CF column
   #occ$label = occ[[newColName(EVENT_CF)]]
@@ -380,7 +387,7 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
   thrd=1
   for (p in pov_list){
 
-    if ((as.integer(p) %% 500) == 0) {print(paste('p=',p))}
+    # if ((as.integer(p) %% 500) == 0) {print(paste('p=',p))}
 
     # get the length of the thread
     tlen = sum(occ[[nPOV]]==p)
