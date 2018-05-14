@@ -37,12 +37,18 @@ DV= newColName(CFs)
 # clean up the ocurrences, add week and month columns
 occ = cleanOcc(rawOcc,CFs)
 
+# pull the day from the timestampe
+occ$vday = as.factor(date(occ$tStamp))
+
+
 # make threads - this will also make a new column that combines the CFs
-threadedOcc <- ThreadOccByPOV(occ,TN,CFs)
+threadedOcc <- ThreadOccByPOV_batch(occ,TN,CFs)
+
+return(threadedOcc)
 
 # may want to make threads with and without different CFs to define events, as well
 
-# pick subsets -- typically just one thread at a time, but could be more
+# pick subsets -- typically just one thread at a time, but could be one day.
 # write a function for this
 criteria <-"threadID"
 bucket_list <- make_buckets(threadedOcc, criteria)
@@ -345,81 +351,32 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
   # The event context factors define the new category of events within those threads
   occ = combineContextFactors(occ,EVENT_CF,newColName(EVENT_CF))
   print(head(occ))
-  # occ = occ[order(occ[nPOV],occ$tStamp),]
 
-  # occ = occ[order(occ$tStamp),]
+ # sort by thread and timestamp
+  occ = occ[order(occ[[nPOV]],occ$tStamp),]
 
-
-  # add two columns to the data frame
-  occ$threadNum = integer(nrow(occ))
-  occ$seqNum =   integer(nrow(occ))
 
   # Use this strategy to break out the threads...
   # split occ data frame by thread
-  # occ_split = lapply(split(occ, occ$vday), function(x) {
-  #   x})
+  tNum=0
+   occ_split = lapply(split(occ, occ[[nPOV]]), function(x) {
 
-  # # row bind data frame back together
-  #occ= data.frame(do.call(rbind, occ_split))
+     # sort the thread by time
+     x = x[order(x$tStamp),]
 
+     #add the thread and sequence numbers
+     tNum <<-tNum +1
+     x$seqNum = 1:nrow(x)
+     x$threadNum = tNum
+     x})
 
-  # add new column called label - just copy the new combined event_CF column
-  #occ$label = occ[[newColName(EVENT_CF)]]
+  # row bind data frame back together
+  occ= data.frame(do.call(rbind, occ_split))
 
-  # occurrences have zero duration
- # occ$eventDuration = 0
-
-  # Also add columns for the time gapsthat appear from this POV
-  # occ$timeGap  =  diff_tStamp(occ$tStamp)
-
-
-  # create new column for relative time stamp. Initialize to absolute tStamp and adjust below
-  # occ$relativeTime = lubridate::ymd_hms(occ$tStamp)
-
-  # then get the unique values in that POV
-  # occ[nPOV] = as.factor(occ[,nPOV])
-  pov_list = levels(occ[[nPOV]])
-
-  print('length(pov_list)')
-  print(length(pov_list))
-  # now loop through the pov_list and assign values to the new columns
-  start_row=1
-  thrd=1
-  for (p in pov_list){
-
-    # if ((as.integer(p) %% 500) == 0) {print(paste('p=',p))}
-
-    # get the length of the thread
-    tlen = sum(occ[[nPOV]]==p)
-
-    # print(paste('start_row=',start_row))
-    # print(paste('thrd =', thrd ))
-    # print(paste('p =', p ))
-    # print(paste('tlen =', tlen ))
-
-    # guard against error
-    if (tlen>0){
-
-      #compute the index of the end row
-      end_row = start_row+tlen-1
-      # print(paste('start_row =', start_row ))
-      # print(paste('end_row =',end_row  ))
-
-      # they all get the same thread number and incrementing seqNum
-      occ[start_row:end_row, "threadNum"] <- as.matrix(rep(as.integer(thrd),tlen))
-      occ[start_row:end_row, "seqNum"] <- as.matrix(c(1:tlen))
+return(occ)
 
 
-      # find the earliest time value for this thread
-     # start_time = min(lubridate::ymd_hms(occ$tStamp[start_row:end_row]))
-      # print(start_time)
 
-
-      # increment the counters for the next thread
-      start_row = end_row + 1
-      thrd=thrd+1
-    } # tlen>0
-  }
 
   # split occ data frame by days
   # occ_split = lapply(split(occ, occ$vday), function(x) {

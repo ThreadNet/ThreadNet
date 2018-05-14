@@ -106,8 +106,7 @@ cleanOcc = function(o, cfnames){
 
   ## clean up the spaces here and make it back into a factor
   for (cf in cfnames){
-    o[,cf] = sapply(o[,cf],fixBlanks)
-    o[cf] = factor( o[,cf] )
+    o[cf] = as.factor(unlist(sapply(o[,cf],fixBlanks)))
   }
 
   # force tStamp into a "YMD_HMS" format
