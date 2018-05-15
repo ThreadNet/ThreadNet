@@ -597,7 +597,7 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # # for debugging, this is really handy
   #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
-  
+
     # store the event map in the GlobalEventMappings and return the eventmap
     eventMap = store_event_mapping(EventMapName, e)
     return(eventMap[['threads']])

@@ -21,8 +21,7 @@
 #'
 #' @export
 #ACHR_batch_V1 <- function(inFileName){
-  ACHR_batch_V1 <- function(rawOcc){
-
+  ACHR_batch_V1 <- function(rawOcc,CFs){
 
 # first read in the csv
 #rawOcc = fread(inFileName)
@@ -30,7 +29,12 @@
 
 # HARD-CODED COLUMNS!! Should probably pass in as a parameters
 TN = "Visit_Number"
-CFs =  c('Workstation_ID', 'Action', 'Role')
+# CFs =  c('Workstation_ID', 'Action', 'Role')
+# CFs =  c('Action', 'Role')
+# CFs =  c('Workstation_ID')
+# CFs =  c( 'Role')
+# CFs =  c( 'Action')
+
 DV= newColName(CFs)
 
 
@@ -44,31 +48,35 @@ occ$vday = as.factor(date(occ$tStamp))
 # make threads - this will also make a new column that combines the CFs
 threadedOcc <- ThreadOccByPOV_batch(occ,TN,CFs)
 
-return(threadedOcc)
+# return(threadedOcc)
 
 # may want to make threads with and without different CFs to define events, as well
 
 # pick subsets -- typically just one thread at a time, but could be one day.
 # write a function for this
-criteria <-"threadID"
+criteria <-TN
 bucket_list <- make_buckets(threadedOcc, criteria)
 
 # get the size (number of buckets)
 N = length(bucket_list)
+print(paste('length(bucket_list)=',length(bucket_list)))
 
 # pre-allocate the data.table.  Tables are supposed to be faster.
 ACHR = data.table(bucket=integer(N),
                   NEvents = integer(N),
                   NDiagnoses = integer(N),
                   NProcedures = integer(N),
-                  visitStartTime = numeric(N),  # might need special data type for time
+                  VisitStartTime = double(N),  # might need special data type for time
                   VisitDuration=numeric(N),  # might need special data type for time
+                  VisitDay = numeric(N),
+                  VisitMonth = numeric(N),
                   NetComplexity=double(N),
                   CompressRatio = double(N),
                   Clinic = character(N),
                   PrimaryDiagnosis = character(N),
                   PayerType = character(N),
                   Provider = character(N)  # might not be available
+
                   )
 
 # Now add columns for the IVs.  There will be three for each IV
@@ -82,16 +90,30 @@ for (cf in CFs){
 
 }
 
+# return(ACHR)
+
 # loop through the buckets. Result will be data frame with one row per bucket
 for (i in 1:N){
+
+  if(i %% 100 == 0) {print(paste('i=', i)) }
 
   b = i #  as.integer(bucket_list[i])
 
   # select the threads that go in this bucket
-    df = threadedOcc[threadedOcc[[TN]] ==bucket_list[i],]
+    df = as.data.frame(threadedOcc[get(TN) ==bucket_list[i],])
+
+  #  print(head(df))
 
     # bucket number
-    ACHR[b,bucket := b]
+    ACHR[b,bucket := bucket_list[b]]
+
+    # clinic, duration and start time
+     ACHR[b,Clinic := df[df[[TN]]==bucket_list[b],][1,'Clinic']]
+     ACHR[b,VisitDuration := df[df[[TN]]==bucket_list[b],][1,'Duration']]
+     ACHR[b,VisitStartTime := df[df[[TN]]==bucket_list[b],][1,'StartTime']]
+     ACHR[b,VisitDay := as.integer(df[df[[TN]]==bucket_list[b],][1,'weekday']) ]
+     ACHR[b,VisitMonth := as.integer(df[df[[TN]]==bucket_list[b],][1,'month']) ]
+
 
     # length of the thread (number of rows)
     ACHR[b,NEvents := nrow(df)]
@@ -104,7 +126,7 @@ for (i in 1:N){
 
     # NetComplexity of DV
     # First get the network
-    n = threads_to_network(df,TN, DV)
+    n = threads_to_network_original(df,TN, DV,'threadNum')
     ACHR[b,NetComplexity := estimate_network_complexity( n )]
 
   # compute stuff on each context factor
@@ -132,7 +154,7 @@ return(ACHR)
 # Each bucket is a list of thread numbers that can be used to subset the list of occurrences
 make_buckets <- function(o, criteria){
 
-  return( levels(o[[criteria]]) )
+  return( unique(o[[criteria]]) )
 
 }
 
@@ -350,11 +372,6 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
 
   # The event context factors define the new category of events within those threads
   occ = combineContextFactors(occ,EVENT_CF,newColName(EVENT_CF))
-  print(head(occ))
-
- # sort by thread and timestamp
-  occ = occ[order(occ[[nPOV]],occ$tStamp),]
-
 
   # Use this strategy to break out the threads...
   # split occ data frame by thread
@@ -368,14 +385,16 @@ ThreadOccByPOV_batch <- function(o,THREAD_CF,EVENT_CF){
      tNum <<-tNum +1
      x$seqNum = 1:nrow(x)
      x$threadNum = tNum
+
+     # calculate the duration and start time- put same value in all rows?
+     x$Duration = difftime(x$tStamp[nrow(x)], x$tStamp[1], units='mins' )
+     x$StartTime = x$tStamp[1]
+
+     # return the new tibble
      x})
 
   # row bind data frame back together
-  occ= rbindlist( occ_split )
-
-return(occ)
-
-
+  occ= data.table::rbindlist( occ_split )
 
 
   # split occ data frame by days
@@ -383,13 +402,8 @@ return(occ)
   #   x})
 
   # # row bind data frame back together
-  #occ= data.frame(do.call(rbind, occ_split))
+  #occ= data.table::rbindlist( occ_split )
 
-  # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
-  # e=clusterEvents(occ, 'OneToOne', 'Network Proximity', EVENT_CF,'threads')
-
-  # for debugging, this is really handy
-  #   save(occ,e,file="O_and_E_1.rdata")
 
   print('done converting occurrences...')
 
