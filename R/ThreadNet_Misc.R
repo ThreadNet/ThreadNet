@@ -678,18 +678,12 @@ get_event_mapping_threads <- function( mapname){
   return(GlobalEventMappings[[idx]][["threads"]])
 }
 
-delete_event_mapping <- function( mapname){
+delete_event_mapping <- function(mapname){
 
   # get the index for the mapname
-  idx=which(mapname==get_event_mapping_name_list() )
+  idx <- which(mapname==get_event_mapping_name_list())
 
-  GlobalEventMappings[[idx]] <<-NULL
-  # GlobalEventMappings[[idx]][["threads"]] <-NULL
-  # GlobalEventMappings[[idx]][["cluster"]] <-NULL
-
-  print(paste('deleting', mapname, idx))
-  save(GlobalEventMappings, file="eventMappings_after_delete.RData")
-
+  GlobalEventMappings[[idx]] <<- NULL
 
 }
 
