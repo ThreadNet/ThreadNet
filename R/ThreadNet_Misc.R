@@ -620,97 +620,6 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
   # return(cbind(df,b_df))
 
 }
-#####################################################
-# GlobalEventMappings is a global variable
-
-#' Checks the name attempting to be create against the list of
-#' map names in memory and forces the creation of a new name.
-#'
-#' @param mapname name of map attempting to be created
-
-check_map_name = function(mapname){
-    if (mapname %in% get_event_mapping_name_list()){
-      existingMap = TRUE
-    } else {
-      existingMap = FALSE
-    }
-    return(existingMap)
-  }
-
-
-get_event_mapping_name_list <- function(){
-
-  # print(paste('length of gem:',length(GlobalEventMappings)))
-
-  n= unlist(lapply(1:length(GlobalEventMappings),function(i){
-    unlist(GlobalEventMappings[[i]][["name"]]) }))
-
-  # print(n)
-
-  return(n)
-  }
-
-
-store_event_mapping <- function(EventMapName, e){
-
-  # Add the mapping to the global list of mappings. Sort by threadNum and seqNum
-  em = list(name = paste(EventMapName), threads = e[order(e[['threadNum']],e[['seqNum']]),])
-
-  GlobalEventMappings <<- append(list(em), GlobalEventMappings )
-
-  return(em)
-
-}
-
-get_event_mapping_threads <- function( mapname){
-
-  # get the index for the mapname
-  # print (paste0('mapname',mapname))
-
-  idx=which(mapname==get_event_mapping_name_list() )
-
-  # print(idx)
-  if (idx==0) {
-    print('mapname not found for threads')
-    return(NULL)
-  }
-  else
-  return(GlobalEventMappings[[idx]][["threads"]])
-}
-
-delete_event_mapping <- function(mapname){
-
-  # get the index for the mapname
-  idx <- which(mapname==get_event_mapping_name_list())
-
-  GlobalEventMappings[[idx]] <<- NULL
-
-}
-
-export_event_mapping <- function(mapname){
-
-  nicename = paste0("EventMap_",mapname)
-
-  assign(nicename, get_event_mapping_threads(mapname))
-
-  save(list=nicename, file = paste0(nicename,".Rdata"))
-
-  print(paste(" EventMapping saved in file: ", paste0(nicename,".Rdata")))
-
-}
-
-export_event_mapping_csv <- function( mapname){
-
-  output = as.data.frame(get_event_mapping_threads(mapname))
-
-  output[grep('V_',colnames(output))]<-NULL
-
-  write.csv(output, file=file.choose(), quote = TRUE, row.names = FALSE)
-
-  print(" EventMapping saved as .csv file")
-
-}
-
 
 # Make a nice dataframe to display
 # Issue is that DT::renderdatatable cannot display lists correctly.
@@ -732,9 +641,6 @@ make_nice_event_DT <- function(e){
 
   return(e)
 }
-
-
-
 
 # find the biggest column with ZM_, and then get the number that goes with that.
 # It will not be the same as the column number.
