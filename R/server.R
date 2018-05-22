@@ -99,8 +99,8 @@ server <- shinyServer(function(input, output, session) {
 	# The POV tabs reconstruct the data into threads by sorting by tStamp and
 	# adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
 	threadedOcc <- reactive({
-	  validate(need(input$THREAD_CF_ID != "", "You must select at least one Thread"))
-	  validate(need(input$EVENT_CF_ID != "", "You must select at least one Event"))
+	  validate(need(input$THREAD_CF_ID != "", "You must select at least one context factor to define Threads"))
+	  validate(need(input$EVENT_CF_ID != "", "You must select at least one context factor to define Events within Threads"))
 	  ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID )
 	  })
 
@@ -110,7 +110,7 @@ server <- shinyServer(function(input, output, session) {
 	  req(input$ChunkInputMapID)
 		get_event_mapping_threads(input$ChunkInputMapID)
 	})
-	
+
 	# this function runs when you push the button to create a new mapping based on chunks
     observeEvent( input$EventButton2,
     if (check_map_name(input$EventMapName2)){
@@ -294,7 +294,7 @@ server <- shinyServer(function(input, output, session) {
 	threadedEventsViz <- reactive({
 	  req(input$VisualizeRangeID[1], input$VisualizeRangeID[2])
 	  loc = input$VisualizeRangeID[1]
-	  width=input$VisualizeRangeID[2] - input$VisualizeRangeID[1]
+	  width=input$VisualizeRangeID[2] - input$VisualizeRangeID[1]+1
 	  get_moving_window(threadedEventsViz_ALL(),width,loc) })
 
 
