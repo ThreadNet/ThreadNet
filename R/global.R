@@ -46,9 +46,9 @@ source("Event_Mappings.R")
 # Global variables, config settings, etc. can be defined here
 
 # This is where we store the list of event mappings.
-GlobalEventMappings <<- list()
-GlobalEventMappings_Name <<- list()
-GlobalEventMappings_Event_CF <<- list()
-GlobalEventMappings_Thread_CF <<- list()
-GlobalEventMappings_Comparison_CF <<- list()
+Global_POV <<- list()
+Global_POV_Name <<- list()
+Global_POV_Event_CF <<- list()
+Global_POV_Thread_CF <<- list()
+Global_POV_Comparison_CF <<- list()
 
