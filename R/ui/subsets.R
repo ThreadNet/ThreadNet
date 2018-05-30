@@ -6,7 +6,7 @@ tabPanel(value = "subsets",
         type = "tabs",
         tabPanel(
             "Contextual Chunks",
-            helpText('This is some help text for this tab...'),
+            helpText('This tab contains functions that are under development and may break. Please feel free to look. Your feedback will be appreciated.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("chunk_controls_0")),
@@ -40,7 +40,7 @@ tabPanel(value = "subsets",
 
         tabPanel(
             "Cluster for Zooming",
-            helpText('This is some help text for this tab...'),
+            helpText('Not all POVs work with all kinds of clustering. If it works, this function will replace the existing clustering on the POV.'),
             tags$hr(),
             fluidRow(
                 column(3,uiOutput("Cluster_Event_controls_1") ),
@@ -62,7 +62,7 @@ tabPanel(value = "subsets",
 
         tabPanel(
             "Find/replace patterns",
-            helpText('Find/replace frequently occurring n-grams with the label of your choice'),
+            helpText('Find/replace frequently occurring n-grams with the label of your choice.  Replacement operates on the text in the window.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("Frequent_Ngram_controls_1")),
@@ -78,7 +78,7 @@ tabPanel(value = "subsets",
 
         tabPanel(
             "Input your pattern",
-            helpText('Enter your own patterns to replace with the label of your choice'),
+            helpText('Enter your own patterns to replace with the label of your choice.  Replacement operates on the text in the window.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("Regular_Expression_controls_1")),
@@ -92,7 +92,7 @@ tabPanel(value = "subsets",
         ),
 
         tabPanel(
-            "Manage Event Maps",
+            "Manage POV maps",
             helpText('Delete or export event maps'),
             tags$hr(),
             uiOutput("Manage_Event_Map_controls"),

@@ -104,8 +104,20 @@ server <- shinyServer(function(input, output, session) {
 	  ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID )
 	  })
 
-	# ??? Here we need another function to do the subset on the POV tab
+	# Here we need a function to do the subset on the POV tab
+	threadedOccSubSet <- reactive(threadedOcc()[input$povDataThreads_rows_all,])
 
+	observeEvent(input$addPOVButton,
+	  if (check_POV_name(input$POVMapName)){
+	    POVName = input$POVMapName
+	    output$EventValidate1 = renderText(paste('POV Name', POVName , 'already exists, please select a different name'))
+	  } else {
+	  rv$newmap <- rv$newmap+1 # trigger reactive value
+	  isolate(
+	    store_POV(input$POVMapName, threadedOccSubSet(),input$THREAD_CF_ID,input$EVENT_CF_ID ) # this is the name; need to get object to add
+	  )
+	  output$EventValidate1 = renderText(paste('New POV named', input$POVMapName ,'has been created'))
+	}, ignoreInit = TRUE)
 
 
 
@@ -118,9 +130,9 @@ server <- shinyServer(function(input, output, session) {
 
 	# this function runs when you push the button to create a new mapping based on chunks
     observeEvent( input$EventButton2,
-    if (check_map_name(input$EventMapName2)){
+    if (check_POV_name(input$EventMapName2)){
       mapName2 = input$EventMapName2
-      output$EventValidate2 = renderText(paste('Map Name', mapName2 , 'already exists, please select a different name'))
+      output$EventValidate2 = renderText(paste('POV Name', mapName2 , 'already exists, please select a different name'))
     } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
@@ -137,7 +149,7 @@ server <- shinyServer(function(input, output, session) {
                 get_POV_COMPARISON_CF(mapName2, get_CF())
             )
         )
-        output$EventValidate2 = renderText(paste('New map named', input$EventMapName2 ,'has been created'))
+        output$EventValidate2 = renderText(paste('New POV named', input$EventMapName2 ,'has been created'))
     }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
@@ -158,9 +170,9 @@ server <- shinyServer(function(input, output, session) {
 
 	# this function runs when you push the button to create a new mapping
     observeEvent(input$EventButton3,
-      if (check_map_name(input$EventMapName3)){
+      if (check_POV_name(input$EventMapName3)){
         mapName3 = input$EventMapName3
-      output$EventValidate3 = renderText(paste('Map Name', mapName3 , 'already exists, please select a different name'))
+      output$EventValidate3 = renderText(paste('POV Name', mapName3 , 'already exists, please select a different name'))
     } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
@@ -176,7 +188,7 @@ server <- shinyServer(function(input, output, session) {
                 input$KeepIrregularEvents
             )
         )
-      output$EventValidate3 = renderText(paste('New map named', input$EventMapName3 ,'has been created'))
+      output$EventValidate3 = renderText(paste('New POV named', input$EventMapName3 ,'has been created'))
     }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
@@ -219,7 +231,7 @@ server <- shinyServer(function(input, output, session) {
 
 	# this function runs when you push the button to create a new mapping
     observeEvent(input$EventButton4,
-      if (check_map_name(input$EventMapName4)){
+      if (check_POV_name(input$EventMapName4)){
         mapName4 = input$EventMapName4
         output$EventValidate4 = renderText(paste('Map Name', mapName4 , 'already exists, please select a different name'))
       } else {
@@ -242,7 +254,7 @@ server <- shinyServer(function(input, output, session) {
 
 	# separate the cluster calculation from the dendrogram display
     cluster_result <- eventReactive(input$EventButton6,{
-        validate(need(!(check_map_name(input$EventMapName6)), paste0('Map Name ',input$EventMapName6,' already exists. Please select a different name.')))
+        validate(need(!(check_POV_name(input$EventMapName6)), paste0('Map Name ',input$EventMapName6,' already exists. Please select a different name.')))
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
             clusterEvents(

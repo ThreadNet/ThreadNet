@@ -22,7 +22,7 @@ tabPanel(
 
     tabPanel(
       value = "defineEvents",
-      "Step 3: Define Events",
+      "Step 2: Define Events",
       tags$h4("Events are marked by contextual features that CHANGE within the threads. At least ONE is required."),
       uiOutput("povEventSelector"),
       plotlyOutput("ContextFlowers_Events")
@@ -31,15 +31,16 @@ tabPanel(
     tabPanel(
       value = "showThreads",
       "Step 3: Select Subset",
-      tags$h4("This table shows the data threaded from your chosen POV."),
+      tags$h4("Optional: you can choose a subset of this POV for comparison."),
       DT::dataTableOutput("povDataThreads")
     ),
 
     tabPanel(
       value = "saveThreads",
       "Step 4: Save POV",
-      tags$h4("Save this dataset to continue."),
-      uiOutput("addPOV")
+      tags$h4("Save this dataset to continue. You can create and compare multiple POVs."),
+      uiOutput("addPOV"),
+      uiOutput("EventValidate1")
     )
   )
 )

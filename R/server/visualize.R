@@ -7,14 +7,14 @@ output$Visualize_Tab_Controls_1 <- renderUI({
 	selectizeInput(
 		"VisualizeEventMapInputID",
 		label = h4("Choose mapping:"),
-		get_event_mapping_names(),
+		get_POV_name_list(),
 		selected = 'OneToOne'
 	)
 })
 
 output$Visualize_Tab_Controls_2 <- renderUI({
   req(input$VisualizeEventMapInputID)
-	zoom_limit = zoom_upper_limit(get_event_mapping_threads(input$VisualizeEventMapInputID))
+	zoom_limit = zoom_upper_limit(get_POV(input$VisualizeEventMapInputID))
 	if(zoom_limit == 1) {
 		tags$h4("Zooming not available for this mapping")
 	} else {
@@ -79,7 +79,7 @@ output$circleVisNetwork <- renderVisNetwork({
 
 # use this to select how to color the nodes in force layout
 output$Other_Network_Tab_Controls <- renderUI({
-	button_choices <- get_EVENT_CF()
+	button_choices <- get_POV_EVENT_CF( input$VisualizeEventMapInputID )
 	tags$div(
 		radioButtons(
 			"OtherNetworkCF",
@@ -128,7 +128,7 @@ output$forceNetworkD3 <- renderForceNetwork({
 output$networkPie <- renderPlotly({
 	req(input$Group)
 	get_group <- input$Group
-	CF_multi_pie_event(threadedOcc(), threadedEventsViz(), get_EVENT_CF(), get_group, get_Zoom_VIZ())
+	CF_multi_pie_event(threadedOcc(), threadedEventsViz(), get_POV_EVENT_CF( input$VisualizeEventMapInputID ), get_group, get_Zoom_VIZ())
 })
 
 #### View Events sub-tab ####
@@ -138,7 +138,7 @@ output$VisualizeCustomNetwork_Controls_0 <- renderUI({
 })
 
 output$VisualizeCustomNetwork_Controls_1 <- renderUI({
-	selectizeInput("Event",label = "Choose Event:",get_EVENT_CF())
+	selectizeInput("Event",label = "Choose Event:",get_POV_EVENT_CF( input$VisualizeEventMapInputID ) )
 })
 
 output$VisualizeCustomNetwork <- renderPlotly({
@@ -157,7 +157,7 @@ output$click <- renderPrint({
 })
 
 #### Role Maps sub-tab ####
-output$Role_map_controls <- renderUI({checkboxGroupInput("Role_map_CFs","Pick Two:", get_EVENT_CF())})
+output$Role_map_controls <- renderUI({checkboxGroupInput("Role_map_CFs","Pick Two:", get_POV_EVENT_CF( input$VisualizeEventMapInputID ) )})
 output$Role_map_output   <- renderPlotly({role_map(threadedEventsViz(), selectOccFilter(), input$Role_map_CFs)})
 
 #### Thread Trajectories sub-tab ####
@@ -166,5 +166,5 @@ output$ThreadTrajectoriesOutput <- renderPlotly({threadTrajectory(threadedEvents
 
 #####  pie chart display #####
 output$visualizePieCharts = renderPlotly({
-  CF_multi_pie(threadedEventsViz(), get_EVENT_CF())
+  CF_multi_pie(threadedEventsViz(), get_POV_EVENT_CF( input$VisualizeEventMapInputID ) )
 })
