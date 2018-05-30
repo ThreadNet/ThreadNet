@@ -317,7 +317,8 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 
     # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
-    e=clusterEvents(occ, 'OneToOne', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
+ #   e=clusterEvents(occ, 'OneToOne', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
+    e=clusterEvents(occ, '', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
 
   })
 
@@ -653,6 +654,11 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
   ### cluster the elements
   clust = hclust( dd,  method="ward.D2" )
 
+  ##### return the cluster solution for display #####
+  if (what_to_return=='cluster') {return(clust)}
+
+  ###### otherwise, continue with appending the new cluster solution onto the POV  #####
+
   ######## need to delete the old ZM_ columns and append the new ones.  ###########
   e[grep("ZM_",colnames(e))]<-NULL
 
@@ -686,16 +692,12 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
   # save(newmap,e,zm, file='O_and_E_zoom.rdata')
 
   # only  store the event map in the GlobalEventMappings if something is filled in
-  if (!NewMapName=="")  {
-    # sort the map here.
-    newmap = e[order(e[['threadNum']],e[['seqNum']]),]
-    store_POV( NewMapName, newmap,thread_CF,event_CF ) }
+  # if (!NewMapName=="")  {
+  #   # sort the map here.
+  #   newmap = e[order(e[['threadNum']],e[['seqNum']]),]
+  #   store_POV( NewMapName, newmap,thread_CF,event_CF ) }
 
-   # return the cluster solution for display
-  if (what_to_return=='cluster')
-    {return(clust)}
-  else
-    {return(newmap)}
+    return(newmap)
 }
 
 # this function pulls computes their similarity of chunks based on sequence
