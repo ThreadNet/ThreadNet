@@ -139,14 +139,14 @@ server <- shinyServer(function(input, output, session) {
             OccToEvents_By_Chunk(
                 chunkInputEvents(),
                 input$Chunks_method_Button, # which method?
-                mapName2,
+                input$EventMapName2,
                 input$fixed_chunk_size,
                 input$chunk_time_gap_threshold,
                 'mins', #get_timeScale()
                 input$chunk_CFs,
-                get_POV_THREAD_CF(mapName2),
-                get_POV_EVENT_CF(mapName2),
-                get_POV_COMPARISON_CF(mapName2, get_CF())
+                get_POV_THREAD_CF(input$EventMapName2),
+                get_POV_EVENT_CF(input$EventMapName2),
+                get_POV_COMPARISON_CF(input$EventMapName2, get_CF())
             )
         )
         output$EventValidate2 = renderText(paste('New POV named', input$EventMapName2 ,'has been created'))
@@ -178,10 +178,10 @@ server <- shinyServer(function(input, output, session) {
         isolate(
             OccToEvents3(
                 regexInputEvents(),
-                mapName3,
-                get_POV_THREAD_CF(mapName3),
-                get_POV_EVENT_CF(mapName3),
-                get_POV_COMPARISON_CF(mapName3, get_CF()),
+                input$EventMapName3,
+                get_POV_THREAD_CF(input$EventMapName3),
+                get_POV_EVENT_CF(input$EventMapName3),
+                get_POV_COMPARISON_CF(input$EventMapName3, get_CF()),
                 'threadNum',
                 get_Zoom_REGEX(),
                 regexInput(),
@@ -239,10 +239,10 @@ server <- shinyServer(function(input, output, session) {
         isolate(
             OccToEvents3(
                 freqNgramInputEvents(),
-                mapName4,
-                get_POV_THREAD_CF(mapName4),
-                get_POV_EVENT_CF(mapName4),
-                get_POV_COMPARISON_CF(mapName4, get_CF()),
+                input$EventMapName4,
+                get_POV_THREAD_CF(input$EventMapName4),
+                get_POV_EVENT_CF(input$EventMapName4),
+                get_POV_COMPARISON_CF(input$EventMapName4, get_CF()),
                 'threadNum',
                 get_Zoom_freqNgram(),
                 selected_ngrams(),

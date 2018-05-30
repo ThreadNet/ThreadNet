@@ -7,8 +7,8 @@ output$chunk_controls_0 <- renderUI({
 		align = "left",
 		selectizeInput(
 			"ChunkInputMapID",
-			label = h4("Start with this view:"),
-			get_event_mapping_names()
+			label = h4("Start with this POV:"),
+			get_POV_name_list()
 		)
 	)
 })
@@ -16,7 +16,7 @@ output$chunk_controls_0 <- renderUI({
 output$chunk_controls_1 <- renderUI({
 	zoom_limit <- zoom_upper_limit( chunkInputEvents())
 	if (zoom_limit == 1) {
-		tags$h4("Zooming not available with this mapping")
+		tags$h4("Zooming not available with this POV")
 	} else {
 		sliderInput(
 			"chunkZoomID",
@@ -32,8 +32,7 @@ output$chunk_controls_2 <- renderUI({
 		checkboxGroupInput(
 			"chunk_CFs",
 			"Start new event when ALL of these change:",
-			intersect(colnames(chunkInputEvents()), union(get_EVENT_CF(),get_COMPARISON_CF())),
-			inline=TRUE
+			intersect(colnames(chunkInputEvents()), union(get_POV_EVENT_CF(input$ChunkInputMapID),get_COMPARISON_CF()))
 		)
 	)
 })
@@ -61,7 +60,7 @@ output$chunk_controls_5 <- renderUI({
 	tags$div(
 		align = "left",
 		textInput("EventMapName2", label = h4("Enter label to save result")),
-		actionButton("EventButton2", "Create New Mapping"),
+		actionButton("EventButton2", "Create New POV"),
 		span(textOutput("EventValidate2"), style="color:red")
 	)
 })
@@ -100,8 +99,8 @@ output$Regular_Expression_controls_1 <- renderUI({
 		align = "left",
 		selectizeInput(
 			"RegExInputMapID",
-			label = h4("Start with this view:"),
-			get_event_mapping_names()
+			label = h4("Start with this POV:"),
+			get_POV_name_list()
 		)
 	)
 })
@@ -180,14 +179,14 @@ output$Regular_Expression_controls_7 <- renderUI({
 output$Frequent_Ngram_controls_1 <- renderUI({
 	tags$div(
 		align="left",
-		selectizeInput("freqNgramInputMapID",label = h4("Start with this view:"), get_event_mapping_names())
+		selectizeInput("freqNgramInputMapID",label = h4("Start with this POV:"), get_POV_name_list())
 	)
 })
 
 output$Frequent_Ngram_controls_2 <- renderUI({
 	zoom_limit <- zoom_upper_limit(freqNgramInputEvents())
 	if (zoom_limit == 1) {
-		tags$h4("Zooming not available with this view")
+		tags$h4("Zooming not available with this POV")
 	} else {
 		sliderInput(
 			"freqNgramZoomID",
@@ -258,7 +257,7 @@ output$Cluster_Event_controls_1 <- renderUI({
 	tags$div(
 		align="left",
 		tags$h4("Group similar events to together to allow zooming"),
-		selectizeInput("ClusterEventsInputID",label = h4("Start with this view:"), get_event_mapping_names() ))
+		selectizeInput("ClusterEventsInputID",label = h4("Start with this POV:"), get_POV_name_list() ))
 })
 
 output$Cluster_Event_controls_2 <- renderUI({
@@ -294,7 +293,7 @@ output$dendroClusterResult <- renderDendroNetwork({
 
 # Controls for the whole set of tabs
 output$SelectSubsetControls_1 <- renderUI({
-	selectizeInput("SelectSubsetMapInputID",label = h4("Choose input mapping:"),get_event_mapping_names())
+	selectizeInput("SelectSubsetMapInputID",label = h4("Choose input POV:"),get_POV_name_list())
 })
 
 output$SelectSubsetControls_2 <- renderUI({
@@ -318,7 +317,7 @@ output$Manage_Event_Map_controls <- renderUI({
 	tags$div(
 		align = "left",
 		tags$h4("Select event mapping to export or delete"),
-		selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() ),
+		selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_POV_name_list() ),
 		actionButton("ExportMappingRData", "Export RData file"),
 		actionButton("ExportMappingCsv", "Export to csv"),
 		actionButton("DeleteMappingButton", "Delete")

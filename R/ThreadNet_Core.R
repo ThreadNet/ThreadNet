@@ -288,7 +288,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
         start_row = end_row + 1
         thrd=thrd+1
       } # tlen>0
-    }
+    } # p in povlist
 
     incProgress(3/n)
 
@@ -320,7 +320,13 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
  #   e=clusterEvents(occ, 'OneToOne', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
     e=clusterEvents(occ, '', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
 
-  })
+    # sort them by threadnum and seqnum
+    e = e[order(e[['threadNum']],e[['seqNum']]),]
+
+    incProgress(5/n)
+
+  } )  # with progress...
+
 
   # for debugging, this is really handy
 #   save(occ,e,file="O_and_E_1.rdata")
@@ -333,7 +339,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
    shinyjs::show(selector = "#navbar li a[data-value=movingWindow]")
    shinyjs::show(selector = "#navbar li a[data-value=parameterSettings]")
 
-   incProgress(5/n)
+
 
   return( e )
 

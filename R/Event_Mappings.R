@@ -18,9 +18,6 @@ check_POV_name <- function(mapname){
 
 get_POV_name_list <- function(){
 
-  # n <- unlist(lapply(1:length(Global_POV),function(i){
-  #   unlist(Global_POV[[i]][["name"]]) }))
-
   # just return the global variable
   n <- unlist(Global_POV_Name)
 
