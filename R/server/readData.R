@@ -1,33 +1,126 @@
-# Server Output Functions for Read Data Tab
+# Server: Read Data functions
+##############################
+# Local Variable Definitions #
+##############################
 
-output$Data_Tab_Controls_1 <- renderUI({
-	tags$div(
-		align = "center",
-		fileInput(
-			"file1",
-			"Please select a .csv file",
-			accept = c(
-				"text/csv",
-				"text/comma-separated-values,text/plain",
-				".csv"
-			)
-		) 
-	)
+# limit what files to accept on input
+fileTypes <- c("text/csv","text/comma-separated-values,text/plain",".csv")
+
+##########################
+# Tab Output Definitions #
+##########################
+
+# file selector dialog
+output$fileSelector <- renderUI({
+  tags$div(
+    align = "center",
+    fileInput("inputFile","Please select a .csv file",accept=fileTypes)
+  )
 })
 
-output$Data_Tab_Controls_2 <- renderUI({
-	checkboxGroupInput(
-		"CFcolumnsID",
-		"Select columns to include in analysis:",
-		cfnames(occ()),
-		selected = cfnames(occ()),
-		inline = TRUE
-	)
+# user selects columns to include
+# [-1] drop first column (tStamp)
+output$columnSelector <- renderUI({
+  checkboxGroupInput(
+    "CFcolumnsID",
+    "Select columns to include in analysis:",
+    names(occ())[-1],
+    selected = names(occ())[-1],
+    inline = TRUE
+  )
 })
 
-
-output$Data_Tab_Output_2 <- DT::renderDataTable({
-	selectOcc() },
-	filter = "top",
-	options = list(autoWidth = TRUE)
+# user filters data for review
+output$dataFilter <- DT::renderDataTable(
+  selectOcc(),
+  filter  = "top",
+  options = list(autoWidth = TRUE)
 )
+
+####################
+# Helper Functions #
+####################
+
+# read in user supplied file
+# return dataframe of occurences
+parseInputData <- function(inputFile){
+
+  # read in the table of occurrences
+  fileRows <- read.csv(inputFile$datapath)
+
+  # validate expected columns (first col must be "tStamp" or "sequence")
+  firstCol <- names(fileRows)[1]
+
+  # if first col is tStamp, no changes, else
+  # if first col is sequence, add a default timestamp, else
+  # supply a default dataset
+
+  if(firstCol != "tStamp"){
+    if(firstCol != "sequence"){
+      fileRows <- read.csv("sampleData.csv") # This could be handled in a config file instead of being hard coded
+    } else {
+      fileRows <- add_relative_timestamps(fileRows)
+    }
+  }
+
+  # clean the data
+  cleanData <- cleanOcc(fileRows)
+
+  # return a valid dataframe of occurences
+  return(cleanData)
+}
+
+# add initial "tStamp" column if missing in original input data
+# Start time for all threads is the same: "2017-01-01 00:00:00"  Happy New Year!
+add_relative_timestamps <- function(fileRows){
+
+  startTime <- as.POSIXct("2017-01-01 00:00:00")
+
+  # add the column at the beginning
+  fileRows <- cbind(startTime + 60*as.numeric(as.character(fileRows[["sequence"]])), fileRows)
+
+  # set the column name
+  names(fileRows)[1] <- "tStamp"
+
+  return(fileRows)
+
+}
+
+# clean up the raw occurrence data
+# Remove blanks for n-gram functionality
+cleanOcc <- function(fileRows){
+
+  # extract tStamp
+  tStamp <- fileRows$tStamp
+
+  # confirm all spaces are converted to underscores in non tStamp columns; set as factors
+  cleanedCF <- data.frame(lapply(fileRows[2:ncol(fileRows)], function(x){ gsub(" ","_",x)}))
+
+  # bind tStamp back to cleaned data
+  complete <- cbind(tStamp,cleanedCF)
+
+  # force tStamp into a "YMD_HMS" format
+  complete$tStamp <- as.character(complete$tStamp)
+  complete$tStamp <- parse_date_time(complete$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
+
+  # add weekday and month
+  complete$weekday <- as.factor(weekdays(as.Date(complete$tStamp)))
+  complete$month   <- as.factor(months(as.Date(complete$tStamp)))
+
+  return(complete)
+}
+
+
+-o-o-o-o-o-o-o-
+  # UI: Read Data tab definitions
+
+  tabPanel(
+    value = "readData",
+    "Read Data",
+    helpText('Select a file that contains your data.'),
+    tags$hr(),
+    uiOutput("fileSelector"),
+    uiOutput("columnSelector"),
+    DT::dataTableOutput("dataFilter")
+  )
+
