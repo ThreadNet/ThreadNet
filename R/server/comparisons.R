@@ -4,12 +4,12 @@
 
   # ####### SUBSET A   ##########
   output$Comparison_Tab_Controls_A1 <- renderUI({
-    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping A:"),  get_event_mapping_names() )
+    selectizeInput("CompareMapInputID_A",label = h4("Choose POV A:"),  get_POV_names() )
   })
 
   output$Comparison_Tab_Controls_A2 <- renderUI({
     req(input$CompareMapInputID_A)
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_A))
+    zoom_limit = zoom_upper_limit(get_POV(  input$CompareMapInputID_A))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
@@ -25,12 +25,12 @@
 
   # ####### SUBSET B   ##########
   output$Comparison_Tab_Controls_B1 <- renderUI({
-    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping B:"),  get_event_mapping_names() )
+    selectizeInput("CompareMapInputID_B",label = h4("Choose POV B:"),  get_POV_names() )
   })
 
   output$Comparison_Tab_Controls_B2 <- renderUI({
     req(input$CompareMapInputID_B)
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$CompareMapInputID_B))
+    zoom_limit = zoom_upper_limit(get_POV(  input$CompareMapInputID_B))
     if (zoom_limit == 1)
     {tags$h4("Zooming not available with this mapping")}
     else
@@ -85,7 +85,7 @@
     forceNetworkD3( n )  })
 
 
-output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
+output$Comp_A_6_controls <- renderUI({button_choices = get_POV_EVENT_CF( input$CompareMapInputID_A)
   tags$div(
     radioButtons("A_6_OtherNetworkCF","Graph co-occurrence relation between:",
                  choices = button_choices,
@@ -93,7 +93,7 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
                  inline=TRUE),
     sliderInput("A_6_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))})
 
-  output$Comp_B_6_controls <- renderUI({button_choices = get_EVENT_CF()
+  output$Comp_B_6_controls <- renderUI({button_choices = get_POV_EVENT_CF( input$CompareMapInputID_B )
   tags$div(
     radioButtons("B_6_OtherNetworkCF","Graph co-occurrence relation between:",
                  choices = button_choices,
@@ -113,8 +113,8 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
     n=filter_network_edges(n,input$B_6_Theshold)
     circleVisNetwork( n ) })
 
-  output$Comp_A_7_controls <- renderUI({checkboxGroupInput("A_7_CFs","Pick Two:", get_EVENT_CF() )})
-  output$Comp_B_7_controls <- renderUI({checkboxGroupInput("B_7_CFs","Pick Two:", get_EVENT_CF() )})
+  output$Comp_A_7_controls <- renderUI({checkboxGroupInput("A_7_CFs","Pick Two:", get_POV_EVENT_CF( input$CompareMapInputID_A) )})
+  output$Comp_B_7_controls <- renderUI({checkboxGroupInput("B_7_CFs","Pick Two:", get_POV_EVENT_CF( input$CompareMapInputID_B) )})
   output$Comp_A_7 <- renderPlotly({ role_map( threadedEventsComp_A(), selectOccFilter(), input$A_7_CFs ) })
   output$Comp_B_7 <- renderPlotly({ role_map( threadedEventsComp_A(), selectOccFilter(), input$B_7_CFs ) })
 
@@ -123,21 +123,21 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_EVENT_CF()
 
 # ##########  DIACHRONIC Comparison sub-tab   ###########
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
-    tagList(  selectizeInput("DiaCompareMapInputID",label = h4("Choose mapping:"),  get_event_mapping_names() ),
+    tagList(  selectizeInput("DiaCompareMapInputID",label = h4("Choose POV:"),  get_POV_names() ),
               selectizeInput('comparePanelViz',label = h4('Choose visualization:'),
                              c('Role Maps','Thread Trajectories','Threads (event time)','Ngrams' )))  })
 
   output$Diachronic_Comparison_Tab_Controls_3 <- renderUI({
     tagList(
       radioButtons("DiaCompareTimeSubsetID", "How many time intervals to compare:", choices = c(1, 2, 3, 4, 5, 6), selected="1", inline=TRUE),
-      checkboxGroupInput("role_map_cfs","Pick Two for role map:", get_EVENT_CF() ) )
+      checkboxGroupInput("role_map_cfs","Pick Two for role map:", get_POV_EVENT_CF( input$DiaCompareMapInputID) ) )
   })
 
 
 # controls for the comparison input panels
   # Use all of the column names here...
   output$Diachronic_Comparison_Tab_Controls_4 <- renderUI({
-    selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF() ) })
+    selectizeInput("selectComparisonID","Compare by:", get_COMPARISON_CF() ) })  #???
 
   output$Diachronic_Comparison_Tab_Controls_5 <- renderUI({
     selectizeInput("selectComparisonGroupsID","Compare specific groups:",

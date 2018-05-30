@@ -1,12 +1,12 @@
 tabPanel(value = "subsets",
-    "Subsets and mapping",
-    helpText('Create subsets of your data and alternative mappings'),
+    "Clusters and Chunks",
+    helpText('This tab contains functions that are under development and may break. Your feedback will be appreciated.'),
     tags$hr(),
     tabsetPanel(
         type = "tabs",
         tabPanel(
             "Contextual Chunks",
-            helpText('This is some help text for this tab...'),
+            helpText('Recode sequences into chunks.  This reduces the length of the sequences.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("chunk_controls_0")),
@@ -40,7 +40,7 @@ tabPanel(value = "subsets",
 
         tabPanel(
             "Cluster for Zooming",
-            helpText('This is some help text for this tab...'),
+            helpText('Not all POVs work with all kinds of clustering. If it works, this function will replace the existing clustering on the POV.'),
             tags$hr(),
             fluidRow(
                 column(3,uiOutput("Cluster_Event_controls_1") ),
@@ -50,19 +50,10 @@ tabPanel(value = "subsets",
             dendroNetworkOutput("dendroClusterResult")
         ),
 
-        tabPanel(
-            "Select Subset",
-            helpText('Select and save a subset of data for visualization and comparison.'),
-            tags$hr(),
-            fluidRow(
-                column(3, uiOutput("SelectSubsetControls_1")),
-                column(3, uiOutput("SelectSubsetControls_2")) ),
-            DT::dataTableOutput("SelectSubsetDataTable")
-        ),
 
         tabPanel(
             "Find/replace patterns",
-            helpText('Find/replace frequently occurring n-grams with the label of your choice'),
+            helpText('Find/replace frequently occurring n-grams with the label of your choice.  Replacement operates on the text in the window.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("Frequent_Ngram_controls_1")),
@@ -78,7 +69,7 @@ tabPanel(value = "subsets",
 
         tabPanel(
             "Input your pattern",
-            helpText('Enter your own patterns to replace with the label of your choice'),
+            helpText('Enter your own patterns to replace with the label of your choice.  Replacement operates on the text in the window.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("Regular_Expression_controls_1")),
@@ -92,7 +83,17 @@ tabPanel(value = "subsets",
         ),
 
         tabPanel(
-            "Manage Event Maps",
+          "Select Subset of POV",
+          helpText('Select and save a subset of data for comparison (again)'),
+          tags$hr(),
+          fluidRow(
+            column(3, uiOutput("SelectSubsetControls_1")),
+            column(3, uiOutput("SelectSubsetControls_2")) ),
+          DT::dataTableOutput("SelectSubsetDataTable")
+        ),
+
+        tabPanel(
+            "Export and delete POV maps",
             helpText('Delete or export event maps'),
             tags$hr(),
             uiOutput("Manage_Event_Map_controls"),

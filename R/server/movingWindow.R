@@ -1,14 +1,14 @@
 # Server Output Functions for Moving Window Tab
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
-    selectizeInput("MovingWindowMapInputID",label = h4("Choose mapping:"), get_event_mapping_names() )
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose POV:"), get_POV_names() )
   })
 
   output$Moving_Window_Tab_Controls_2 <- renderUI({
     req(input$MovingWindowMapInputID)
-    zoom_limit = zoom_upper_limit(get_event_mapping_threads(  input$MovingWindowMapInputID))
+    zoom_limit = zoom_upper_limit(get_POV(  input$MovingWindowMapInputID))
     if (zoom_limit == 1)
-    {tags$h4("Zooming not available with this mapping")}
+    {tags$h4("Zooming not available with this POV")}
     else
     {sliderInput("MovingWindowZoomID",
                  label = h4("Zoom in and out by event similarity:"),
@@ -45,7 +45,8 @@ output$single_moving_window_timeline = renderPlotly({
 
   output$Moving_5_controls <- renderUI({sliderInput("M_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
 
-  output$Moving_6_controls <- renderUI({button_choices = get_EVENT_CF()
+
+  output$Moving_6_controls <- renderUI({button_choices = get_POV_EVENT_CF( input$MovingWindowMapInputID )
   tags$div(
     radioButtons("M_6_OtherNetworkCF","Graph co-occurrence relation between:",
                  choices = button_choices,
@@ -54,7 +55,7 @@ output$single_moving_window_timeline = renderPlotly({
     sliderInput("M_6_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE ))})
 
 
-  output$Moving_7_controls <- renderUI({checkboxGroupInput("M_7_CFs","Pick Two:", get_EVENT_CF() )})
+  output$Moving_7_controls <- renderUI({checkboxGroupInput("M_7_CFs","Pick Two:", get_POV_EVENT_CF( input$MovingWindowMapInputID ) )})
 
 
  ##  New moving window outputs

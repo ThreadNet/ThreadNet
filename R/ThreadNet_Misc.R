@@ -392,13 +392,13 @@ threadSizeTable <- function(o,TN){
 #' @export
 #'
 #' @examples
-convert_TN_to_TramineR <- function(df, TN, CF){
+convert_TN_to_TramineR <- function(df, CF){
   # dataframe must be sorted by time or sequence within each threadNumber
   # TN is the threadnumber
   # CF is some attribute we will use in TramineR
 
   # first find the threads
-  threads = unique(df[,TN])
+  threads = unique(df$threadNum)
   nThreads = length(threads)
 
   # Initialize list of empty lists
@@ -407,7 +407,7 @@ convert_TN_to_TramineR <- function(df, TN, CF){
   for ( th in 1:nThreads){
 
     #subset of df that contains the sequence
-    s[[th]] = as.character(df[df[[TN]]==threads[th],CF])
+    s[[th]] = as.character(df[df$threadNum==threads[th],CF])
   }
 
   # add NA to make all the lists the same length
@@ -416,8 +416,6 @@ convert_TN_to_TramineR <- function(df, TN, CF){
   # convert to data frame
   df <- data.frame(matrix(unlist(s), nrow=nThreads, byrow=T))
 
-  # add a column for the threadnumber
-  # df[TN] = threads
 
   return(df)
 

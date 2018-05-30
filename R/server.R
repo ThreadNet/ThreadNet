@@ -37,54 +37,54 @@ server <- shinyServer(function(input, output, session) {
 
 	# These sliders controls the zoom level for zooming in-out
 	# they are grouoped here because hopefully they can be replaced by a single function... except that reactive functions don't take parameters
-	get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$VisualizeEventMapInputID))==1 ,
+	get_Zoom_VIZ <<- reactive({ return( ifelse (zoom_upper_limit(get_POV(input$VisualizeEventMapInputID))==1 ,
 												"ZM_1", paste0("ZM_",input$VisualizeTabZoomID))) })
 
 	get_Zoom_COMP_A <<- reactive({
 	  req(input$CompareMapInputID_A, input$CompareZoomID_A)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$CompareMapInputID_A))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$CompareMapInputID_A))==1 ,
 													"ZM_1", paste0("ZM_",input$CompareZoomID_A)))
 	  })
 
 	get_Zoom_COMP_B <<- reactive({
 	  req(input$CompareMapInputID_B, input$CompareZoomID_B)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$CompareMapInputID_B))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$CompareMapInputID_B))==1 ,
 													"ZM_1", paste0("ZM_",input$CompareZoomID_B)))
 	  })
 
 	get_Zoom_DIA_COMP <<- reactive({
 	  req(input$DiaCompareMapInputID, input$DiaCompareZoomID)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$DiaCompareMapInputID))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$DiaCompareMapInputID))==1 ,
 													"ZM_1", paste0("ZM_",input$DiaCompareZoomID)))
 	  })
 
 	get_Zoom_MOVE <<- reactive({
 	  req(input$MovingWindowMapInputID, input$MovingWindowZoomID)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$MovingWindowMapInputID))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$MovingWindowMapInputID))==1 ,
 												"ZM_1", paste0("ZM_",input$MovingWindowZoomID)))
 	  })
 
 	get_Zoom_REGEX <<- reactive({
 	  req(input$RegExInputMapID, input$regexZoomID)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$RegExInputMapID))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$RegExInputMapID))==1 ,
 													"ZM_1", paste0("ZM_",input$regexZoomID)))
 	  })
 
 	get_Zoom_freqNgram <<- reactive({
 	  req(input$freqNgramInputMapID, input$freqNgramZoomID)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$freqNgramInputMapID))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$freqNgramInputMapID))==1 ,
 														"ZM_1", paste0("ZM_",input$freqNgramZoomID)))
 	  })
 
 	get_Zoom_CHUNK <<- reactive({
 	  req(input$ChunkInputMapID, input$chunkZoomID)
-	  return( ifelse (zoom_upper_limit(get_event_mapping_threads(input$ChunkInputMapID))==1 ,
+	  return( ifelse (zoom_upper_limit(get_POV(input$ChunkInputMapID))==1 ,
 											"ZM_1", paste0("ZM_",input$chunkZoomID))) })
 
 	# add reactive value to force update
-	get_event_mapping_names <- reactive({
+	get_POV_names <- reactive({
 		rv$newmap
-		get_event_mapping_name_list()
+		get_POV_name_list()
 	})
 
 	#dataframe for occurrences that are read in from file1
@@ -104,18 +104,35 @@ server <- shinyServer(function(input, output, session) {
 	  ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID )
 	  })
 
+	# Here we need a function to do the subset on the POV tab
+	threadedOccSubSet <- reactive(threadedOcc()[input$povDataThreads_rows_all,])
+
+	observeEvent(input$addPOVButton,
+	  if (check_POV_name(input$POVMapName)){
+	    POVName = input$POVMapName
+	    output$EventValidate1 = renderText(paste('POV Name', POVName , 'already exists, please select a different name'))
+	  } else {
+	  rv$newmap <- rv$newmap+1 # trigger reactive value
+	  isolate(
+	    store_POV(input$POVMapName, threadedOccSubSet(),input$THREAD_CF_ID,input$EVENT_CF_ID ) # this is the name; need to get object to add
+	  )
+	  output$EventValidate1 = renderText(paste('New POV named', input$POVMapName ,'has been created'))
+	}, ignoreInit = TRUE)
+
+
+
 	# get the data that will be the input for this tab
 	chunkInputEvents <- reactive({
 		rv$newmap
 	  req(input$ChunkInputMapID)
-		get_event_mapping_threads(input$ChunkInputMapID)
+		get_POV(input$ChunkInputMapID)
 	})
 
 	# this function runs when you push the button to create a new mapping based on chunks
     observeEvent( input$EventButton2,
-    if (check_map_name(input$EventMapName2)){
+    if (check_POV_name(input$EventMapName2)){
       mapName2 = input$EventMapName2
-      output$EventValidate2 = renderText(paste('Map Name', mapName2 , 'already exists, please select a different name'))
+      output$EventValidate2 = renderText(paste('POV Name', mapName2 , 'already exists, please select a different name'))
     } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
@@ -125,19 +142,20 @@ server <- shinyServer(function(input, output, session) {
                 input$EventMapName2,
                 input$fixed_chunk_size,
                 input$chunk_time_gap_threshold,
-                'mins',
+                'mins', #get_timeScale()
                 input$chunk_CFs,
-                get_EVENT_CF(),
-                get_COMPARISON_CF()
+                get_POV_THREAD_CF(input$ChunkInputMapID),
+                get_POV_EVENT_CF(input$ChunkInputMapID),
+                get_POV_COMPARISON_CF(input$ChunkInputMapID, get_CF())
             )
         )
-        output$EventValidate2 = renderText(paste('New map named', input$EventMapName2 ,'has been created'))
+        output$EventValidate2 = renderText(paste('New POV named', input$EventMapName2 ,'has been created'))
     }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
 	regexInputEvents <- reactive({
 	  req(input$RegExInputMapID)
-	  get_event_mapping_threads(input$RegExInputMapID)
+	  get_POV(input$RegExInputMapID)
 	})
 
 	# get the input values and return data frame with regex & label
@@ -152,30 +170,31 @@ server <- shinyServer(function(input, output, session) {
 
 	# this function runs when you push the button to create a new mapping
     observeEvent(input$EventButton3,
-      if (check_map_name(input$EventMapName3)){
+      if (check_POV_name(input$EventMapName3)){
         mapName3 = input$EventMapName3
-      output$EventValidate3 = renderText(paste('Map Name', mapName3 , 'already exists, please select a different name'))
+      output$EventValidate3 = renderText(paste('POV Name', mapName3 , 'already exists, please select a different name'))
     } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
             OccToEvents3(
                 regexInputEvents(),
                 input$EventMapName3,
-                get_EVENT_CF(),
-                get_COMPARISON_CF(),
+                get_POV_THREAD_CF(input$RegExInputMapID),
+                get_POV_EVENT_CF(input$RegExInputMapID),
+                get_POV_COMPARISON_CF(input$RegExInputMapID, get_CF()),
                 'threadNum',
                 get_Zoom_REGEX(),
                 regexInput(),
                 input$KeepIrregularEvents
             )
         )
-      output$EventValidate3 = renderText(paste('New map named', input$EventMapName3 ,'has been created'))
+      output$EventValidate3 = renderText(paste('New POV named', input$EventMapName3 ,'has been created'))
     }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
 	freqNgramInputEvents <- reactive({
 	  req(input$freqNgramInputMapID)
-	  get_event_mapping_threads( input$freqNgramInputMapID)
+	  get_POV( input$freqNgramInputMapID)
 	  })
 
 	fng_select <- reactive(
@@ -212,83 +231,97 @@ server <- shinyServer(function(input, output, session) {
 
 	# this function runs when you push the button to create a new mapping
     observeEvent(input$EventButton4,
-      if (check_map_name(input$EventMapName4)){
+      if (check_POV_name(input$EventMapName4)){
         mapName4 = input$EventMapName4
-        output$EventValidate4 = renderText(paste('Map Name', mapName4 , 'already exists, please select a different name'))
+        output$EventValidate4 = renderText(paste('POV name', mapName4 , 'already exists, please select a different name'))
       } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
             OccToEvents3(
                 freqNgramInputEvents(),
                 input$EventMapName4,
-                get_EVENT_CF(),
-                get_COMPARISON_CF(),
+                get_POV_THREAD_CF(input$freqNgramInputMapID),
+                get_POV_EVENT_CF(input$freqNgramInputMapID),
+                get_POV_COMPARISON_CF(input$freqNgramInputMapID, get_CF()),
                 'threadNum',
                 get_Zoom_freqNgram(),
                 selected_ngrams(),
                 input$KeepIrregularEvents_2
             )
         )
-        output$EventValidate4 = renderText(paste('New map named', input$EventMapName4 ,'has been created'))
+        output$EventValidate4 = renderText(paste('New POV named', input$EventMapName4 ,'has been created'))
     }, ignoreInit = TRUE)
 
 	# separate the cluster calculation from the dendrogram display
     cluster_result <- eventReactive(input$EventButton6,{
-        validate(need(!(check_map_name(input$EventMapName6)), paste0('Map Name ',input$EventMapName6,' already exists. Please select a different name.')))
+        validate(need(!(check_POV_name(input$EventMapName6)), paste0('Map Name ',input$EventMapName6,' already exists. Please select a different name.')))
         rv$newmap <- rv$newmap+1 # trigger reactive value
-        isolate(
-            clusterEvents(
-                get_event_mapping_threads(input$ClusterEventsInputID),
-                input$EventMapName6,
-                input$ClusterMethodID,
-                get_EVENT_CF(),
-                'cluster'
-            )
-        )
-    }, ignoreInit = TRUE )
+
+            # return a list with both the cluster_result and the new POV
+            # store the POV and return the cluster_result for display
+            thread_CF = get_POV_THREAD_CF(input$ClusterEventsInputID)
+            event_CF = get_POV_EVENT_CF(input$ClusterEventsInputID)
+            cluster_POV = clusterEvents(
+                      get_POV(input$ClusterEventsInputID),
+                      input$EventMapName6,
+                      input$ClusterMethodID,
+                      thread_CF,
+                      event_CF,
+                      'cluster')
+            store_POV(input$EventMapName6,
+                      cluster_POV[['POV']],
+                      thread_CF,
+                      event_CF )
+            cluster_POV[['cluster_result']]
+
+    } )
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
 	subsetEventsViz <- reactive({
 	  req(input$SelectSubsetMapInputID)
-	  get_event_mapping_threads( input$SelectSubsetMapInputID )
+	  get_POV( input$SelectSubsetMapInputID )
 	    })
 
 	# reactive functions for the export and delete buttons
 	observeEvent(input$DeleteMappingButton,{
 		rv$newmap <- rv$newmap+1 # trigger reactive value
-		delete_event_mapping(input$ManageEventMapInputID)
+		delete_POV(input$ManageEventMapInputID)
 		output$delete_confirm <- renderText(paste(input$ManageEventMapInputID, " deleted."))
 	}, ignoreInit = TRUE)
 
 	observeEvent(input$ExportMappingRData,{
-		export_event_mapping(input$ManageEventMapInputID )
+		export_POV(input$ManageEventMapInputID )
 		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
 	})
 
 	observeEvent(input$ExportMappingCsv,{
-		export_event_mapping_csv( input$ManageEventMapInputID )
+		export_POV_csv( input$ManageEventMapInputID )
 		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
 	})
 
+	# Another opportunity to make subsets...
 	observeEvent(input$SelectSubsetButton,
-                 if (check_map_name(input$SelectSubsetMapName)){
+                 if (check_POV_name(input$SelectSubsetMapName)){
                    SubsetMapName = input$SelectSubsetMapName
                    output$SelectSubsetValidate = renderText(paste('Map Name', SubsetMapName , 'already exists, please select a different name'))
                  } else {
                    rv$newmap <- rv$newmap+1 # trigger reactive value
-                   store_event_mapping( input$SelectSubsetMapName, subsetEventsViz()[input$SelectSubsetDataTable_rows_all,] )
-                   output$SelectSubsetValidate = renderText(paste('New map named', input$SelectSubsetMapName ,'has been created'))
+                   store_POV( input$SelectSubsetMapName,
+                              subsetEventsViz()[input$SelectSubsetDataTable_rows_all,],
+                              get_POV_THREAD_CF(input$SelectSubsetMapInputID),
+                              get_POV_EVENT_CF(input$SelectSubsetMapInputID))
+                   output$SelectSubsetValidate = renderText(paste('New POV named', input$SelectSubsetMapName ,'has been created'))
                  }, ignoreInit = TRUE)
 
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
-#	threadedEventsViz <- reactive({get_event_mapping_threads( input$VisualizeEventMapInputID ) })
+#	threadedEventsViz <- reactive({get_POV( input$VisualizeEventMapInputID ) })
 
 
 	# Get data for the Visualize tab.  Need parallel functions for the other tabs.
 	threadedEventsViz_ALL <- reactive({
 	  req(input$VisualizeEventMapInputID)
-	  get_event_mapping_threads( input$VisualizeEventMapInputID )
+	  get_POV( input$VisualizeEventMapInputID )
 	  })
 
 	threadedEventsViz <- reactive({
@@ -302,19 +335,19 @@ server <- shinyServer(function(input, output, session) {
 	# Get data for the COMPARE tab mapping A
 	threadedEventsComp_A <- reactive({
 	  req(input$CompareMapInputID_A)
-	  get_event_mapping_threads(input$CompareMapInputID_A )
+	  get_POV(input$CompareMapInputID_A )
 	  })
 
 	# Get data for the COMPARE tab mapping B.
 	threadedEventsComp_B <- reactive({
 	  req(input$CompareMapInputID_B)
-	  get_event_mapping_threads( input$CompareMapInputID_B )
+	  get_POV( input$CompareMapInputID_B )
 	  })
 
 	# Get data for the Diachronic COMPARE tab.
 	threadedEventsDiaComp <- reactive({
 	  req(input$DiaCompareMapInputID)
-	  get_event_mapping_threads(input$DiaCompareMapInputID )
+	  get_POV(input$DiaCompareMapInputID )
 	  })
 
 	CF_levels <- reactive( get_CF_levels( threadedEventsDiaComp(),input$selectComparisonID) )
@@ -322,7 +355,7 @@ server <- shinyServer(function(input, output, session) {
 	# Get data for the Moving Window tab.
 	threadedEventsMove <- reactive({
 	  req(input$MovingWindowMapInputID)
-	  get_event_mapping_threads(input$MovingWindowMapInputID )
+	  get_POV(input$MovingWindowMapInputID )
 	  })
 
 	threadedEventsMove_A <- reactive({

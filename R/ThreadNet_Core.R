@@ -288,7 +288,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
         start_row = end_row + 1
         thrd=thrd+1
       } # tlen>0
-    }
+    } # p in povlist
 
     incProgress(3/n)
 
@@ -315,14 +315,18 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
     incProgress(4/n)
 
-    # just add the one column with the combined values
-   # occ["ZM_1"] = as.integer(occ[,newColName(EVENT_CF)])
-
 
     # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
-    e=clusterEvents(occ, 'OneToOne', 'Network Proximity', EVENT_CF,'threads')
+ #   e=clusterEvents(occ, 'OneToOne', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
+    e=clusterEvents(occ, '', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
 
-  })
+    # sort them by threadnum and seqnum
+    e = e[order(e[['threadNum']],e[['seqNum']]),]
+
+    incProgress(5/n)
+
+  } )  # with progress...
+
 
   # for debugging, this is really handy
 #   save(occ,e,file="O_and_E_1.rdata")
@@ -335,7 +339,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
    shinyjs::show(selector = "#navbar li a[data-value=movingWindow]")
    shinyjs::show(selector = "#navbar li a[data-value=parameterSettings]")
 
-   incProgress(5/n)
+
 
   return( e )
 
@@ -366,7 +370,7 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
 # new version containing more ways to create chunks -- uses concepts from original prototype, but better implementation
 # chunk by handoff, time gap and handoff gap
-OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale='mins', chunk_CF, event_CF, compare_CF){
+OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale='mins', chunk_CF, thread_CF, event_CF, compare_CF){
 
   # Inputs: o = table of occurrences
   #         m = method parameter =  c( "Handoffs", "Time Gap","Fixed Size")
@@ -481,7 +485,10 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
   # print(head(e))
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
-  e=clusterEvents(e, EventMapName, 'Contextual Similarity', event_CF,'threads')
+  e=clusterEvents(e, EventMapName, 'Contextual Similarity', thread_CF, event_CF,'POV')
+
+  # store the POV in the GlobalEventMappings
+  store_POV(EventMapName, e, thread_CF, event_CF)
 
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E_2.rdata")
@@ -492,7 +499,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
 
 # this one creates events based on frequent ngrams or regular expressions
-OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
+OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
   # print(rx)
 
@@ -510,8 +517,6 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   # put this here for now
   timescale='mins'
 
-  # Only run if eventMapName is filled in; return empty data frame otherwise
-  if (EventMapName ==""){return(data.frame())}
 
   # get the text vector for this set of threaded occurrences, delimited by commas
   tv = thread_text_vector( o, TN, CF, ',' )
@@ -622,9 +627,10 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
   #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
 
 
-    # store the event map in the GlobalEventMappings and return the eventmap
-    eventMap = store_event_mapping(EventMapName, e)
-    return(eventMap[['threads']])
+    # store the POV in the GlobalEventMappings
+    store_POV(EventMapName, e, THREAD_CF, EVENT_CF)
+
+    return(e)
 
 }
 
@@ -632,11 +638,9 @@ OccToEvents3 <- function(o, EventMapName,EVENT_CF, compare_CF,TN, CF, rx, KeepIr
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
 # cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
-clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return='cluster'){
+clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,what_to_return='POV'){
 
   # make sure to cluster on the correct column (one that exists...)
-
-
 
   if (cluster_method=="Sequential similarity")
   { dd = dist_matrix_seq(e) }
@@ -657,6 +661,7 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return
 
   ### cluster the elements
   clust = hclust( dd,  method="ward.D2" )
+
 
   ######## need to delete the old ZM_ columns and append the new ones.  ###########
   e[grep("ZM_",colnames(e))]<-NULL
@@ -690,15 +695,12 @@ clusterEvents <- function(e, NewMapName, cluster_method, event_CF,what_to_return
 
   # save(newmap,e,zm, file='O_and_E_zoom.rdata')
 
-  # only  store the event map in the GlobalEventMappings if something is filled in
-  if (!NewMapName=="")  {
-   eventMap = store_event_mapping( NewMapName, newmap ) }
 
-   # return the cluster solution for display
+  ##### return the cluster solution for display if so desired. Otherwise, just return the new POV map
   if (what_to_return=='cluster')
-    {return(clust)}
+  {return(list(cluster_result=clust, POV=newmap))}
   else
-    {return(eventMap[['threads']])}
+   {return(newmap)}
 }
 
 # this function pulls computes their similarity of chunks based on sequence
@@ -759,6 +761,9 @@ make_event_df <- function(event_CF,compare_CF,N){
     occurrences = integer(N),
     threadNum = integer(N),
     seqNum = integer(N))
+
+  # print(paste("in make_event_df, event_CF=",event_CF))
+  # print(paste("in make_event_df, compare_CF=",compare_CF))
 
   # add columns for each of the context factors used to define events
   # first make the dataframes for each
