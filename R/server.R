@@ -256,15 +256,21 @@ server <- shinyServer(function(input, output, session) {
     cluster_result <- eventReactive(input$EventButton6,{
         validate(need(!(check_POV_name(input$EventMapName6)), paste0('Map Name ',input$EventMapName6,' already exists. Please select a different name.')))
         rv$newmap <- rv$newmap+1 # trigger reactive value
-        isolate(
-            clusterEvents(
-                get_POV(input$ClusterEventsInputID),
-                input$EventMapName6,
-                input$ClusterMethodID,
-                get_POV_THREAD_CF(input$ClusterEventsInputID),
-                get_POV_EVENT_CF(input$ClusterEventsInputID),
-                'cluster'
-            )
+        isolate({
+            # return a list with both the cluster_result and the new POV
+            # store the POV and display the cluster_result
+            cluster_POV = clusterEvents(
+                      get_POV(input$ClusterEventsInputID),
+                      input$EventMapName6,
+                      input$ClusterMethodID,
+                      get_POV_THREAD_CF(input$ClusterEventsInputID),
+                      get_POV_EVENT_CF(input$ClusterEventsInputID),
+                      'cluster')
+            store_POV(input$EventMapName6,
+                      cluster_POV[['POV']],
+                      get_POV_THREAD_CF(input$ClusterEventsInputID),
+                      get_POV_EVENT_CF(input$ClusterEventsInputID) )
+            cluster_POV[['cluster_result']]}
         )
     }, ignoreInit = TRUE )
 

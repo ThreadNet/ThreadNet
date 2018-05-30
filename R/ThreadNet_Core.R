@@ -487,6 +487,9 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
   e=clusterEvents(e, EventMapName, 'Contextual Similarity', thread_CF, event_CF,'threads')
 
+  # store the POV in the GlobalEventMappings
+  store_POV(EventMapName, e, thread_CF, event_CF)
+
   # for debugging, this is really handy
   #  save(o,e,file="O_and_E_2.rdata")
 
@@ -635,7 +638,7 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
 # cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
-clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,what_to_return='cluster'){
+clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,what_to_return='POV'){
 
   # make sure to cluster on the correct column (one that exists...)
 
@@ -659,10 +662,6 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
   ### cluster the elements
   clust = hclust( dd,  method="ward.D2" )
 
-  ##### return the cluster solution for display #####
-  if (what_to_return=='cluster') {return(clust)}
-
-  ###### otherwise, continue with appending the new cluster solution onto the POV  #####
 
   ######## need to delete the old ZM_ columns and append the new ones.  ###########
   e[grep("ZM_",colnames(e))]<-NULL
@@ -696,13 +695,12 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
 
   # save(newmap,e,zm, file='O_and_E_zoom.rdata')
 
-  # only  store the event map in the GlobalEventMappings if something is filled in
-  # if (!NewMapName=="")  {
-  #   # sort the map here.
-  #   newmap = e[order(e[['threadNum']],e[['seqNum']]),]
-  #   store_POV( NewMapName, newmap,thread_CF,event_CF ) }
 
-    return(newmap)
+  ##### return the cluster solution for display if so desired. Otherwise, just return the new POV map
+  if (what_to_return=='cluster')
+  {return(list(cluster_result=clust, POV=newmap))}
+  else
+   {return(newmap)}
 }
 
 # this function pulls computes their similarity of chunks based on sequence
@@ -764,9 +762,8 @@ make_event_df <- function(event_CF,compare_CF,N){
     threadNum = integer(N),
     seqNum = integer(N))
 
-
-  print(paste("in make_event_df, event_CF=",event_CF))
-  print(paste("in make_event_df, compare_CF=",compare_CF))
+  # print(paste("in make_event_df, event_CF=",event_CF))
+  # print(paste("in make_event_df, compare_CF=",compare_CF))
 
   # add columns for each of the context factors used to define events
   # first make the dataframes for each

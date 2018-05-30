@@ -19,7 +19,7 @@ ui <- fluidPage(
     useShinyjs(),
 
     # Application title
-    tags$h3(align='center', "ThreadNet 3 Development"),
+    tags$h3(align='center', "ThreadNet 3"),
 
     #  tags$audio( src='tellusastory.mp3',type='audio/mpeg', controls='TRUE'),
 

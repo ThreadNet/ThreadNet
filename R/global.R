@@ -50,5 +50,4 @@ Global_POV <<- list()
 Global_POV_Name <<- list()
 Global_POV_Event_CF <<- list()
 Global_POV_Thread_CF <<- list()
-Global_POV_Comparison_CF <<- list()
 
