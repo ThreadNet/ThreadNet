@@ -59,7 +59,7 @@ output$addPOV <- renderUI({
       "POVMapName",
       label = h4(paste("Enter label for this POV mapping")),
       value = paste0(knitr::combine_words(get_THREAD_CF(),sep='+'),
-                     '//',
+                     '>>',
                      knitr::combine_words(get_EVENT_CF(),sep='+'))
     ),
     actionButton("addPOVButton", "Save mapping")

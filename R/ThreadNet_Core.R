@@ -485,7 +485,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
   # print(head(e))
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
-  e=clusterEvents(e, EventMapName, 'Contextual Similarity', thread_CF, event_CF,'threads')
+  e=clusterEvents(e, EventMapName, 'Contextual Similarity', thread_CF, event_CF,'POV')
 
   # store the POV in the GlobalEventMappings
   store_POV(EventMapName, e, thread_CF, event_CF)
