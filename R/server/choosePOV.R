@@ -46,7 +46,9 @@ output$povDataThreads <- DT::renderDataTable({
 
   # thread occurences by POV
   threadedOcc()
-})
+},
+filter = "top",
+options = list(autoWidth = TRUE))
 
 #### Add new Dataset sub-tab ####
 
@@ -56,7 +58,9 @@ output$addPOV <- renderUI({
     textInput(
       "POVMapName",
       label = h4(paste("Enter label for this POV mapping")),
-      value = ""
+      value = paste0(paste(get_THREAD_CF(),sep='_'),
+                     '//',
+                     paste(get_EVENT_CF(),sep='_'))
     ),
     actionButton("addPOVButton", "Save mapping")
   )

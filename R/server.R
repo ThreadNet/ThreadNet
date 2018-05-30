@@ -104,6 +104,11 @@ server <- shinyServer(function(input, output, session) {
 	  ThreadOccByPOV( selectOccFilter(), input$THREAD_CF_ID, input$EVENT_CF_ID )
 	  })
 
+	# ??? Here we need another function to do the subset on the POV tab
+
+
+
+
 	# get the data that will be the input for this tab
 	chunkInputEvents <- reactive({
 		rv$newmap
@@ -122,13 +127,14 @@ server <- shinyServer(function(input, output, session) {
             OccToEvents_By_Chunk(
                 chunkInputEvents(),
                 input$Chunks_method_Button, # which method?
-                input$EventMapName2,
+                mapName2,
                 input$fixed_chunk_size,
                 input$chunk_time_gap_threshold,
-                'mins',
+                'mins', #get_timeScale()
                 input$chunk_CFs,
-                get_EVENT_CF(),
-                get_COMPARISON_CF()
+                get_POV_THREAD_CF(mapName2),
+                get_POV_EVENT_CF(mapName2),
+                get_POV_COMPARISON_CF(mapName2, get_CF())
             )
         )
         output$EventValidate2 = renderText(paste('New map named', input$EventMapName2 ,'has been created'))
@@ -160,9 +166,10 @@ server <- shinyServer(function(input, output, session) {
         isolate(
             OccToEvents3(
                 regexInputEvents(),
-                input$EventMapName3,
-                get_EVENT_CF(),
-                get_COMPARISON_CF(),
+                mapName3,
+                get_POV_THREAD_CF(mapName3),
+                get_POV_EVENT_CF(mapName3),
+                get_POV_COMPARISON_CF(mapName3, get_CF()),
                 'threadNum',
                 get_Zoom_REGEX(),
                 regexInput(),
@@ -220,9 +227,10 @@ server <- shinyServer(function(input, output, session) {
         isolate(
             OccToEvents3(
                 freqNgramInputEvents(),
-                input$EventMapName4,
-                get_EVENT_CF(),
-                get_COMPARISON_CF(),
+                mapName4,
+                get_POV_THREAD_CF(mapName4),
+                get_POV_EVENT_CF(mapName4),
+                get_POV_COMPARISON_CF(mapName4, get_CF()),
                 'threadNum',
                 get_Zoom_freqNgram(),
                 selected_ngrams(),
@@ -241,7 +249,7 @@ server <- shinyServer(function(input, output, session) {
                 get_POV(input$ClusterEventsInputID),
                 input$EventMapName6,
                 input$ClusterMethodID,
-                get_EVENT_CF(),
+                get_POV_EVENT_CF(input$EventMapName6),
                 'cluster'
             )
         )
@@ -270,19 +278,19 @@ server <- shinyServer(function(input, output, session) {
 		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
 	})
 
-	#???
+	#??? check if this is OK... especially the comparison_CFs
 	observeEvent(input$SelectSubsetButton,
-                 if (check_map_name(input$SelectSubsetMapName)){
+                 if (check_POV_name(input$SelectSubsetMapName)){
                    SubsetMapName = input$SelectSubsetMapName
                    output$SelectSubsetValidate = renderText(paste('Map Name', SubsetMapName , 'already exists, please select a different name'))
                  } else {
                    rv$newmap <- rv$newmap+1 # trigger reactive value
                    store_POV( input$SelectSubsetMapName,
                               subsetEventsViz()[input$SelectSubsetDataTable_rows_all,],
-                              get_POV_THREAD_CF(x),
-                              get_POV_EVENT_CF(x),
-                              get_POV_COMPARISON_CF(x))
-                   output$SelectSubsetValidate = renderText(paste('New map named', input$SelectSubsetMapName ,'has been created'))
+                              get_POV_THREAD_CF(SubsetMapName),
+                              get_POV_EVENT_CF(SubsetMapName),
+                              get_POV_COMPARISON_CF(SubsetMapName, get_CF()))
+                   output$SelectSubsetValidate = renderText(paste('New POV named', input$SelectSubsetMapName ,'has been created'))
                  }, ignoreInit = TRUE)
 
 

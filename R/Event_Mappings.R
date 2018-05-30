@@ -28,19 +28,19 @@ get_POV_name_list <- function(){
 }
 
 
-store_POV <- function(EventMapName, e,  thread_CF, event_CF, comparison_CF){
+store_POV <- function(EventMapName, e,  thread_CF, event_CF){
 
 
   # make sure the name does not already exist
   if (check_POV_name(EventMapName))
     { print(paste(EventMapName, ' already exists. Cannot use the same name.')) }
   else {
-        # Add the mapping to the global list of mappings. Sort by threadNum and seqNum
-        Global_POV <<- append( list(e[order(e[['threadNum']],e[['seqNum']]),]), Global_POV )
+        # Add the mapping to the global list of mappings.
+        Global_POV <<- append( list(e), Global_POV )
         Global_POV_Name <<- append( list(paste(EventMapName)), Global_POV_Name )
         Global_POV_Event_CF <<- append( list(event_CF), Global_POV_Event_CF )
         Global_POV_Thread_CF <<- append( list(thread_CF), Global_POV_Thread_CF )
-        Global_POV_Comparison_CF <<- append( list(comparison_CF), Global_POV_Comparison_CF )
+  #     Global_POV_Comparison_CF <<- append( list(comparison_CF), Global_POV_Comparison_CF )
   }
 }
 
@@ -80,7 +80,8 @@ get_POV_EVENT_CF <- function(mapname){
   }
 }
 
-get_POV_COMPARISON_CF <- function(mapname){
+# this one compute the list based on the other two
+get_POV_COMPARISON_CF <- function(mapname, CF_list){
 
   idx <- which(mapname==get_POV_name_list() )
   if (length(idx)==0)  return(NULL)
@@ -88,7 +89,7 @@ get_POV_COMPARISON_CF <- function(mapname){
   if (idx==0) {
     return(NULL)
   } else {
-    return( Global_POV_Comparison_CF[[idx]] )
+    return(  setdiff(CF_list, union(get_POV_THREAD_CF(mapname),get_POV_EVENT_CF(mapname) )) )
   }
 }
 
@@ -102,7 +103,7 @@ delete_POV <- function(mapname){
   Global_POV_Name[[idx]] <<- NULL
   Global_POV_Event_CF[[idx]] <<- NULL
   Global_POV_Thread_CF[[idx]] <<- NULL
-  Global_POV_Comparison_CF[[idx]] <<- NULL
+  # Global_POV_Comparison_CF[[idx]] <<- NULL
 
 
 }
@@ -114,8 +115,9 @@ export_POV <- function(mapname){
   nicename_TM = paste0("TM_",mapname)
 
   # assign the data to the variables
+  # ??? may want to make CF for traminer output a user input.
   assign(nicename, get_POV(mapname))
-  assign(nicename_TM, convert_TN_to_TramineR(get_POV(mapname)) )
+  assign(nicename_TM, convert_TN_to_TramineR(get_POV(mapname),'label') )
 
   # save the data
   save(list=c(nicename,nicename_TM), file = paste0(nicename,".Rdata"))
