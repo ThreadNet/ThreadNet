@@ -45,5 +45,10 @@ source("Event_Mappings.R")
 
 # Global variables, config settings, etc. can be defined here
 
-# This is where we store the list of event mappings.  Reactive bindings are added in server.R
-GlobalEventMappings <- list()
+# This is where we store the list of event mappings.
+GlobalEventMappings <<- list()
+GlobalEventMappings_Name <<- list()
+GlobalEventMappings_Event_CF <<- list()
+GlobalEventMappings_Thread_CF <<- list()
+GlobalEventMappings_Comparison_CF <<- list()
+
