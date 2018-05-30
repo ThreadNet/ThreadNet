@@ -1,7 +1,7 @@
 # Server Output Functions for Moving Window Tab
 
   output$Moving_Window_Tab_Controls_1 <- renderUI({
-    selectizeInput("MovingWindowMapInputID",label = h4("Choose POV:"), get_POV_name_list() )
+    selectizeInput("MovingWindowMapInputID",label = h4("Choose POV:"), get_POV_names() )
   })
 
   output$Moving_Window_Tab_Controls_2 <- renderUI({

@@ -4,7 +4,7 @@
 
   # ####### SUBSET A   ##########
   output$Comparison_Tab_Controls_A1 <- renderUI({
-    selectizeInput("CompareMapInputID_A",label = h4("Choose mapping A:"),  get_POV_name_list() )
+    selectizeInput("CompareMapInputID_A",label = h4("Choose POV A:"),  get_POV_names() )
   })
 
   output$Comparison_Tab_Controls_A2 <- renderUI({
@@ -25,7 +25,7 @@
 
   # ####### SUBSET B   ##########
   output$Comparison_Tab_Controls_B1 <- renderUI({
-    selectizeInput("CompareMapInputID_B",label = h4("Choose mapping B:"),  get_POV_name_list() )
+    selectizeInput("CompareMapInputID_B",label = h4("Choose POV B:"),  get_POV_names() )
   })
 
   output$Comparison_Tab_Controls_B2 <- renderUI({
@@ -123,7 +123,7 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_POV_EVENT_CF( input$C
 
 # ##########  DIACHRONIC Comparison sub-tab   ###########
   output$Diachronic_Comparison_Tab_Controls_1 <- renderUI({
-    tagList(  selectizeInput("DiaCompareMapInputID",label = h4("Choose POV:"),  get_POV_name_list() ),
+    tagList(  selectizeInput("DiaCompareMapInputID",label = h4("Choose POV:"),  get_POV_names() ),
               selectizeInput('comparePanelViz',label = h4('Choose visualization:'),
                              c('Role Maps','Thread Trajectories','Threads (event time)','Ngrams' )))  })
 

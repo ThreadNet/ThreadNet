@@ -28,6 +28,8 @@ get_POV_name_list <- function(){
 store_POV <- function(EventMapName, e,  thread_CF, event_CF){
 
 
+  print(paste('in store_POV, EventMapName=',EventMapName))
+
   # make sure the name does not already exist
   if (check_POV_name(EventMapName))
     { print(paste(EventMapName, ' already exists. Cannot use the same name.')) }

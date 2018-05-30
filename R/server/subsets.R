@@ -8,7 +8,7 @@ output$chunk_controls_0 <- renderUI({
 		selectizeInput(
 			"ChunkInputMapID",
 			label = h4("Start with this POV:"),
-			get_POV_name_list()
+			get_POV_names()
 		)
 	)
 })
@@ -100,7 +100,7 @@ output$Regular_Expression_controls_1 <- renderUI({
 		selectizeInput(
 			"RegExInputMapID",
 			label = h4("Start with this POV:"),
-			get_POV_name_list()
+			get_POV_names()
 		)
 	)
 })
@@ -179,7 +179,7 @@ output$Regular_Expression_controls_7 <- renderUI({
 output$Frequent_Ngram_controls_1 <- renderUI({
 	tags$div(
 		align="left",
-		selectizeInput("freqNgramInputMapID",label = h4("Start with this POV:"), get_POV_name_list())
+		selectizeInput("freqNgramInputMapID",label = h4("Start with this POV:"), get_POV_names())
 	)
 })
 
@@ -257,7 +257,7 @@ output$Cluster_Event_controls_1 <- renderUI({
 	tags$div(
 		align="left",
 		tags$h4("Group similar events to together to allow zooming"),
-		selectizeInput("ClusterEventsInputID",label = h4("Start with this POV:"), get_POV_name_list() ))
+		selectizeInput("ClusterEventsInputID",label = h4("Start with this POV:"), get_POV_names() ))
 })
 
 output$Cluster_Event_controls_2 <- renderUI({
@@ -293,7 +293,7 @@ output$dendroClusterResult <- renderDendroNetwork({
 
 # Controls for the whole set of tabs
 output$SelectSubsetControls_1 <- renderUI({
-	selectizeInput("SelectSubsetMapInputID",label = h4("Choose input POV:"),get_POV_name_list())
+	selectizeInput("SelectSubsetMapInputID",label = h4("Start with this POV:"),get_POV_names())
 })
 
 output$SelectSubsetControls_2 <- renderUI({
@@ -317,7 +317,7 @@ output$Manage_Event_Map_controls <- renderUI({
 	tags$div(
 		align = "left",
 		tags$h4("Select event mapping to export or delete"),
-		selectizeInput("ManageEventMapInputID",label = h4("Choose mapping:"), get_POV_name_list() ),
+		selectizeInput("ManageEventMapInputID",label = h4("Choose POV:"), get_POV_names() ),
 		actionButton("ExportMappingRData", "Export RData file"),
 		actionButton("ExportMappingCsv", "Export to csv"),
 		actionButton("DeleteMappingButton", "Delete")

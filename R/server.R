@@ -144,9 +144,9 @@ server <- shinyServer(function(input, output, session) {
                 input$chunk_time_gap_threshold,
                 'mins', #get_timeScale()
                 input$chunk_CFs,
-                get_POV_THREAD_CF(input$EventMapName2),
-                get_POV_EVENT_CF(input$EventMapName2),
-                get_POV_COMPARISON_CF(input$EventMapName2, get_CF())
+                get_POV_THREAD_CF(input$ChunkInputMapID),
+                get_POV_EVENT_CF(input$ChunkInputMapID),
+                get_POV_COMPARISON_CF(input$ChunkInputMapID, get_CF())
             )
         )
         output$EventValidate2 = renderText(paste('New POV named', input$EventMapName2 ,'has been created'))
@@ -179,9 +179,9 @@ server <- shinyServer(function(input, output, session) {
             OccToEvents3(
                 regexInputEvents(),
                 input$EventMapName3,
-                get_POV_THREAD_CF(input$EventMapName3),
-                get_POV_EVENT_CF(input$EventMapName3),
-                get_POV_COMPARISON_CF(input$EventMapName3, get_CF()),
+                get_POV_THREAD_CF(input$RegExInputMapID),
+                get_POV_EVENT_CF(input$RegExInputMapID),
+                get_POV_COMPARISON_CF(input$RegExInputMapID, get_CF()),
                 'threadNum',
                 get_Zoom_REGEX(),
                 regexInput(),
@@ -233,23 +233,23 @@ server <- shinyServer(function(input, output, session) {
     observeEvent(input$EventButton4,
       if (check_POV_name(input$EventMapName4)){
         mapName4 = input$EventMapName4
-        output$EventValidate4 = renderText(paste('Map Name', mapName4 , 'already exists, please select a different name'))
+        output$EventValidate4 = renderText(paste('POV name', mapName4 , 'already exists, please select a different name'))
       } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
             OccToEvents3(
                 freqNgramInputEvents(),
                 input$EventMapName4,
-                get_POV_THREAD_CF(input$EventMapName4),
-                get_POV_EVENT_CF(input$EventMapName4),
-                get_POV_COMPARISON_CF(input$EventMapName4, get_CF()),
+                get_POV_THREAD_CF(input$freqNgramInputMapID),
+                get_POV_EVENT_CF(input$freqNgramInputMapID),
+                get_POV_COMPARISON_CF(input$freqNgramInputMapID, get_CF()),
                 'threadNum',
                 get_Zoom_freqNgram(),
                 selected_ngrams(),
                 input$KeepIrregularEvents_2
             )
         )
-        output$EventValidate4 = renderText(paste('New map named', input$EventMapName4 ,'has been created'))
+        output$EventValidate4 = renderText(paste('New POV named', input$EventMapName4 ,'has been created'))
     }, ignoreInit = TRUE)
 
 	# separate the cluster calculation from the dendrogram display
@@ -261,7 +261,8 @@ server <- shinyServer(function(input, output, session) {
                 get_POV(input$ClusterEventsInputID),
                 input$EventMapName6,
                 input$ClusterMethodID,
-                get_POV_EVENT_CF(input$EventMapName6),
+                get_POV_THREAD_CF(input$ClusterEventsInputID),
+                get_POV_EVENT_CF(input$ClusterEventsInputID),
                 'cluster'
             )
         )
@@ -290,7 +291,7 @@ server <- shinyServer(function(input, output, session) {
 		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
 	})
 
-	#??? check if this is OK... especially the comparison_CFs
+	# Another opportunity to make subsets...
 	observeEvent(input$SelectSubsetButton,
                  if (check_POV_name(input$SelectSubsetMapName)){
                    SubsetMapName = input$SelectSubsetMapName
@@ -299,9 +300,8 @@ server <- shinyServer(function(input, output, session) {
                    rv$newmap <- rv$newmap+1 # trigger reactive value
                    store_POV( input$SelectSubsetMapName,
                               subsetEventsViz()[input$SelectSubsetDataTable_rows_all,],
-                              get_POV_THREAD_CF(SubsetMapName),
-                              get_POV_EVENT_CF(SubsetMapName),
-                              get_POV_COMPARISON_CF(SubsetMapName, get_CF()))
+                              get_POV_THREAD_CF(input$SelectSubsetMapInputID),
+                              get_POV_EVENT_CF(input$SelectSubsetMapInputID))
                    output$SelectSubsetValidate = renderText(paste('New POV named', input$SelectSubsetMapName ,'has been created'))
                  }, ignoreInit = TRUE)
 

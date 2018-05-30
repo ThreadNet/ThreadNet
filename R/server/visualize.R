@@ -6,9 +6,8 @@
 output$Visualize_Tab_Controls_1 <- renderUI({
 	selectizeInput(
 		"VisualizeEventMapInputID",
-		label = h4("Choose mapping:"),
-		get_POV_name_list(),
-		selected = 'OneToOne'
+		label = h4("Choose POV:"),
+		get_POV_names()
 	)
 })
 
@@ -16,7 +15,7 @@ output$Visualize_Tab_Controls_2 <- renderUI({
   req(input$VisualizeEventMapInputID)
 	zoom_limit = zoom_upper_limit(get_POV(input$VisualizeEventMapInputID))
 	if(zoom_limit == 1) {
-		tags$h4("Zooming not available for this mapping")
+		tags$h4("Zooming not available for this POV")
 	} else {
 		sliderInput(
 			"VisualizeTabZoomID",

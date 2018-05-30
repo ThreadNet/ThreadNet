@@ -514,8 +514,6 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
   # put this here for now
   timescale='mins'
 
-  # Only run if eventMapName is filled in; return empty data frame otherwise
-  if (EventMapName ==""){return(data.frame())}
 
   # get the text vector for this set of threaded occurrences, delimited by commas
   tv = thread_text_vector( o, TN, CF, ',' )
@@ -534,7 +532,6 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
   nChunks = length(unlist(tvrxs))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
-  print(paste("before make_event_df, EventMapName=",EventMapName))
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
 
   # # for debugging, this is really handy
@@ -629,6 +626,7 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 
     # store the POV in the GlobalEventMappings
     store_POV(EventMapName, e, THREAD_CF, EVENT_CF)
+
     return(e)
 
 }
