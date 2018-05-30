@@ -534,6 +534,7 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
   nChunks = length(unlist(tvrxs))
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
+  print(paste("before make_event_df, EventMapName=",EventMapName))
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
 
   # # for debugging, this is really handy
@@ -764,6 +765,10 @@ make_event_df <- function(event_CF,compare_CF,N){
     occurrences = integer(N),
     threadNum = integer(N),
     seqNum = integer(N))
+
+
+  print(paste("in make_event_df, event_CF=",event_CF))
+  print(paste("in make_event_df, compare_CF=",compare_CF))
 
   # add columns for each of the context factors used to define events
   # first make the dataframes for each
