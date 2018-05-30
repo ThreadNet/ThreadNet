@@ -30,22 +30,24 @@ get_POV_name_list <- function(){
 
 store_POV <- function(EventMapName, e,  thread_CF, event_CF, comparison_CF){
 
-  # Add the mapping to the global list of mappings. Sort by threadNum and seqNum
-  # em = list(name = paste(EventMapName), threads = e[order(e[['threadNum']],e[['seqNum']]),])
 
-  Global_POV <<- append( list(e[order(e[['threadNum']],e[['seqNum']]),]), Global_POV )
-  Global_POV_Name <<- append( list(paste(EventMapName)), Global_POV_Name )
-  Global_POV_Event_CF <<- append( list(event_CF), Global_POV_Event_CF )
-  Global_POV_Thread_CF <<- append( list(thread_CF), Global_POV_Thread_CF )
-  Global_POV_Comparison_CF <<- append( list(comparison_CF), Global_POV_Comparison_CF )
-
-  return(em)
-
+  # make sure the name does not already exist
+  if (check_POV_name(EventMapName))
+    { print(paste(EventMapName, ' already exists. Cannot use the same name.')) }
+  else {
+        # Add the mapping to the global list of mappings. Sort by threadNum and seqNum
+        Global_POV <<- append( list(e[order(e[['threadNum']],e[['seqNum']]),]), Global_POV )
+        Global_POV_Name <<- append( list(paste(EventMapName)), Global_POV_Name )
+        Global_POV_Event_CF <<- append( list(event_CF), Global_POV_Event_CF )
+        Global_POV_Thread_CF <<- append( list(thread_CF), Global_POV_Thread_CF )
+        Global_POV_Comparison_CF <<- append( list(comparison_CF), Global_POV_Comparison_CF )
+  }
 }
 
 get_POV <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
+  if (length(idx)==0)  return(NULL)
 
   if (idx==0) {
     return(NULL)
@@ -57,6 +59,7 @@ get_POV <- function(mapname){
 get_POV_THREAD_CF <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
+  if (length(idx)==0)  return(NULL)
 
   if (idx==0) {
     return(NULL)
@@ -68,6 +71,7 @@ get_POV_THREAD_CF <- function(mapname){
 get_POV_EVENT_CF <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
+  if (length(idx)==0)  return(NULL)
 
   if (idx==0) {
     return(NULL)
@@ -79,6 +83,7 @@ get_POV_EVENT_CF <- function(mapname){
 get_POV_COMPARISON_CF <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
+  if (length(idx)==0)  return(NULL)
 
   if (idx==0) {
     return(NULL)
