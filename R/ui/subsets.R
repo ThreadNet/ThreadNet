@@ -1,12 +1,12 @@
 tabPanel(value = "subsets",
-    "Subsets and mapping",
-    helpText('Create subsets of your data and alternative mappings'),
+    "Clusters and Chunks",
+    helpText('This tab contains functions that are under development and may break. Your feedback will be appreciated.'),
     tags$hr(),
     tabsetPanel(
         type = "tabs",
         tabPanel(
             "Contextual Chunks",
-            helpText('This tab contains functions that are under development and may break. Please feel free to look. Your feedback will be appreciated.'),
+            helpText('Recode sequences into chunks.  This reduces the length of the sequences.'),
             tags$hr(),
             fluidRow(
                 column(3, uiOutput("chunk_controls_0")),
@@ -50,15 +50,6 @@ tabPanel(value = "subsets",
             dendroNetworkOutput("dendroClusterResult")
         ),
 
-        tabPanel(
-            "Select Subset",
-            helpText('Select and save a subset of data for visualization and comparison.'),
-            tags$hr(),
-            fluidRow(
-                column(3, uiOutput("SelectSubsetControls_1")),
-                column(3, uiOutput("SelectSubsetControls_2")) ),
-            DT::dataTableOutput("SelectSubsetDataTable")
-        ),
 
         tabPanel(
             "Find/replace patterns",
@@ -92,7 +83,17 @@ tabPanel(value = "subsets",
         ),
 
         tabPanel(
-            "Manage POV maps",
+          "Select Subset of POV",
+          helpText('Select and save a subset of data for comparison (again)'),
+          tags$hr(),
+          fluidRow(
+            column(3, uiOutput("SelectSubsetControls_1")),
+            column(3, uiOutput("SelectSubsetControls_2")) ),
+          DT::dataTableOutput("SelectSubsetDataTable")
+        ),
+
+        tabPanel(
+            "Export and delete POV maps",
             helpText('Delete or export event maps'),
             tags$hr(),
             uiOutput("Manage_Event_Map_controls"),
