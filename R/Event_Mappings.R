@@ -28,7 +28,7 @@ get_POV_name_list <- function(){
 }
 
 
-store_POV <- function(EventMapName, e, event_CF, thread_CF, comparison_CF){
+store_POV <- function(EventMapName, e,  thread_CF, event_CF, comparison_CF){
 
   # Add the mapping to the global list of mappings. Sort by threadNum and seqNum
   # em = list(name = paste(EventMapName), threads = e[order(e[['threadNum']],e[['seqNum']]),])
