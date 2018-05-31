@@ -45,8 +45,12 @@ output$dataFilter <- DT::renderDataTable(
 # return dataframe of occurences
 parseInputData <- function(inputFile){
 
+  withProgress(message = "Cleaning Data", value = 0,{
+
   # read in the table of occurrences
   fileRows <- read.csv(inputFile$datapath)
+
+  incProgress(1/3)
 
   # validate expected columns (first col must be "tStamp" or "sequence")
   firstCol <- names(fileRows)[1]
@@ -54,7 +58,6 @@ parseInputData <- function(inputFile){
   # if first col is tStamp, no changes, else
   # if first col is sequence, add a default timestamp, else
   # supply a default dataset
-
   if(firstCol != "tStamp"){
     if(firstCol != "sequence"){
       fileRows <- read.csv("sampleData.csv") # This could be handled in a config file instead of being hard coded
@@ -62,9 +65,15 @@ parseInputData <- function(inputFile){
       fileRows <- add_relative_timestamps(fileRows)
     }
   }
+  incProgress(2/3)
 
   # clean the data
   cleanData <- cleanOcc(fileRows)
+
+  incProgress(3/3)
+
+  })
+
 
   shinyjs::show(selector = "#navbar li a[data-value=choosePOV]")
   shinyjs::hide(selector = "#navbar li a[data-value=visualize]")
