@@ -87,14 +87,20 @@ server <- shinyServer(function(input, output, session) {
 		get_POV_name_list()
 	})
 
+	###########################
+	### read data functions ###
+	###########################
+
 	#dataframe for occurrences that are read in from file1
 	occ <- eventReactive(input$file1,parseInputData(input$file1))
 
 	# selected columns from the raw data
 	selectOcc <- reactive(occ()[c("tStamp", input$CFcolumnsID)] )
 
-	# select rows using the nice DT input
-	selectOccFilter <- reactive(selectOcc()[input$Data_Tab_Output_2_rows_all,])
+	# select all rows using the nice DT input
+	# global for general use -- check what else calls this if anything
+	selectOccFilter <<- reactive(selectOcc()[input$dataFilter_rows_all,])
+
 
 	# The POV tabs reconstruct the data into threads by sorting by tStamp and
 	# adding columns for threadNum and seqNum for the selected POV in ThreadOccByPOV
