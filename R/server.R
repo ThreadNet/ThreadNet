@@ -141,6 +141,9 @@ server <- shinyServer(function(input, output, session) {
       output$EventValidate2 = renderText(paste('POV Name', mapName2 , 'already exists, please select a different name'))
     } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
+        thread_CF = get_POV_THREAD_CF(input$ChunkInputMapID)
+        event_CF = get_POV_EVENT_CF(input$ChunkInputMapID)
+        compare_CF = get_POV_COMPARISON_CF(input$ChunkInputMapID, get_CF())
         isolate(
             OccToEvents_By_Chunk(
                 chunkInputEvents(),
@@ -148,12 +151,11 @@ server <- shinyServer(function(input, output, session) {
                 input$EventMapName2,
                 input$fixed_chunk_size,
                 input$chunk_time_gap_threshold,
-                'mins', #get_timeScale()
+                get_timeScale(),
                 input$chunk_CFs,
-                get_POV_THREAD_CF(input$ChunkInputMapID),
-                get_POV_EVENT_CF(input$ChunkInputMapID),
-                get_POV_COMPARISON_CF(input$ChunkInputMapID, get_CF())
-            )
+                thread_CF,
+                event_CF,
+                compare_CF )
         )
         output$EventValidate2 = renderText(paste('New POV named', input$EventMapName2 ,'has been created'))
     }, ignoreInit = TRUE )

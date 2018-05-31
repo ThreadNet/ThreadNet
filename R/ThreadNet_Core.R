@@ -202,6 +202,8 @@ count_ngrams <- function(o,TN,CF,n){
 #'@export
 ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
+  timescale = get_timeScale()
+
   withProgress(message = "Creating Events", value = 0,{
 
     n = 5
@@ -283,7 +285,6 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
         start_time = min(lubridate::ymd_hms(occ$tStamp[start_row:end_row]))
         # print(start_time)
 
-
         # increment the counters for the next thread
         start_row = end_row + 1
         thrd=thrd+1
@@ -294,7 +295,8 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
     # split occ data frame by threadNum to find earliest time value for that thread
     # then substract that from initiated relativeTime from above
-     occ_split = lapply(split(occ, occ$threadNum), function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+     occ_split = lapply(split(occ, occ$threadNum),
+                          function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
     # # row bind data frame back together
      occ= data.frame(do.call(rbind, occ_split))
 
@@ -385,8 +387,8 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
 
   # put this here for now
-  timescale='mins'
-
+ # timescale='mins'
+  timescale=get_timeScale()
 
   #### First get the break points between the events
  # Ideally, these should operate WITHIN each thread, not on the whole set of occurrences...
@@ -483,6 +485,16 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   e$ZM_1 = as.factor(e$label)
 #  e$ZM_1 = 1:nrow(e)
 
+
+  # split data frame by threadNum to find earliest time value for that thread
+  # then substract that from initiated relativeTime from above
+  e$relativeTime = lubridate::ymd_hms(e$tStamp)
+  e_split = lapply(split(e, e$threadNum),
+                    function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+  # # row bind data frame back together
+  e= data.frame(do.call(rbind, e_split))
+
+
   # print(head(e))
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
   e=clusterEvents(e, EventMapName, 'Contextual Similarity', thread_CF, event_CF,'POV')
@@ -514,8 +526,8 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
   # print(rx)
   # print(rx$label)
 
-  # put this here for now
-  timescale='mins'
+  # get the time scale
+  timescale=get_timeScale()
 
 
   # get the text vector for this set of threaded occurrences, delimited by commas
@@ -622,6 +634,17 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
     # keep the subset where the event is not blank
     e=subset(e, !ZM_1=='')
     }
+
+
+  # split data frame by threadNum to find earliest time value for that thread
+  # then substract that from initiated relativeTime from above
+  e$relativeTime = lubridate::ymd_hms(e$tStamp)
+  e_split = lapply(split(e, e$threadNum),
+                   function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+
+  # # row bind data frame back together
+  e= data.frame(do.call(rbind, e_split))
+
 
   # # for debugging, this is really handy
   #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
@@ -756,6 +779,7 @@ make_event_df <- function(event_CF,compare_CF,N){
   # Make a data frame with columns for each CF, and put one vector into each column
   e = data.frame(
     tStamp = numeric(N),  # this is the event start time
+    relativeTime = numeric(N),
     eventDuration = numeric(N),
     label = character(N),
     occurrences = integer(N),

@@ -20,12 +20,14 @@ output$fileSelector <- renderUI({
 
 # user selects time scale for graphics
 output$timeSelector <- renderUI({
-  checkboxGroupInput(
+  tags$div(
+    align = "center",
+  radioButtons(
     "timeScaleID",
     "Select time scale for graphs:",
     c( 'mins', 'hours','days','weeks', 'auto'),
     selected = 'mins',
-    inline = TRUE
+    inline = TRUE)
   )
 })
 
