@@ -92,10 +92,10 @@ server <- shinyServer(function(input, output, session) {
 	###########################
 
 	#dataframe for occurrences that are read in from file1
-	occ <- eventReactive(input$file,parseInputData(input$file))
+	occ <<- eventReactive(input$file,parseInputData(input$file))
 
 	# selected columns from the raw data
-	selectOcc <- reactive(occ()[c("tStamp", input$CFcolumnsID)] )
+	selectOcc <<- reactive(occ()[c("tStamp", input$CFcolumnsID)] )
 
 	# select all rows using the nice DT input
 	# global for general use -- check what else calls this if anything
