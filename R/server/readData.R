@@ -18,6 +18,17 @@ output$fileSelector <- renderUI({
   )
 })
 
+# user selects time scale for graphics
+output$timeSelector <- renderUI({
+  checkboxGroupInput(
+    "timeScaleID",
+    "Select time scale for graphs:",
+    c( 'mins', 'hours','days','weeks', 'auto'),
+    selected = 'mins',
+    inline = TRUE
+  )
+})
+
 # user selects columns to include
 # [-1] drop first column (tStamp)
 output$columnSelector <- renderUI({
