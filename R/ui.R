@@ -30,10 +30,10 @@ ui <- fluidPage(
         source(file.path("ui", "readData.R"),          local = TRUE)$value,
         source(file.path("ui", "choosePOV.R"),         local = TRUE)$value,
         source(file.path("ui", "visualize.R"),         local = TRUE)$value,
-        source(file.path("ui", "subsets.R"),           local = TRUE)$value,
         source(file.path("ui", "comparisons.R"),       local = TRUE)$value,
         source(file.path("ui", "movingWindow.R"),      local = TRUE)$value,
-        source(file.path("ui", "parameterSettings.R"), local = TRUE)$value,
+        source(file.path("ui", "subsets.R"),           local = TRUE)$value,
+      # source(file.path("ui", "parameterSettings.R"), local = TRUE)$value,
         source(file.path("ui", "acknowledgements.R"),  local = TRUE)$value
     )
 )

@@ -167,3 +167,8 @@ output$ThreadTrajectoriesOutput <- renderPlotly({threadTrajectory(threadedEvents
 output$visualizePieCharts = renderPlotly({
   CF_multi_pie(threadedEventsViz(), get_POV_EVENT_CF( input$VisualizeEventMapInputID ) )
 })
+
+# provide a data table view, as well
+output$visualizePOVData <-DT::renderDataTable(
+  threadedEventsViz(),
+  options = list(autoWidth = TRUE))

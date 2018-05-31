@@ -50,23 +50,29 @@ tabPanel(value = "visualize",
                 column(3, plotlyOutput("networkPie"))
             )
         ),
-        tabPanel(
-            "Event Frequency",
-            value = 'Custom',
-            fluidRow(
-                column(3, uiOutput("VisualizeCustomNetwork_Controls_0")),
-                column(3, uiOutput("VisualizeCustomNetwork_Controls_1"))
-            ),
-            plotlyOutput("VisualizeCustomNetwork")
-            # verbatimTextOutput("hover"),
-            # verbatimTextOutput("click")
-        ),
+        # tabPanel(
+        #     "Event Frequency",
+        #     value = 'Custom',
+        #     fluidRow(
+        #         column(3, uiOutput("VisualizeCustomNetwork_Controls_0")),
+        #         column(3, uiOutput("VisualizeCustomNetwork_Controls_1"))
+        #     ),
+        #     plotlyOutput("VisualizeCustomNetwork")
+        #     # verbatimTextOutput("hover"),
+        #     # verbatimTextOutput("click")
+        # ),
         tabPanel(
             "Other networks",
             uiOutput("Other_Network_Tab_Controls"),
             visNetworkOutput("otherVisNetwork", width = "100%", height = "1200px")
         ),
-        tabPanel("Role Maps",uiOutput("Role_map_controls"), plotlyOutput("Role_map_output") )
+        tabPanel("Role Maps",
+                 uiOutput("Role_map_controls"),
+                 plotlyOutput("Role_map_output")
+                 ),
+        tabPanel(
+          "Data Table",
+          DT::dataTableOutput("visualizePOVData"))
 
     )
 )
