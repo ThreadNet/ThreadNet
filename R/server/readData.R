@@ -66,6 +66,15 @@ parseInputData <- function(inputFile){
   # clean the data
   cleanData <- cleanOcc(fileRows)
 
+  shinyjs::show(selector = "#navbar li a[data-value=choosePOV]")
+  shinyjs::hide(selector = "#navbar li a[data-value=visualize]")
+  shinyjs::hide(selector = "#navbar li a[data-value=subsets]")
+  shinyjs::hide(selector = "#navbar li a[data-value=comparisons]")
+  shinyjs::hide(selector = "#navbar li a[data-value=movingWindow]")
+  shinyjs::hide(selector = "#navbar li a[data-value=parameterSettings]")
+
+
+
   # return a valid dataframe of occurences
   return(cleanData)
 }
