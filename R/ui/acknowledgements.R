@@ -6,7 +6,7 @@ tabPanel(
     tags$h4("Code Gurus:"),
     tags$p("Yu Lucy Han, Ezra Brooks, Patrick Bills, Danielle Barnes, Morgan Patterson, Douglas Krum"),
     tags$h4("Collaborators:"),
-    tags$p("Jan Recker, George Wyner, Martha Feldman, Thorvald Haerem, Waldemar Kremser, Julie Ryan Wolf, Ken Frank, Alice Pentland,  Inkyu Kim, Sudhanshu Srivastava"),
+    tags$p("Katharina Dittrich, Martha Feldman, Ken Frank, Thorvald Haerem, Inkyu Kim, Waldemar Kremser, Christian Mahringer, Alice Pentland, Jan Recker, Sudhanshu Srivastava, Julie Ryan Wolf, George Wyner "),
     tags$h4("Related Publications:"),
     tags$a(href="http://routines.broad.msu.edu/resources/","http://routines.broad.msu.edu/resources/" ),
     tags$h4("ThreadNet 2 (MatLab version):"),
