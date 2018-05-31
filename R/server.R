@@ -276,8 +276,9 @@ server <- shinyServer(function(input, output, session) {
                       thread_CF,
                       event_CF,
                       'cluster')
+            e = cluster_POV[['POV']]
             store_POV(input$EventMapName6,
-                      cluster_POV[['POV']],
+                      e[order(e[['threadNum']],e[['seqNum']]),] ,
                       thread_CF,
                       event_CF )
             cluster_POV[['cluster_result']]

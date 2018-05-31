@@ -28,8 +28,14 @@ library(plotly)
 #' @export
 CF_multi_pie <- function(oc,CF){
 
+  # print(paste('in CF_multiPie, oc colnames=',colnames(oc)))
+  # print(paste('in CF_multiPie, CF=',CF))
+
   # avoid unpleasant error messages
   if (length(CF)==0) {return(plotly_empty())}
+
+  # make sure the necessary columns are present
+  if (!all(CF %in% colnames(oc))) {return(plotly_empty())}
 
   # first add the combined column if there is more than one
   if (length(CF) >1){

@@ -485,6 +485,8 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   e$ZM_1 = as.factor(e$label)
 #  e$ZM_1 = 1:nrow(e)
 
+  # sort them by threadnum and seqnum
+  e = e[order(e[['threadNum']],e[['seqNum']]),]
 
   # split data frame by threadNum to find earliest time value for that thread
   # then substract that from initiated relativeTime from above
@@ -498,6 +500,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   # print(head(e))
   # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
   e=clusterEvents(e, EventMapName, 'Contextual Similarity', thread_CF, event_CF,'POV')
+
 
   # store the POV in the GlobalEventMappings
   store_POV(EventMapName, e, thread_CF, event_CF)
@@ -635,13 +638,14 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
     e=subset(e, !ZM_1=='')
     }
 
+  # sort them by threadnum and seqnum
+  e = e[order(e[['threadNum']],e[['seqNum']]),]
 
   # split data frame by threadNum to find earliest time value for that thread
   # then substract that from initiated relativeTime from above
   e$relativeTime = lubridate::ymd_hms(e$tStamp)
   e_split = lapply(split(e, e$threadNum),
                    function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
-
   # # row bind data frame back together
   e= data.frame(do.call(rbind, e_split))
 
