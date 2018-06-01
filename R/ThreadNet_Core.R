@@ -341,8 +341,6 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
    shinyjs::show(selector = "#navbar li a[data-value=movingWindow]")
    shinyjs::show(selector = "#navbar li a[data-value=parameterSettings]")
 
-
-
   return( e )
 
 }
@@ -409,6 +407,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   threadbreaks = which(o$seqNum == 1)
   breakpoints = sort(union(threadbreaks,breakpoints))
 
+  print(breakpoints)
 
   ### Use the break points to find the chunks -- just store the index back to the raw data
   nChunks = length(breakpoints)
@@ -447,7 +446,14 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
                                 '>')
 
     # assign timestamp and duration
-    e$tStamp[chunkNo] = o$tStamp[start_idx]
+ #   e$tStamp[chunkNo] = o$tStamp[start_idx]
+    d=  parse_date_time(o$tStamp[start_idx], c("dmy HMS", "dmY HMS", "ymd HMS"))
+    print( d )
+
+    e$tStamp[chunkNo] = d
+
+    print( e$tStamp[chunkNo] )
+
     e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
 
     # copy in the threadNum and assign sequence number
@@ -490,11 +496,13 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
   # split data frame by threadNum to find earliest time value for that thread
   # then substract that from initiated relativeTime from above
-  e$relativeTime = lubridate::ymd_hms(e$tStamp)
-  e_split = lapply(split(e, e$threadNum),
-                    function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
-  # # row bind data frame back together
-  e= data.frame(do.call(rbind, e_split))
+ # e$relativeTime = lubridate::ymd_hms(e$tStamp)
+  e$relativeTime = parse_date_time(e$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
+
+   e_split = lapply(split(e, e$threadNum),
+                     function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+  # # # row bind data frame back together
+   e= data.frame(do.call(rbind, e_split))
 
 
   # print(head(e))
@@ -649,10 +657,8 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
   # # row bind data frame back together
   e= data.frame(do.call(rbind, e_split))
 
-
   # # for debugging, this is really handy
   #   save(o,e,rx,tvrxs, file="O_and_E.rdata")
-
 
     # store the POV in the GlobalEventMappings
     store_POV(EventMapName, e, THREAD_CF, EVENT_CF)
@@ -782,13 +788,17 @@ make_event_df <- function(event_CF,compare_CF,N){
 
   # Make a data frame with columns for each CF, and put one vector into each column
   e = data.frame(
-    tStamp = numeric(N),  # this is the event start time
-    relativeTime = numeric(N),
+    tStamp = character(N),  # this is the event start time
+    relativeTime = character(N),
     eventDuration = numeric(N),
     label = character(N),
     occurrences = integer(N),
     threadNum = integer(N),
     seqNum = integer(N))
+
+  # set as.POSIXct
+    e$tStamp=as.POSIXct("2010-12-07 08:00:00")
+    e$relativeTime=as.POSIXct("2010-12-07 08:00:00")
 
   # print(paste("in make_event_df, event_CF=",event_CF))
   # print(paste("in make_event_df, compare_CF=",compare_CF))
