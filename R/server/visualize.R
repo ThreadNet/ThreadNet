@@ -19,7 +19,7 @@ output$Visualize_Tab_Controls_2 <- renderUI({
 	} else {
 		sliderInput(
 			"VisualizeTabZoomID",
-			"Zoom in and out by event similarity:",
+			label = h4("Zoom in and out by event similarity:"),
 			1, zoom_limit, zoom_limit, step = 1, ticks = FALSE
 		)
 	}
