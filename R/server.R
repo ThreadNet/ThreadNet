@@ -282,8 +282,8 @@ server <- shinyServer(function(input, output, session) {
                       e[order(e[['threadNum']],e[['seqNum']]),] ,
                       thread_CF,
                       event_CF )
-            cluster_POV[['cluster_result']]
             showNotification(paste('New POV named', input$EventMapName6 ,'has been created'), type='message', duration=10 )
+            cluster_POV[['cluster_result']]
     } )
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
