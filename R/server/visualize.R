@@ -17,11 +17,13 @@ output$Visualize_Tab_Controls_2 <- renderUI({
 	if(zoom_limit == 1) {
 		tags$h4("Zooming not available for this POV")
 	} else {
+	  tags$div(
 		sliderInput(
 			"VisualizeTabZoomID",
 			label = h4("Zoom in and out by event similarity:"),
 			1, zoom_limit, zoom_limit, step = 1, ticks = FALSE
-		)
+		),
+	  helpText('Zooming does not apply to some visualizations.'))
 	}
 })
 
@@ -38,7 +40,13 @@ output$Visualize_Tab_Controls_3 = renderUI({
 output$nGramControls <- renderUI({
 	tagList(
 		sliderInput("nGramLengthID","nGram Size", 1,10,2,step = 1,ticks = FALSE),
-		sliderInput("nGramDisplayThresholdID","Display threshold", 1,50,1,step = 1,ticks = FALSE)
+		sliderInput("nGramDisplayThresholdID","Display threshold", 1,50,1,step = 1,ticks = FALSE),
+		radioButtons(
+		  "Label_or_Zoom_3",
+		  "Do you prefer:",
+		  choices = c('Labels','Zooming'),
+		  selected = 'Labels',
+		  inline = TRUE)
 	)
 })
 
@@ -64,12 +72,29 @@ output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({ threadMap(threadedE
 #### Event Network (circle) sub-tab ####
 
 # use this to select how to color the nodes in force layout
-output$Circle_Network_Tab_Controls <- renderUI({ sliderInput("circleEdgeTheshold","Display edges above", 0,1,0,step = 0.01,ticks = FALSE )})
+output$Circle_Network_Tab_Controls <- renderUI({
+  tags$div(
+  sliderInput("circleEdgeTheshold","Display edges above", 0,1,0,step = 0.01,ticks = FALSE ),
+  radioButtons(
+    "Label_or_Zoom_1",
+    "Do you prefer:",
+    choices = c('Labels','Zooming'),
+    selected = 'Labels',
+    inline = TRUE)
+  )
+})
+
 
 output$circleVisNetwork <- renderVisNetwork({
   req(input$circleEdgeTheshold)
+
 	# first convert the threads to the network
-	n <- threads_to_network_original(threadedEventsViz(), "threadNum", get_Zoom_VIZ())
+  if (input$Label_or_Zoom_1 == 'Labels')
+  { n <- threads_to_network_original(threadedEventsViz(), "threadNum", 'label') }
+  else
+  { n <- threads_to_network_original(threadedEventsViz(), "threadNum", get_Zoom_VIZ()) }
+
+  # filter out the edges if desired
 	n <- filter_network_edges(n,input$circleEdgeTheshold)
 	circleVisNetwork(n, TRUE)
 })
@@ -113,14 +138,26 @@ output$Force_Network_Tab_Controls <- renderUI({
 			selected = button_choices[1], # always start with the first one
 			inline=TRUE
 		),
-		sliderInput("forceEdgeTheshold","Display edges above",0,1,0,step = 0.01,ticks = FALSE)
+		sliderInput("forceEdgeTheshold","Display edges above",0,1,0,step = 0.01,ticks = FALSE),
+		radioButtons(
+		  "Label_or_Zoom_2",
+		  "Do you prefer:",
+		  choices = c('Labels','Zooming'),
+		  selected = 'Labels',
+		  inline = TRUE)
 	)
 })
 
 output$forceNetworkD3 <- renderForceNetwork({
   req(input$forceEdgeTheshold)
-	n <- threads_to_network_original(threadedEventsViz(), 'threadNum', get_Zoom_VIZ(), input$NetworkGroupID)
+
+  if (input$Label_or_Zoom_2 == 'Labels')
+  {  n <- threads_to_network_original(threadedEventsViz(), 'threadNum',  'label', input$NetworkGroupID)  }
+  else
+  { n <- threads_to_network_original(threadedEventsViz(), 'threadNum', get_Zoom_VIZ(), input$NetworkGroupID)  }
+
 	n <- filter_network_edges(n,input$forceEdgeTheshold)
+
 	forceNetworkD3(n)
 })
 
