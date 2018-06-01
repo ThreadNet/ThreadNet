@@ -17,16 +17,6 @@ library(visNetwork)
 
 ui <- fluidPage(
 
-  # change location of notifications
-  tags$head(
-    tags$style(
-      HTML(".shiny-notification {
-           position:fixed;
-           top: calc(50%);;
-           left: calc(50%);;
-           }
-           "))),
-
     useShinyjs(),
 
     # Application title
