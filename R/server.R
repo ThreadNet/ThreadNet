@@ -296,17 +296,17 @@ server <- shinyServer(function(input, output, session) {
 	observeEvent(input$DeleteMappingButton,{
 		rv$newmap <- rv$newmap+1 # trigger reactive value
 		delete_POV(input$ManageEventMapInputID)
-		output$delete_confirm <- renderText(paste(input$ManageEventMapInputID, " deleted."))
+		showNotification(paste(input$ManageEventMapInputID, " deleted."), type='message', duration=10 )
 	}, ignoreInit = TRUE)
 
 	observeEvent(input$ExportMappingRData,{
 		export_POV(input$ManageEventMapInputID )
-		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .RData file"))
+	  showNotification(paste(input$ManageEventMapInputID, " exported as .RData file"), type='message', duration=10)
 	})
 
 	observeEvent(input$ExportMappingCsv,{
 		export_POV_csv( input$ManageEventMapInputID )
-		output$action_confirm <- renderText(paste(input$ManageEventMapInputID, " exported as .csv file"))
+	  showNotification(paste(input$ManageEventMapInputID, " exported as .csv file"), type='message', duration=10)
 	})
 
 	# Another opportunity to make subsets...

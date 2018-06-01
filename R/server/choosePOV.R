@@ -52,7 +52,7 @@ options = list(autoWidth = TRUE))
 
 
 #### Add new Dataset sub-tab ####
-output$addPOV <- renderUI({
+output$addPOV1 <- renderUI({
   tags$div(
     align="left",
     textInput(
@@ -61,8 +61,20 @@ output$addPOV <- renderUI({
       value = paste0(knitr::combine_words(get_THREAD_CF(),sep='+'),
                      '>>',
                      knitr::combine_words(get_EVENT_CF(),sep='+'))
-    ),
-    actionButton("addPOVButton", "Save mapping")
-  )
-})
+    ))})
+
+output$addPOV2 <- renderUI({
+  tags$div(
+    align="center",
+    h3('  '),
+    actionButton("addPOVButton", "Save this POV",
+              style = "font-size: 150%;
+                 font-weight: bold;
+                 height: 60px;
+                 width: 200px;
+                 text-align:center;
+                 border-radius: 6px;
+                 border-width: 2px") ) })
+
+
 

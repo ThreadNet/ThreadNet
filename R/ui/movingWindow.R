@@ -8,12 +8,12 @@ tabPanel(value = "movingWindow",
                 'Choose visualization:',
                 visualizations # references list defined in UI.R
             ),
-            radioButtons(
-                "Moving_Window_Type",
-                "Moving window type:",
-                choices = c('Single Window','Dual Window'),
-                selected = c('Single Window')
-            )
+            # radioButtons(
+            #     "Moving_Window_Type",
+            #     "Moving window type:",
+            #     choices = c('Single Window','Dual Window'),
+            #     selected = c('Single Window')
+            # )
         ),
         column(3,
             uiOutput("Moving_Window_Tab_Controls_3"),

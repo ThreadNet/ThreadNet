@@ -38,9 +38,10 @@ tabPanel(
     tabPanel(
       value = "saveThreads",
       "Step 4: Save POV",
-      tags$h4("Save this dataset to continue. You can create and compare multiple POVs."),
-      uiOutput("addPOV"),
-      uiOutput("EventValidate1")
+      tags$h4("Save this POV to continue. You can create and compare multiple POVs.") ,
+      fluidRow(
+        column(3, uiOutput("addPOV1") ),
+        column(3, uiOutput("addPOV2") ) )
     )
   )
 )
