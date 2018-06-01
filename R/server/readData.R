@@ -132,7 +132,7 @@ cleanOcc <- function(fileRows){
 
   # force tStamp into a "YMD_HMS" format
   complete$tStamp <- as.character(complete$tStamp)
-  complete$tStamp <- parse_date_time(complete$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
+  complete$tStamp <- parse_date_time(complete$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS","dmy HM", "dmY HM", "ymd HM"))
 
   # add weekday and month
   complete$weekday <- as.factor(weekdays(as.Date(complete$tStamp)))
