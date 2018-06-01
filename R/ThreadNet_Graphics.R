@@ -500,10 +500,10 @@ threadLengthBarchart <- function(o, TN){
 # accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
 circleVisNetwork <- function( n,showTitle=FALSE ){
 
-  if (showTitle==TRUE)
-    title_phrase = paste("Estimated complexity index =",round(estimate_network_complexity(n),2))
-  else
-    title_phrase =''
+  # if (showTitle==TRUE)
+  #   title_phrase = paste("Estimated complexity index =",round(estimate_network_complexity(n),2))
+  # else
+  #   title_phrase =''
 
   # print("nodes")
   # print(n$nodeDF)
