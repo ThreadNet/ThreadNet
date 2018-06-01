@@ -50,8 +50,8 @@ output$povDataThreads <- DT::renderDataTable({
 filter = "top",
 options = list(autoWidth = TRUE))
 
-#### Add new Dataset sub-tab ####
 
+#### Add new Dataset sub-tab ####
 output$addPOV <- renderUI({
   tags$div(
     align="left",

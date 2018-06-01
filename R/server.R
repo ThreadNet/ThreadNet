@@ -116,13 +116,14 @@ server <- shinyServer(function(input, output, session) {
 	observeEvent(input$addPOVButton,
 	  if (check_POV_name(input$POVMapName)){
 	    POVName = input$POVMapName
-	    output$EventValidate1 = renderText(paste('POV Name', POVName , 'already exists, please select a different name'))
+	    showNotification(paste('POV Name', POVName , 'already exists, please select a different name'), type='message', duration=10)
 	  } else {
 	  rv$newmap <- rv$newmap+1 # trigger reactive value
 	  isolate(
 	    store_POV(input$POVMapName, threadedOccSubSet(),input$THREAD_CF_ID,input$EVENT_CF_ID ) # this is the name; need to get object to add
 	  )
-	  output$EventValidate1 = renderText(paste('New POV named', input$POVMapName ,'has been created'))
+	  showNotification(paste('New POV named', input$POVMapName ,'has been created'), type='message', duration=10 )
+
 	}, ignoreInit = TRUE)
 
 
@@ -138,7 +139,7 @@ server <- shinyServer(function(input, output, session) {
     observeEvent( input$EventButton2,
     if (check_POV_name(input$EventMapName2)){
       mapName2 = input$EventMapName2
-      output$EventValidate2 = renderText(paste('POV Name', mapName2 , 'already exists, please select a different name'))
+      showNotification(paste('POV Name', mapName2 , 'already exists, please select a different name'), type='message', duration=10 )
     } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         thread_CF = get_POV_THREAD_CF(input$ChunkInputMapID)
@@ -157,7 +158,7 @@ server <- shinyServer(function(input, output, session) {
                 event_CF,
                 compare_CF )
         )
-        output$EventValidate2 = renderText(paste('New POV named', input$EventMapName2 ,'has been created'))
+        showNotification(paste('New POV named', input$EventMapName2 ,'has been created'), type='message', duration=10 )
     }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
@@ -180,8 +181,8 @@ server <- shinyServer(function(input, output, session) {
     observeEvent(input$EventButton3,
       if (check_POV_name(input$EventMapName3)){
         mapName3 = input$EventMapName3
-      output$EventValidate3 = renderText(paste('POV Name', mapName3 , 'already exists, please select a different name'))
-    } else {
+        showNotification(paste('POV Name', mapName3 , 'already exists, please select a different name'), type='message', duration=10 )
+      } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
             OccToEvents3(
@@ -196,7 +197,7 @@ server <- shinyServer(function(input, output, session) {
                 input$KeepIrregularEvents
             )
         )
-      output$EventValidate3 = renderText(paste('New POV named', input$EventMapName3 ,'has been created'))
+        showNotification(paste('New POV named', input$EventMapName3 ,'has been created'), type='message', duration=10 )
     }, ignoreInit = TRUE )
 
 	# get the data that will be the input for this tab
@@ -241,7 +242,7 @@ server <- shinyServer(function(input, output, session) {
     observeEvent(input$EventButton4,
       if (check_POV_name(input$EventMapName4)){
         mapName4 = input$EventMapName4
-        output$EventValidate4 = renderText(paste('POV name', mapName4 , 'already exists, please select a different name'))
+        showNotification(paste('POV Name', mapName4 , 'already exists, please select a different name'), type='message', duration=10 )
       } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
         isolate(
@@ -257,8 +258,8 @@ server <- shinyServer(function(input, output, session) {
                 input$KeepIrregularEvents_2
             )
         )
-        output$EventValidate4 = renderText(paste('New POV named', input$EventMapName4 ,'has been created'))
-    }, ignoreInit = TRUE)
+        showNotification(paste('New POV named', input$EventMapName4 ,'has been created'), type='message', duration=10 )
+      }, ignoreInit = TRUE)
 
 	# separate the cluster calculation from the dendrogram display
     cluster_result <- eventReactive(input$EventButton6,{
@@ -282,7 +283,7 @@ server <- shinyServer(function(input, output, session) {
                       thread_CF,
                       event_CF )
             cluster_POV[['cluster_result']]
-
+            showNotification(paste('New POV named', input$EventMapName6 ,'has been created'), type='message', duration=10 )
     } )
 
 	# Get data for the Visualize tab.Need parallel functions for the other tabs.
@@ -312,14 +313,14 @@ server <- shinyServer(function(input, output, session) {
 	observeEvent(input$SelectSubsetButton,
                  if (check_POV_name(input$SelectSubsetMapName)){
                    SubsetMapName = input$SelectSubsetMapName
-                   output$SelectSubsetValidate = renderText(paste('Map Name', SubsetMapName , 'already exists, please select a different name'))
+                   showNotification(paste('POV Name', SubsetMapName , 'already exists, please select a different name'), type='message', duration=10 )
                  } else {
                    rv$newmap <- rv$newmap+1 # trigger reactive value
                    store_POV( input$SelectSubsetMapName,
                               subsetEventsViz()[input$SelectSubsetDataTable_rows_all,],
                               get_POV_THREAD_CF(input$SelectSubsetMapInputID),
                               get_POV_EVENT_CF(input$SelectSubsetMapInputID))
-                   output$SelectSubsetValidate = renderText(paste('New POV named', input$SelectSubsetMapName ,'has been created'))
+                   showNotification(paste('New POV named', input$SelectSubsetMapName ,'has been created'), type='message', duration=10 )
                  }, ignoreInit = TRUE)
 
 

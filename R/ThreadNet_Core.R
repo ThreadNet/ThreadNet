@@ -296,7 +296,9 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
     # split occ data frame by threadNum to find earliest time value for that thread
     # then substract that from initiated relativeTime from above
      occ_split = lapply(split(occ, occ$threadNum),
-                          function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+                          # function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+              function(x) {x$relativeTime = difftime(x$relativeTime,  min(lubridate::ymd_hms(x$tStamp)), units=timescale ); x})
+
     # # row bind data frame back together
      occ= data.frame(do.call(rbind, occ_split))
 
@@ -500,7 +502,8 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   e$relativeTime = parse_date_time(e$tStamp, c("dmy HMS", "dmY HMS", "ymd HMS"))
 
    e_split = lapply(split(e, e$threadNum),
-                     function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+                    function(x) {x$relativeTime = difftime(x$relativeTime,  min(lubridate::ymd_hms(x$tStamp)), units=timescale ); x})
+                     # function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
   # # # row bind data frame back together
    e= data.frame(do.call(rbind, e_split))
 
@@ -653,7 +656,9 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
   # then substract that from initiated relativeTime from above
   e$relativeTime = lubridate::ymd_hms(e$tStamp)
   e_split = lapply(split(e, e$threadNum),
-                   function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+                   function(x) {x$relativeTime = difftime(x$relativeTime,  min(lubridate::ymd_hms(x$tStamp)), units=timescale ); x})
+                   # function(x) {x$relativeTime = x$relativeTime - min(lubridate::ymd_hms(x$tStamp)); x})
+
   # # row bind data frame back together
   e= data.frame(do.call(rbind, e_split))
 
