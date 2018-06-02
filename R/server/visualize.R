@@ -96,7 +96,7 @@ output$circleVisNetwork <- renderVisNetwork({
 
   # filter out the edges if desired
 	n <- filter_network_edges(n,input$circleEdgeTheshold)
-	circleVisNetwork(n, TRUE)
+	circleVisNetwork(n, 'directed', TRUE)
 })
 
 #### Other Networks sub-tab ####
@@ -121,7 +121,7 @@ output$otherVisNetwork <- renderVisNetwork({
 	# first convert the threads to the network
 	n <- normalNetwork(threadedEventsViz(), selectOccFilter(), input$OtherNetworkCF)
 	n <- filter_network_edges(n,input$otherEdgeTheshold)
-	circleVisNetwork(n)
+	circleVisNetwork(n, 'nondirected')
 })
 
 

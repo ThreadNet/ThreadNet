@@ -73,13 +73,13 @@ output$single_moving_window_timeline = renderPlotly({
     req(input$M_4_Theshold)
     n = threads_to_network_original( threadedEventsMove_A(), "threadNum", get_Zoom_MOVE() )
     n=filter_network_edges(n,input$M_4_Theshold)
-    circleVisNetwork( n ) })
+    circleVisNetwork( n , 'directed' ) })
 
   output$Moving_B_4 <- renderVisNetwork({
     req(input$M_4_Theshold)
     n = threads_to_network_original( threadedEventsMove_B(), "threadNum", get_Zoom_MOVE() )
     n=filter_network_edges(n,input$M_4_Theshold)
-    circleVisNetwork( n  ) })
+    circleVisNetwork( n , 'directed' ) })
 
   output$Moving_A_5 <- renderForceNetwork({
     req(input$M_5_Theshold)

@@ -62,13 +62,13 @@
     req(input$A_4_Theshold)
     n = threads_to_network_original( threadedEventsComp_A(), "threadNum", get_Zoom_COMP_A() )
     n=filter_network_edges(n,input$A_4_Theshold)
-    circleVisNetwork( n ) })
+    circleVisNetwork( n , 'directed' ) })
 
   output$Comp_B_4 <- renderVisNetwork({
     req(input$B_4_Theshold)
     n = threads_to_network_original( threadedEventsComp_B(), "threadNum", get_Zoom_COMP_B() )
     n=filter_network_edges(n,input$B_4_Theshold)
-    circleVisNetwork( n  ) })
+    circleVisNetwork( n , 'directed' ) })
 
   output$Comp_A_5_controls <- renderUI({sliderInput("A_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
   output$Comp_B_5_controls <- renderUI({sliderInput("B_5_Theshold","Display edges above", 0,1,0,step=0.01,ticks=FALSE )})
@@ -105,13 +105,13 @@ output$Comp_A_6_controls <- renderUI({button_choices = get_POV_EVENT_CF( input$C
     req(input$A_6_Theshold)
     n = normalNetwork( threadedEventsComp_A(), selectOccFilter(), input$A_6_OtherNetworkCF )
     n=filter_network_edges(n,input$A_6_Theshold)
-    circleVisNetwork( n )  })
+    circleVisNetwork( n,'nondirected' )  })
 
   output$Comp_B_6 <- renderVisNetwork({
     req(input$B_6_Theshold)
     n = normalNetwork( threadedEventsComp_B(), selectOccFilter(), input$B_6_OtherNetworkCF )
     n=filter_network_edges(n,input$B_6_Theshold)
-    circleVisNetwork( n ) })
+    circleVisNetwork( n, ,'nondirected' ) })
 
   output$Comp_A_7_controls <- renderUI({checkboxGroupInput("A_7_CFs","Pick Two:", get_POV_EVENT_CF( input$CompareMapInputID_A) )})
   output$Comp_B_7_controls <- renderUI({checkboxGroupInput("B_7_CFs","Pick Two:", get_POV_EVENT_CF( input$CompareMapInputID_B) )})

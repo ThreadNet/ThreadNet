@@ -501,7 +501,7 @@ threadLengthBarchart <- function(o, TN){
 
 # Basic Network layout - back from the dead
 # accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
-circleVisNetwork <- function( n,showTitle=FALSE ){
+circleVisNetwork <- function( n,directed='directed', showTitle=FALSE ){
 
   title_phrase =''
   # if (showTitle==TRUE)
@@ -514,8 +514,8 @@ circleVisNetwork <- function( n,showTitle=FALSE ){
   #
   # print("edges")
   # print(n$edgeDF)
-
-  return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
+if (directed =='directed')
+  { return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
            visEdges(arrows ="to",
                     color = list(color = "black", highlight = "red")) %>%
            visLayout(randomSeed = 12 ) %>%  # to have always the same network
@@ -523,10 +523,15 @@ circleVisNetwork <- function( n,showTitle=FALSE ){
            #      visIgraphLayout(layout = "layout_as_tree") %>%
            visNodes(size = 10) %>%
            visOptions(highlightNearest = list(enabled = T, hover = T),
-                      nodesIdSelection = T)
-
-  )
-
+                      nodesIdSelection = T)) }
+   else {return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
+                  visEdges(color = list(color = "black", highlight = "red")) %>%
+                  visLayout(randomSeed = 12 ) %>%  # to have always the same network
+                  visIgraphLayout(layout = "layout_in_circle") %>%
+                  #      visIgraphLayout(layout = "layout_as_tree") %>%
+                  visNodes(size = 10) %>%
+                  visOptions(highlightNearest = list(enabled = T, hover = T),
+                             nodesIdSelection = T))}
 }
 
 
@@ -557,6 +562,9 @@ normalNetwork <- function(e, o, cf){
   # compute outer product to get adjacency matrix and then standardize to 0-1
   a=sqrt(vcf_sum %o% vcf_sum)
   a=a/max(a)
+
+  # remove diagonal (self-ties)
+  diag(a) = 0
 
   # print(a)
   g=graph_from_adjacency_matrix(a, mode='undirected', weighted=TRUE)
