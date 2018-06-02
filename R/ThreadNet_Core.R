@@ -413,6 +413,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(event_CF, compare_CF, nChunks)
+  e$label = as.character(e$label)
 
   #  need to create chunks WITHIN threads.  Need to respect thread boundaries
   # take union of the breakpoints, plus thread boundaries, plus 1st and last row
@@ -436,20 +437,14 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
     }
 
     # assign the occurrences
-    e$occurrences[[chunkNo]] = list(start_idx:stop_idx)
+    e$occurrences[chunkNo] = list(start_idx:stop_idx)
 
-    e$label[[chunkNo]] = paste0('<',
+    e$label[chunkNo] = paste0('<',
                                 str_replace_all(concatenate(o$label[start_idx:stop_idx]), ' ','++'),
                                 '>')
 
     # assign timestamp and duration
- #   e$tStamp[chunkNo] = o$tStamp[start_idx]
-    d=  parse_date_time(o$tStamp[start_idx], c("dmy HMS", "dmY HMS", "ymd HMS"))
-    print( d )
-
-    e$tStamp[chunkNo] = d
-
-    print( e$tStamp[chunkNo] )
+    e$tStamp[chunkNo] = parse_date_time(o$tStamp[start_idx], c("dmy HMS", "dmY HMS", "ymd HMS"))
 
     e$eventDuration[chunkNo] = difftime(o$tStamp[stop_idx], o$tStamp[start_idx],units=timescale )
 
@@ -485,7 +480,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   }
 
   # fill in the last column with the label (tried using row number...)
-  e$ZM_1 = as.factor(e$label)
+#  e$ZM_1 = as.factor(e$label)
 #  e$ZM_1 = 1:nrow(e)
 
   # sort them by threadnum and seqnum
@@ -557,6 +552,7 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 
   # make the dataframe for the results.  This is the main data structure for the visualizations and comparisons.
   e = make_event_df(EVENT_CF, compare_CF, nChunks)
+  e$label = as.character(e$label)
 
   # # for debugging, this is really handy
   # save(o,rx,tvrxs, file="O_and_E_3.rdata")
