@@ -335,13 +335,8 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
   # for debugging, this is really handy
 #   save(occ,e,file="O_and_E_1.rdata")
 
-   print('done converting occurrences...')
+print('done converting occurrences...')
 
-   shinyjs::show(selector = "#navbar li a[data-value=visualize]")
-   shinyjs::show(selector = "#navbar li a[data-value=subsets]")
-   shinyjs::show(selector = "#navbar li a[data-value=comparisons]")
-   shinyjs::show(selector = "#navbar li a[data-value=movingWindow]")
-   shinyjs::show(selector = "#navbar li a[data-value=parameterSettings]")
 
   return( e )
 

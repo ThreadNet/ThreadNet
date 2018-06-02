@@ -122,6 +122,12 @@ server <- shinyServer(function(input, output, session) {
 	  isolate(
 	    store_POV(input$POVMapName, threadedOccSubSet(),input$THREAD_CF_ID,input$EVENT_CF_ID ) # this is the name; need to get object to add
 	  )
+	  shinyjs::show(selector = "#navbar li a[data-value=visualize]")
+	  shinyjs::show(selector = "#navbar li a[data-value=subsets]")
+	  shinyjs::show(selector = "#navbar li a[data-value=comparisons]")
+	  shinyjs::show(selector = "#navbar li a[data-value=movingWindow]")
+	  shinyjs::show(selector = "#navbar li a[data-value=parameterSettings]")
+
 	  showNotification(paste('New POV named', input$POVMapName ,'has been created'), type='message', duration=10 )
 
 	}, ignoreInit = TRUE)

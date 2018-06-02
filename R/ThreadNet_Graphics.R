@@ -558,12 +558,12 @@ normalNetwork <- function(e, o, cf){
   # add up the indicators of co-presence in this set of events
   vcf_sum = colSums( matrix( unlist(e[[vcf]]), nrow = length(e[[vcf]]), byrow = TRUE) )
 
-  # compute outer product to get adjacency matrix and then standardize to 0-1
+  # compute outer product to get adjacency matrix,remove diagonal (self-ties) and then standardize to 0-1
   a=sqrt(vcf_sum %o% vcf_sum)
+  diag(a) = 0
   a=a/max(a)
 
-  # remove diagonal (self-ties)
-  diag(a) = 0
+
 
   # print(a)
   g=graph_from_adjacency_matrix(a, mode='undirected', weighted=TRUE)

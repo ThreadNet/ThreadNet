@@ -53,13 +53,20 @@ output$nGramControls <- renderUI({
 # NGRAMdisplay
 output$nGramBarchart <- renderPlotly({
   req(input$nGramLengthID)
+  if (input$Label_or_Zoom_3 == 'Labels')
 	ng_bar_chart(
 		threadedEventsViz(),
 		"threadNum",
-		get_Zoom_VIZ(),
+		'label',
 		input$nGramLengthID,
-		input$nGramDisplayThresholdID
-	)
+		input$nGramDisplayThresholdID)
+		else
+		  ng_bar_chart(
+		    threadedEventsViz(),
+		    "threadNum",
+		    get_Zoom_VIZ(),
+		    input$nGramLengthID,
+		    input$nGramDisplayThresholdID)
 })
 
 #### Whole Sequences sub-tab ####
