@@ -404,7 +404,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
   threadbreaks = which(o$seqNum == 1)
   breakpoints = sort(union(threadbreaks,breakpoints))
 
-  print(breakpoints)
+  # print(breakpoints)
 
   ### Use the break points to find the chunks -- just store the index back to the raw data
   nChunks = length(breakpoints)
