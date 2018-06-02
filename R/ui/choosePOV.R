@@ -7,7 +7,8 @@ tabPanel(
   "Choose POV",
 
   tags$hr(),
-
+  uiOutput("timeSelector"),
+  tags$hr(),
   tabsetPanel(
 
     id = "tabs",
