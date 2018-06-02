@@ -133,7 +133,6 @@ server <- shinyServer(function(input, output, session) {
 	}, ignoreInit = TRUE)
 
 
-
 	# get the data that will be the input for this tab
 	chunkInputEvents <- reactive({
 		rv$newmap
