@@ -8,7 +8,7 @@
 
 # graphic functions used in Shiny App.
 # some plotly, but some from other packages
-
+library(plotly)
 
 ###### Pie charts for context factors  ####
 # It would be nice to display some other helpful information, perhaps (like the % of possible combinations that occur)
@@ -28,8 +28,14 @@
 #' @export
 CF_multi_pie <- function(oc,CF){
 
+  # print(paste('in CF_multiPie, oc colnames=',colnames(oc)))
+  # print(paste('in CF_multiPie, CF=',CF))
+
   # avoid unpleasant error messages
   if (length(CF)==0) {return(plotly_empty())}
+
+  # make sure the necessary columns are present
+  if (!all(CF %in% colnames(oc))) {return(plotly_empty())}
 
   # first add the combined column if there is more than one
   if (length(CF) >1){
@@ -131,6 +137,8 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 
   # avoid unpleasant error messages
   if (length(CF)==0) {return(plotly_empty())}
+  # print(paste('in CF_multi_pie_event, r=',r))
+  if (is.na(as.numeric(r))) {return(plotly_empty())}
 
   # get number of plots
   nPlots = length(CF)
@@ -160,15 +168,24 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 
     # make table information for each plot
     # cfData = data.frame(Freq=as.matrix(unlist(e[r,CF[i]])),Var1= letters[seq( from = 1, to = length(unlist(e[r,CF[i]])) )])
-      cfData = make_df_for_one_pie(o,e,CF[i],r,zm)
+    cfData = make_df_for_one_pie(o,e,CF[i],r,zm)
 
-        # take out rows with zero frequency
+    # take out rows with zero frequency
     cfData = cfData[(cfData[,"Freq"]>0),]
 
     #N levels
     CFlevels = length(cfData[,"Freq"])
 
-  # Add the new plots
+    # Add the new plots
+    if(CFlevels==1){
+      pies = pies  %>%
+        add_pie(data = cfData, labels = ~Label, values = ~Freq,
+                textinfo='label',textposition='none', name=as.character(CF[i]),
+                domain = list(x = c(plotDomainLB[i], plotDomainUB[i])) ) %>%
+        add_annotations(text=paste0(CF[i],"<br>",cfData$Label),showarrow=FALSE,xanchor="center",
+                        font=list(size="14",color="white"),
+                        xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+    } else {
     pies = pies  %>%
       add_pie(data = cfData, labels = ~Label, values = ~Freq,
               textinfo='label',textposition='none', name=as.character(CF[i]),
@@ -176,6 +193,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
       add_annotations(text=paste0(CF[i],"<br>N=",CFlevels),showarrow=FALSE,xanchor="center",
                       font=list(size="14",color="white"),
                       xref="paper",yref="paper",y=.5,x=ctrPlot[i])
+    }
   }
 
   pies = pies %>%
@@ -206,17 +224,36 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #' @return  plotly object
 #' @export
 #'
-threadMap <- function(or,TN, timescale, CF, shape){
+threadMap <- function(or, TN, timescale, CF, shape){
+
+
+  # print('in threadMap')
+  # print(head(or))
 
   # setting color palettes
   # first find the number of distinct colors
   nColors = length(unique(or[,CF]))
   pal <- diverge_hcl(nColors)
 
-  return( plot_ly(or, x = ~or[[timescale]], y = ~or[[TN]], color= ~or[,CF],
+  if (timescale == 'seqNum') {
+    xaxis = 'Event Time'
+  } else if (timescale == 'tStamp') {
+    xaxis = 'Actual Time'
+  } else if (timescale == 'relativeTime') {
+    xaxis = 'Relative time'
+  }
+
+  return( plot_ly(or, x = ~as.integer(or[[timescale]]), y = ~or[[TN]], color= ~as.character(or[,CF]),
              colors=pal,
              name = 'threads', type = 'scatter', mode='markers', marker=list(size=10, opacity=1), # fill='tonextx',
+             text = ~or$label,
+             hoverinfo = "text+x+y",
              symbol= "line-ew", symbols=shape, showlegend=FALSE)
+             %>%
+               layout(
+                 xaxis = list(title = xaxis),
+                 yaxis = list(title = knitr::combine_words(get_THREAD_CF(), sep = ", "))
+               )
         )
 }
 
@@ -261,6 +298,18 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
   return(ngp)
 }
 
+# this version we pass in the ngram data frame already sorted
+ng_bar_chart_freq <- function(ngdf){
+
+  # put them in descending order -- tricky (http://stackoverflow.com/questions/40224892/r-plotly-barplot-sort-by-value)
+  ngdf$ngrams = factor(ngdf$ngrams, levels =unique(ngdf$ngrams)[order(ngdf$freq, decreasing = FALSE)])
+
+  ngp <- plot_ly( ngdf, y = ~ngrams, x = ~freq, type = "bar",showlegend=FALSE) %>%
+    layout(xaxis= list(showticklabels = TRUE, title='Frequency'))  %>%
+    layout(yaxis= list(showticklabels = FALSE, title=''))
+
+  return(ngp)
+}
 
 
 #############################################################################
@@ -279,7 +328,10 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
 #' @export
 
 eventNetwork <- function(et, TN, CF, timesplit){
+
   n <- threads_to_network(et, TN, CF, timesplit)
+
+
   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
 
   edge_shapes <- list()
@@ -288,7 +340,7 @@ eventNetwork <- function(et, TN, CF, timesplit){
 
     edge_shape = list(
       type = "line",
-      line = list(color = "#030303", width = 0.1),
+      line = list(color = "#030303", width = 0),
       x0 = E[['from_x']],
       x1 = E[['to_x']],
       y0 = E[['from_y']],
@@ -310,6 +362,7 @@ eventNetwork <- function(et, TN, CF, timesplit){
   color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
   size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
   network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
+                     width = 0,
                      mode = "markers",
                      marker = list(size= size_pal,
                                    color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
@@ -330,118 +383,29 @@ eventNetwork <- function(et, TN, CF, timesplit){
 ################################################################
 ##  Here is the networkD3 version of the same thing.
 # it has a bunch of extra code because of the groups...
-# needs to be re-written to use the network function
+# needs to be re-written to separate computation of the network from the layout...
 
-#' NetworkD3 force layout for event network
-#'
-#' Should be replaced with a more expressive layout in plotly
+#' NetworkD3 layout for event network
 #'
 #' @family ThreadNet_Graphics
 #'
-#' @param et dataframe with the threads to be graphed
-#' @param TN the column with the threadNumber
-#' @param grp used to color some of the nodes
-#' @param zoom_level this is just the contextual factor (column) to be graphed
+#' @param n = list with data frames for nodes and edges
 #'
 #' @return networkD3 object
 #' @export
-#'
-forceNetworkD3 <- function(et,TN, grp, zoom_level){
-  # et is a dataframe of event threads
-  # TN is the column that holds the threadNumber
-  # grp is one of the comparison columns
-  # zoom_level is the column with the event code (node ID)
 
-#   print(paste("TN =", TN))
-#   print(paste("grp =", grp))
-#   print(paste("zoom_level =", zoom_level))
-
-
-  # First get the node names & remove the spaces
-  node_label = levels(factor(et[[zoom_level]]))  # unique(et[[zoom_level]])
-  node_label=str_replace_all(node_label," ","_")
-  nNodes = length(node_label)
-
-  node_group=character()
-  for (n in 1:nNodes){
-    node_group = c(node_group, as.character(unlist( et[which(et[[zoom_level]]==node_label[n]),grp][1]) ) )
-  }
-
-#    print(paste("node_label = ", node_label))
-#    print(paste("node_group = ", node_group))
-
-
-  # set up the data frames we need to draw the network
-  # needs to have name, group, size
-  nodes = data.frame(
-    id = 1:length(node_label),
-    label = node_label,
-    Group = node_group,
-    Title=node_label)
+forceNetworkD3 <- function(n){
 
   # zero indexing
-  nodes$id = nodes$id-1
+  n$nodeDF['id'] =  n$nodeDF['id']-1
+  n$edgeDF['from'] =  n$edgeDF['from']-1
+  n$edgeDF['to'] =  n$edgeDF['to']-1
 
-  # print("nodes")
-  # print(nodes)
 
-
-  # Only count in threads where length is adequate
-  text_vector = vector(mode="character")
-  j=0
-  for (i in unique(et[[TN]])){
-    txt =et[et[[TN]]==i,zoom_level]
-    # length needs to be longer than n
-    if (length(txt)>2){
-      j=j+1
-      text_vector[j] = concatenate(txt,collapse = "|", rm.space = TRUE)
-    }
-  }
-
-  # print("text_vector")
-  # print(text_vector)
-
-  # try using ngram to get edges since it is so fast
-  ngdf = get.phrasetable(ngram(text_vector,2,sep = "|"))
-
-  # need to split 2-grams into from and to
-  from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
-
-  # need to find a better way to do this...
-  nEdges = length(from_to_str)
-  from_labels=matrix(data="", nrow=nEdges,ncol=1)
-  to_labels =matrix(data="", nrow=nEdges,ncol=1)
-
-  from=integer(nEdges)
-  to=integer(nEdges)
-  for (i in 1:length(from_to_str)){
-
-    # Get from and to by spliting the 2-gram
-    from_labels[i] = str_split(from_to_str[[i]]," ")[1]
-    to_labels[i] = str_split(from_to_str[[i]]," ")[2]
-
-    # use match to lookup the nodeID from the label...
-    from[i] = match(from_labels[i], nodes$label)
-    to[i] = match(to_labels[i], nodes$label)
-  }
-
-  # zero indexing for D3
-  from=from-1
-  to=to-1
-
-  # ideally need to have source, target, value
-  edges = data.frame(
-    from,
-    to,
-    Value = paste(ngdf$freq)
-  )
-
-  # print("edges")
-  # print(edges)
-
-  return( forceNetwork(Links = edges, Nodes = nodes, Source = "from",
+  return( forceNetwork(Links = n$edgeDF, Nodes = n$nodeDF, Source = "from",
                        Target = "to", Value = "Value", NodeID = "label",
-                       Group = "Group", opacity = 1, zoom = T, bounded = FALSE))
+                       Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE,
+                       clickAction = 'Shiny.onInputChange("Group", d.name)'))
 }
 
 
@@ -454,17 +418,19 @@ forceNetworkD3 <- function(et,TN, grp, zoom_level){
 #' @family ThreadNet_Graphics
 #'
 #' @param e dataframe with threads to be plotted
+#' @param o dataframe with the original data
 #' @param CF contextul factors
 #' @param CF_levels  list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)
 #' @param nTimePeriods how many time periods to divide the data?
 #' @param ng_size size of ngram
 #' @param zoom_level choose the zoom level, if applicable
+#' @param plot_type a type of plotly plot with a function written
 #'
 #' @return plotly object, including subplots
 #' @export
 #'
 #' @examples
-Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_level){
+Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,role_map_cfs){
 
   # get the first event of each thread, so we can order them consistently by time
   et = e[e$seqNum==1,]
@@ -482,89 +448,41 @@ Comparison_Plots <- function(e, CF, CF_levels, nTimePeriods=1, ng_size , zoom_le
   # Get the subsets, first by time and then by category.  This will just return thread numbers.
   time_buckets = make_subsets(et$threadNum,nTimeBuckets)
 
-  # print("time_buckets")
-  # print(time_buckets)
-
-  # further divide each by context factor
-
-  # plotList <- function(nplots) {
-  #   lapply(seq_len(nplots), function(x) plot_ly())
-
   plot_list = list()
 
   for (tb in 1:nTimeBuckets){
     for (f in 1:nLevels){
 
       plotName = paste0("Time-",tb,"-","CF-",f)
-
-      # print("plotName")
-      # print(plotName)
-      # print("CF")
-      # print(CF)
-
       plot_bucket = et[(is.element(et$threadNum,unlist(time_buckets[tb])) & et[CF]==CF_levels[f]),"threadNum"]
-
-      # print("plot_bucket")
-      # print(plot_bucket)
 
       # then make the subplots
       # this gets all of the events in all of the threads that match the criteria
-
       dfp= e[is.element(e$threadNum,unlist(plot_bucket)),]
       # print("dfp[,1:7]")
       # print(dfp[,1:7])
 
       # ideally make sure at least one thread is long enough to do an ngram...
-      if (nrow(dfp)>ng_size){
+      if (nrow(dfp)>2){
 
-        plot_list[[plotName]] =  ng_bar_chart(dfp,"threadNum", zoom_level, ng_size, 1)
-        #      plot_list[[plotName]] =  eventNetworkD3(dfp,"threadNum", get_COMPARISON_CF(), zoom_level)
-
-      } else
-      {plot_list[[plotName]] =  plotly_empty()}
-
-
+        if (plot_type=='Ngrams')
+        {plot_list[[plotName]] =  ng_bar_chart(dfp,"threadNum", 1, 2, 2)}
+        else if (plot_type=='Role Maps')
+        {plot_list[[plotName]] = role_map( dfp, o, role_map_cfs ) }
+        else if (plot_type=='Thread Trajectories')
+        {plot_list[[plotName]] = threadTrajectory( dfp ) }
+         else if (plot_type=='Threads (event time)')
+         {plot_list[[plotName]] = threadMap(dfp, "threadNum", "seqNum", 1, 15 ) }
+       else
+        {plot_list[[plotName]] =  plotly_empty()}
     }
-  }
+  }}
 
   # create two versions: one that uses ngrams (1-2-3) and one that shows numbers.
   return(subplot(plot_list,nrows=nLevels))
 }
 
 
-###################################################################
-
-#' Use TraMiner plotting function to produce threadmap
-#'
-#' Would like to re-implement in plotly for mouse-over and for better interactivity and speed
-#'
-#' @family ThreadNet_Graphics
-#'
-#' @param df
-#' @param TN
-#' @param CF
-#'
-#' @return standard R plot
-#' @export
-traminer_threadMap <- function(df,TN, CF){
-
-  # setting color palettes
-  # first find the number of distinct colors
-  nColors = length(unique(df[,CF]))
-  pal <- diverge_hcl(nColors)
-
-  #  reformat the data for traminerR
-  df = convert_TN_to_TramineR(df, TN, CF)
-
-
-  #plot sequence - also try seqfplot?
-  # add grouping variable?
-  return(seqiplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
-
-  #  return(seqfplot( seqdef(df, cpal=pal) , withlegend = T, main = "ThreadMap", border = NA,idxs=1:nrow(df)) )
-
-
-}
 
 # This one is not currently used.
 threadLengthBarchart <- function(o, TN){
@@ -578,3 +496,191 @@ threadLengthBarchart <- function(o, TN){
   return(tgbc)
 }
 
+
+
+# Basic Network layout - back from the dead
+# accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
+circleVisNetwork <- function( n,directed='directed', showTitle=FALSE ){
+
+  title_phrase =''
+  # if (showTitle==TRUE)
+  #   title_phrase = paste("Estimated complexity index =",round(estimate_network_complexity(n),2))
+  # else
+  #   title_phrase =''
+
+  # print("nodes")
+  # print(n$nodeDF)
+  #
+  # print("edges")
+  # print(n$edgeDF)
+if (directed =='directed')
+  { return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
+           visEdges(arrows ="to",
+                    color = list(color = "black", highlight = "red")) %>%
+           visLayout(randomSeed = 12 ) %>%  # to have always the same network
+           visIgraphLayout(layout = "layout_in_circle") %>%
+           #      visIgraphLayout(layout = "layout_as_tree") %>%
+           visNodes(size = 10) %>%
+           visOptions(highlightNearest = list(enabled = T, hover = T),
+                      nodesIdSelection = T)) }
+   else {return(visNetwork(n$nodeDF, n$edgeDF, width = "100%", main=title_phrase) %>%
+                  visEdges(color = list(color = "black", highlight = "red")) %>%
+                  visLayout(randomSeed = 12 ) %>%  # to have always the same network
+                  visIgraphLayout(layout = "layout_in_circle") %>%
+                  #      visIgraphLayout(layout = "layout_as_tree") %>%
+                  visNodes(size = 10) %>%
+                  visOptions(highlightNearest = list(enabled = T, hover = T),
+                             nodesIdSelection = T))}
+}
+
+
+# e is any set of events
+# vcf is the context factor to graph as network for that set of events
+# l is the set of labels = factor levels of original data for that VCF
+normalNetwork <- function(e, o, cf){
+
+  # First get the node names & remove the spaces just in case
+  node_label = levels(o[[cf]])
+  node_label=str_replace_all(node_label," ","_")
+
+  # print("node_label")
+  # print(node_label)
+
+  # set up the data frames we need to draw the network
+  nodes = data.frame(
+    id = 1:length(node_label),
+    label = node_label,
+    title=node_label)
+
+  # get the column name for the vector...
+  vcf=paste0('V_',cf)
+
+  # add up the indicators of co-presence in this set of events
+  vcf_sum = colSums( matrix( unlist(e[[vcf]]), nrow = length(e[[vcf]]), byrow = TRUE) )
+
+  # compute outer product to get adjacency matrix,remove diagonal (self-ties) and then standardize to 0-1
+  a=sqrt(vcf_sum %o% vcf_sum)
+  diag(a) = 0
+  a=a/max(a)
+
+
+
+  # print(a)
+  g=graph_from_adjacency_matrix(a, mode='undirected', weighted=TRUE)
+
+  #E = get.edgelist(g, attr='weight')
+  edges=cbind( get.edgelist(g) , round( E(g)$weight, 3 ))
+
+  colnames(edges)=c('from','to','label')
+
+
+  return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
+}
+
+
+filter_network_edges <- function(n, threshold){
+  # print(head(n$edgeDF))
+  # print(paste('threshold=',threshold))
+
+  n$edgeDF = n$edgeDF %>% filter(label>threshold)
+
+  # print(head(n$edgeDF))
+
+  return(n)
+}
+
+# role map will show "who does what" for any set of events
+# cfs contains a list of two contextual factors.
+role_map <- function(e, o, cfs){
+
+  if (!length(cfs)==2)
+    return(plot_ly())
+
+  # Get the context factors
+  vcf_1 = paste0('V_',cfs[1])
+  vcf_2 = paste0('V_',cfs[2])
+
+  # add up the indicators of co-presence in this set of events
+  vcf_1_sum = colSums( matrix( unlist(e[[vcf_1]]), nrow = length(e[[vcf_1]]), byrow = TRUE) )
+  vcf_2_sum = colSums( matrix( unlist(e[[vcf_2]]), nrow = length(e[[vcf_2]]), byrow = TRUE) )
+
+   # compute outer product to get adjacency matrix
+  who_does_what= round(vcf_1_sum %o% vcf_2_sum,0)
+
+  return( plot_ly(
+          x=levels(o[[cfs[2]]]),
+          y=levels(o[[cfs[1]]]),
+          z=who_does_what,
+          type='heatmap',
+          colors= 'Reds') )
+
+}
+
+
+# this shows relative time versus sequential time
+# Inspired by Gergen and Daniger-Schroeder
+threadTrajectory <- function(or){
+
+  # setting color palettes
+  # first find the number of distinct colors
+  nColors = length(unique(or$threadNum))
+  pal <- rainbow_hcl(nColors)
+
+  return( plot_ly(or, x = ~or$relativeTime, y = ~or$seqNum, color= as.character(or$threadNum),
+                  colors=pal,
+                  name = 'threads', type = 'scatter', mode='lines',
+                  text = ~paste(or$threadNum,or$label,sep=':'),
+                  hoverinfo = "text",
+                  showlegend=FALSE)
+          %>%
+            layout(
+              xaxis = list(title='Relative time'),
+              yaxis = list(title='Sequence')
+            ))
+}
+
+
+movingWindowCorrelation <- function( trace ){
+  return( plot_ly(trace, x = ~window, y = ~correlation,
+                  name = 'Window', type = 'scatter', mode='lines+markers',
+                  text = paste('Thread:',trace$thread),
+                  marker=list(size=8, opacity=1),
+                  hoverinfo = "text",
+                  symbol= "line-ew", symbols=15, showlegend=FALSE
+  )
+  %>%
+    layout(
+      xaxis = list(title='Window number'),
+      yaxis = list(title='Correlation',
+                   range = c(0, 1),
+                   autotick = FALSE,
+                   ticks = "outside",
+                   tick0 = 0,
+                   dtick = 0.1,
+                   ticklen = 5,
+                   tickwidth = 2,
+                   showticklabels = TRUE))
+  )
+}
+dualmovingWindowCorrelation <- function( trace ){
+  return( plot_ly(trace, x = ~thread, y = ~correlation,
+                  name = 'Window', type = 'scatter', mode='lines+markers',
+      #          text = ~thread,
+                  marker=list(size=8, opacity=1),
+       #           hoverinfo = "text",
+                  symbol= "line-ew", symbols=15, showlegend=FALSE  #,height = 200
+  )
+  %>%
+    layout(
+      xaxis = list(title='Window number'),
+      yaxis = list(title='Correlation',
+                   range = c(0, 1),
+                   autotick = FALSE,
+                   ticks = "outside",
+                   tick0 = 0,
+                   dtick = 0.1,
+                   ticklen = 5,
+                   tickwidth = 2,
+                   showticklabels = TRUE))
+  )
+}
