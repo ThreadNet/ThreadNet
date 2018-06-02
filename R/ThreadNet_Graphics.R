@@ -137,8 +137,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 
   # avoid unpleasant error messages
   if (length(CF)==0) {return(plotly_empty())}
-  print(paste('in CF_multi_pie_event, r=',r))
-
+  # print(paste('in CF_multi_pie_event, r=',r))
   if (is.na(as.numeric(r))) {return(plotly_empty())}
 
   # get number of plots
