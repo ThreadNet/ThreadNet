@@ -1,6 +1,15 @@
 
 #### Define Threads sub-tab ####
 
+output$timeSelector <- renderUI({
+    radioButtons(
+      "timeScaleID",
+      "Select time scale for graphs:",
+      c( 'auto', 'mins', 'hours','days','weeks' ),
+      selected = 'auto',
+      inline = TRUE)
+})
+
 output$povThreadSelector <- renderUI({
   checkboxGroupInput(
     "THREAD_CF_ID",

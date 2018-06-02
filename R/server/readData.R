@@ -18,18 +18,6 @@ output$fileSelector <- renderUI({
   )
 })
 
-# user selects time scale for graphics
-output$timeSelector <- renderUI({
-  tags$div(
-    align = "center",
-  radioButtons(
-    "timeScaleID",
-    "Select time scale for graphs:",
-    c( 'mins', 'hours','days','weeks', 'auto'),
-    selected = 'mins',
-    inline = TRUE)
-  )
-})
 
 # user selects columns to include
 # [-1] drop first column (tStamp)
