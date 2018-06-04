@@ -133,7 +133,6 @@ server <- shinyServer(function(input, output, session) {
 	}, ignoreInit = TRUE)
 
 
-
 	# get the data that will be the input for this tab
 	chunkInputEvents <- reactive({
 		rv$newmap
@@ -190,13 +189,16 @@ server <- shinyServer(function(input, output, session) {
         showNotification(paste('POV Name', mapName3 , 'already exists, please select a different name'), type='message', duration=10 )
       } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
+        thread_cf = get_POV_THREAD_CF(input$RegExInputMapID)
+        event_cf = get_POV_EVENT_CF(input$RegExInputMapID)
+        comp_cf = get_POV_COMPARISON_CF(input$RegExInputMapID, get_CF())
         isolate(
             OccToEvents3(
                 regexInputEvents(),
                 input$EventMapName3,
-                get_POV_THREAD_CF(input$RegExInputMapID),
-                get_POV_EVENT_CF(input$RegExInputMapID),
-                get_POV_COMPARISON_CF(input$RegExInputMapID, get_CF()),
+                thread_cf,
+                event_cf,
+                comp_cf,
                 'threadNum',
                 get_Zoom_REGEX(),
                 regexInput(),
@@ -251,13 +253,16 @@ server <- shinyServer(function(input, output, session) {
         showNotification(paste('POV Name', mapName4 , 'already exists, please select a different name'), type='message', duration=10 )
       } else {
         rv$newmap <- rv$newmap+1 # trigger reactive value
+        thread_cf = get_POV_THREAD_CF(input$freqNgramInputMapID)
+        event_cf = get_POV_EVENT_CF(input$freqNgramInputMapID)
+        comp_cf = get_POV_COMPARISON_CF(input$freqNgramInputMapID, get_CF())
         isolate(
             OccToEvents3(
                 freqNgramInputEvents(),
                 input$EventMapName4,
-                get_POV_THREAD_CF(input$freqNgramInputMapID),
-                get_POV_EVENT_CF(input$freqNgramInputMapID),
-                get_POV_COMPARISON_CF(input$freqNgramInputMapID, get_CF()),
+                thread_cf,
+                event_cf,
+                comp_cf,
                 'threadNum',
                 get_Zoom_freqNgram(),
                 selected_ngrams(),

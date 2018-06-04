@@ -6,7 +6,6 @@ tabPanel(
   helpText('Select a file that contains your data.'),
   tags$hr(),
   uiOutput("fileSelector"),
-  uiOutput("timeSelector"),
   uiOutput("columnSelector"),
   DT::dataTableOutput("dataFilter")
 )
