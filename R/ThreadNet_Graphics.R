@@ -667,7 +667,7 @@ threadTrajectory <- function(or){
             ))
 }
 
-#' @param Trace
+#' @param trace list of (x,y) coordinates
 #' @return plotly scatter plot
 #' @export
 movingWindowCorrelation <- function( trace ){
@@ -692,7 +692,7 @@ movingWindowCorrelation <- function( trace ){
                    showticklabels = TRUE))
   )
 }
-#' @param Trace
+#' @param trace list of (x,y) coordinates
 #' @return plotly scatter plot
 #' @export
 dualmovingWindowCorrelation <- function( trace ){
