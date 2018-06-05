@@ -14,6 +14,8 @@ threadMap(or, TN, timescale, CF, shape)
 \item{timescale}{name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)}
 
 \item{CF}{name of contextual factor that will determine the colors}
+
+\item{shape}{shape code for the markers on the threadmap}
 }
 \value{
 plotly object

@@ -22,9 +22,11 @@ OccToEvents_By_Chunk(o, m, EventMapName, uniform_chunk_size, tThreshold,
 
 \item{chunk_CF}{- context factors used to delineate chunks}
 
-\item{compare_CF}{= context factors used for comparison -- need to be copied over here when the thread is created.}
+\item{thread_CF}{- context factors used to delineate threads}
 
-\item{EVENT_CF}{- context factors used to define events}
+\item{event_CF}{- context factors used to define events}
+
+\item{compare_CF}{= context factors used for comparison -- need to be copied over here when the thread is created.}
 }
 \value{
 event data frame, with occurrences aggregated into events.

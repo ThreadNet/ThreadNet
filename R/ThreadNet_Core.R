@@ -22,8 +22,6 @@
 #' @return a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
 #'
 #' @export
-
-
 threads_to_network <- function(et,TN,CF,timesplit){
   et$time = et[[timesplit]]
   #et$time = et$POVseqNum
@@ -357,7 +355,8 @@ print('done converting occurrences...')
 #' @param tThreshold = used to identify breakpoints -- from input slider
 #' @param timescale hours, min or sec
 #' @param chunk_CF - context factors used to delineate chunks
-#' @param EVENT_CF - context factors used to define events
+#' @param thread_CF - context factors used to delineate threads
+#' @param event_CF - context factors used to define events
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
 #'
 #' @return event data frame, with occurrences aggregated into events.

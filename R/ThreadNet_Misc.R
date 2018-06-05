@@ -244,7 +244,6 @@ threadSizeTable <- function(o,TN){
 #'
 #' @family ThreadNet_Misc
 #' @param df  threads (occurrences or events)
-#' @param TN Column with threadNumber
 #' @param CF Contextual factor that will be used to define the state sequences in TraMineR
 #'
 #' @return Dataframe in TraMineR format (state sequeces in horizontal rows)

@@ -20,9 +20,7 @@ Comparison_Plots(e, o, CF, CF_levels, nTimePeriods = 1, plot_type,
 
 \item{plot_type}{a type of plotly plot with a function written}
 
-\item{ng_size}{size of ngram}
-
-\item{zoom_level}{choose the zoom level, if applicable}
+\item{role_map_cfs}{context factors for the role map plot}
 }
 \value{
 plotly object, including subplots

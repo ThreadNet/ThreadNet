@@ -219,6 +219,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
 #' @param CF name of contextual factor that will determine the colors
+#' @param shape shape code for the markers on the threadmap
 #'
 #' @return  plotly object
 #' @export
@@ -419,9 +420,8 @@ forceNetworkD3 <- function(n){
 #' @param CF contextul factors
 #' @param CF_levels  list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)
 #' @param nTimePeriods how many time periods to divide the data?
-#' @param ng_size size of ngram
-#' @param zoom_level choose the zoom level, if applicable
 #' @param plot_type a type of plotly plot with a function written
+#' @param role_map_cfs context factors for the role map plot
 #'
 #' @return plotly object, including subplots
 #' @export

@@ -10,8 +10,6 @@ convert_TN_to_TramineR(df, CF)
 \item{df}{threads (occurrences or events)}
 
 \item{CF}{Contextual factor that will be used to define the state sequences in TraMineR}
-
-\item{TN}{Column with threadNumber}
 }
 \value{
 Dataframe in TraMineR format (state sequeces in horizontal rows)

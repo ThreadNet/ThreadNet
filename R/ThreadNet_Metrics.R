@@ -16,7 +16,7 @@
 #'
 #' @family ThreadNet_Metrics
 #'
-#' @param net
+#' @param net Object with dataframe for nodes and edges
 #'
 #' @return number
 #' @export
