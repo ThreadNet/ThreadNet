@@ -9,4 +9,4 @@ License: GNU General Public License (GPL-3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Imports: shiny,  plotly, tidyverse, ngram, stringr,stringdist,networkD3, ggplot2,colorspace, igraph, rcolorbrewer, xesreadR, DT, lubridate, knitr,  
+Imports: shiny,  plotly, tidyverse, ngram, stringr,stringdist,networkD3, ggplot2,colorspace, igraph, RColorBrewer, xesreadR, DT, lubridate, knitr,  
