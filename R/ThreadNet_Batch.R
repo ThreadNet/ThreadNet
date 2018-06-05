@@ -131,7 +131,6 @@ make_buckets <- function(o, criteria){
 
 
 make_box_plots <- function(){
-library("ggpubr")
 ggboxplot(ACHR_test[NEvents>100 & Clinic=='DRH'], x = "VisitMonth", y = "NetComplexity",
           color = "VisitDay",
           ylab = "Complexity", xlab = "Month (DRH)")

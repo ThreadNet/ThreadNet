@@ -17,74 +17,11 @@
 #' @param et dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
 #' @param CF name of the column in dataframe that contains the events that will form the nodes of the network
-#' @param timesplit time measure
+#' @param grp grouping variable for coloring the nodes
 #'
 #' @return a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
 #'
-#' @export
-
-
-threads_to_network <- function(et,TN,CF,timesplit){
-  et$time = et[[timesplit]]
-  #et$time = et$POVseqNum
-
-  #et$time<-as.numeric(et$tStamp)
-  # First get the node names & remove the spaces
-  node_label = unique(et[[CF]])
-  node_label=str_replace_all(node_label," ","_")
-
-  # print("node_label")
-  # print(node_label)
-
-  # set up the data frames we need to draw the network
-  nodes = data.frame(
-    id = 1:length(node_label),
-    label = node_label,
-    title=node_label)
-
-  node_position_y = data.frame(table(et[[CF]]))
-  colnames(node_position_y) <- c('label', 'y_pos')
-  node_position_x = aggregate(et$time, list(et[[CF]]), mean)
-  colnames(node_position_x) <- c('label', 'x_pos')
-
-  nodes = merge(nodes, node_position_y, by=c("label"))
-  nodes = merge(nodes, node_position_x, by=c("label"))
-
-  # get the 2 grams for the edges
-  ngdf = count_ngrams(et,TN, CF, 2)
-
-  # need to split 2-grams into from and to
-  from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
-
-  # need to find a better way to do this...
-  nEdges = length(from_to_str)
-  from_labels=matrix(data="", nrow=nEdges,ncol=1)
-  to_labels =matrix(data="", nrow=nEdges,ncol=1)
-  from=integer(nEdges)
-  to=integer(nEdges)
-  for (i in 1:length(from_to_str)){
-
-    # Get from and to by spliting the 2-gram
-    from_labels[i] = str_split(from_to_str[[i]]," ")[1]
-    to_labels[i] = str_split(from_to_str[[i]]," ")[2]
-
-    # use match to lookup the nodeID from the label...
-    from[i] = match(from_labels[i], nodes$label)
-    to[i] = match(to_labels[i], nodes$label)
-  }
-
-  edges = data.frame(
-    from,
-    to,
-    label = paste(ngdf$freq)
-  )
-
-  edges = merge(edges, nodes[,c('id', 'y_pos', 'x_pos')], by.x=c('from'), by.y=c('id'))
-  edges = merge(edges, nodes[,c('id', 'y_pos', 'x_pos')], by.x=c('to'), by.y=c('id'))
-  colnames(edges)<-c('from', 'to', 'label', 'from_y', 'from_x', 'to_y', 'to_x')
-  return(list(nodeDF = nodes, edgeDF = edges))
-}
-
+#' @export threads_to_network_original
 # here is a version without all the position stuff, which should be separated out, if possible.
 # Added in the "group" for the network graphics - default group is 'threadNum' because it will always be there
 threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
@@ -151,6 +88,67 @@ threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
 
   return(list(nodeDF = nodes, edgeDF = edges))
 }
+
+# threads_to_network_with_positions <- function(et,TN,CF,timesplit){
+#   et$time = et[[timesplit]]
+#   #et$time = et$POVseqNum
+#
+#   #et$time<-as.numeric(et$tStamp)
+#   # First get the node names & remove the spaces
+#   node_label = unique(et[[CF]])
+#   node_label=str_replace_all(node_label," ","_")
+#
+#   # print("node_label")
+#   # print(node_label)
+#
+#   # set up the data frames we need to draw the network
+#   nodes = data.frame(
+#     id = 1:length(node_label),
+#     label = node_label,
+#     title=node_label)
+#
+#   node_position_y = data.frame(table(et[[CF]]))
+#   colnames(node_position_y) <- c('label', 'y_pos')
+#   node_position_x = aggregate(et$time, list(et[[CF]]), mean)
+#   colnames(node_position_x) <- c('label', 'x_pos')
+#
+#   nodes = merge(nodes, node_position_y, by=c("label"))
+#   nodes = merge(nodes, node_position_x, by=c("label"))
+#
+#   # get the 2 grams for the edges
+#   ngdf = count_ngrams(et,TN, CF, 2)
+#
+#   # need to split 2-grams into from and to
+#   from_to_str = str_split(str_trim(ngdf$ngrams), " ", n=2)
+#
+#   # need to find a better way to do this...
+#   nEdges = length(from_to_str)
+#   from_labels=matrix(data="", nrow=nEdges,ncol=1)
+#   to_labels =matrix(data="", nrow=nEdges,ncol=1)
+#   from=integer(nEdges)
+#   to=integer(nEdges)
+#   for (i in 1:length(from_to_str)){
+#
+#     # Get from and to by spliting the 2-gram
+#     from_labels[i] = str_split(from_to_str[[i]]," ")[1]
+#     to_labels[i] = str_split(from_to_str[[i]]," ")[2]
+#
+#     # use match to lookup the nodeID from the label...
+#     from[i] = match(from_labels[i], nodes$label)
+#     to[i] = match(to_labels[i], nodes$label)
+#   }
+#
+#   edges = data.frame(
+#     from,
+#     to,
+#     label = paste(ngdf$freq)
+#   )
+#
+#   edges = merge(edges, nodes[,c('id', 'y_pos', 'x_pos')], by.x=c('from'), by.y=c('id'))
+#   edges = merge(edges, nodes[,c('id', 'y_pos', 'x_pos')], by.x=c('to'), by.y=c('id'))
+#   colnames(edges)<-c('from', 'to', 'label', 'from_y', 'from_x', 'to_y', 'to_x')
+#   return(list(nodeDF = nodes, edgeDF = edges))
+# }
 
 # Counting ngrams is essential to several ThreadNet functions
 #' Counts ngrams in a set of threads
@@ -263,12 +261,14 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
       # get the length of the thread
       tlen = sum(occ[[nPOV]]==p)
 
+
       # print(paste('start_row=',start_row))
       # print(paste('thrd =', thrd ))
       # print(paste('p =', p ))
       # print(paste('tlen =', tlen ))
 
       # guard against error
+      if (length(tlen)==0) tlen=0
       if (tlen>0){
 
         #compute the index of the end row
@@ -357,25 +357,14 @@ print('done converting occurrences...')
 #' @param tThreshold = used to identify breakpoints -- from input slider
 #' @param timescale hours, min or sec
 #' @param chunk_CF - context factors used to delineate chunks
-#' @param EVENT_CF - context factors used to define events
+#' @param thread_CF - context factors used to delineate threads
+#' @param event_CF - context factors used to define events
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
 #'
-#' @result event data frame, with occurrences aggregated into events.
+#' @return event data frame, with occurrences aggregated into events.
 #'
 #' @export
-
-
-# new version containing more ways to create chunks -- uses concepts from original prototype, but better implementation
-# chunk by handoff, time gap and handoff gap
 OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale='mins', chunk_CF, thread_CF, event_CF, compare_CF){
-
-  # Inputs: o = table of occurrences
-  #         m = method parameter =  c( "Handoffs", "Time Gap","Fixed Size")
-  #         uniform_chunk_size = used to identify breakpoints -- from input slider
-  #         tThreshold = used to identify breakpoints -- from input slider
-  #         EventMapName = used to store this mapping in an environment
-  #         CF_compare = context factors used for comparison -- need to be copied over here when the thread is created.
-
 
   # Only run if eventMapName is filled in
   if (EventMapName =="") {return(data.frame()) }
@@ -515,6 +504,24 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
 
 # this one creates events based on frequent ngrams or regular expressions
+#' @family ThreadNet_Core
+#' @param  o  a dataframe of occurrences
+#' @param EventMapName = used to store this mapping for visualization and comparison
+#' @param uniform_chunk_size = used to identify breakpoints -- from input slider
+#' @param tThreshold = used to identify breakpoints -- from input slider
+#' @param timescale hours, min or sec
+#' @param chunk_CF - context factors used to delineate chunks
+#' @param THREAD_CF - context factors used to delineate threads
+#' @param EVENT_CF - context factors used to define events
+#' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
+#' @param TN ThreadNum
+#' @param CF context factor
+#' @param rx list of patterns
+#' @param KeepIrregularEvents = keep or drop events that don't fit patterns
+#'
+#' @return event data frame, with occurrences aggregated into events.
+#'
+#' @export
 OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
   # print(rx)
@@ -667,6 +674,19 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
 # cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
+#' @family ThreadNet_Core
+#' @param  e  a dataframe of events or occurrences
+#' @param NewMapName = used to store this mapping for visualization and comparison
+#' @param cluster_method = method for clustering
+#' @param thread_CF - context factors used to delineate threads
+#' @param event_CF - context factors used to define events
+#' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
+#' @param TN ThreadNum
+#' @param what_to_return POV or Cluster solution
+
+#' @return event data frame with occurrences aggregated into events or cluster solution
+#'
+#' @export
 clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,what_to_return='POV'){
 
   # make sure to cluster on the correct column (one that exists...)
@@ -733,6 +753,7 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
 }
 
 # this function pulls computes their similarity of chunks based on sequence
+# these functions are only used locally
 dist_matrix_seq <- function(e){
 
   nChunks = nrow(e)
@@ -836,7 +857,6 @@ convert_CF_to_vector <- function(o,CF,r){
 # o is a dataframe of occurrences.  The values of V_ (the VCF) does not have to be filled in.  It gets re-computed here for each occurrence.
 # occlist is the list of occurrences of that event (e$occurrences)
 # cf is the name of the contextual factor to create the VCF
-
 aggregate_VCF_for_event <- function(o, occList, cf){
 
   # get the column name for the VCF

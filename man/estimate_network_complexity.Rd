@@ -7,7 +7,7 @@
 estimate_network_complexity(net)
 }
 \arguments{
-\item{net}{}
+\item{net}{Object with dataframe for nodes and edges}
 }
 \value{
 number

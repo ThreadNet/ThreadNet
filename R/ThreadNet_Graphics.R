@@ -219,7 +219,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
 #' @param CF name of contextual factor that will determine the colors
-#' @shape shape of plotted points
+#' @param shape shape code for the markers on the threadmap
 #'
 #' @return  plotly object
 #' @export
@@ -273,8 +273,6 @@ threadMap <- function(or, TN, timescale, CF, shape){
 #'
 #' @return plotly object
 #' @export
-#'
-#' @examples
 ng_bar_chart <- function(o,TN, CF, n, mincount){
 
   # get the ngrams
@@ -393,7 +391,6 @@ eventNetwork <- function(et, TN, CF, timesplit){
 #'
 #' @return networkD3 object
 #' @export
-
 forceNetworkD3 <- function(n){
 
   # zero indexing
@@ -422,14 +419,11 @@ forceNetworkD3 <- function(n){
 #' @param CF contextul factors
 #' @param CF_levels  list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)
 #' @param nTimePeriods how many time periods to divide the data?
-#' @param ng_size size of ngram
-#' @param zoom_level choose the zoom level, if applicable
 #' @param plot_type a type of plotly plot with a function written
+#' @param role_map_cfs context factors for the role map plot
 #'
 #' @return plotly object, including subplots
 #' @export
-#'
-#' @examples
 Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,role_map_cfs){
 
   # get the first event of each thread, so we can order them consistently by time
@@ -484,22 +478,30 @@ Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,rol
 
 
 
-# This one is not currently used.
-threadLengthBarchart <- function(o, TN){
+# # This one is not currently used.
+# threadLengthBarchart <- function(o, TN){
+#
+#
+#   sizes = threadSizeTable(o,TN)
+#
+#   tgbc <- plot_ly( sizes, x = ~Var1, y = ~Freq, type = "bar", showlegend=FALSE) %>%
+#     layout(xaxis= list(showticklabels = TRUE, title=paste0("Distribution of thread length")))
+#
+#   return(tgbc)
+# }
 
 
-  sizes = threadSizeTable(o,TN)
 
-  tgbc <- plot_ly( sizes, x = ~Var1, y = ~Freq, type = "bar", showlegend=FALSE) %>%
-    layout(xaxis= list(showticklabels = TRUE, title=paste0("Distribution of thread length")))
-
-  return(tgbc)
-}
-
-
-
-# Basic Network layout - back from the dead
+# Basic Network layout
 # accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
+#' @family ThreadNet_Graphics
+#'
+#' @param n list with nodeDF and edgeDF dataframes
+#' @param directed type of network = directed or not
+#' @param showTitle  - show the title or not
+#'
+#' @return visnetwork object
+#' @export
 circleVisNetwork <- function( n,directed='directed', showTitle=FALSE ){
 
   title_phrase =''
@@ -537,6 +539,14 @@ if (directed =='directed')
 # e is any set of events
 # vcf is the context factor to graph as network for that set of events
 # l is the set of labels = factor levels of original data for that VCF
+#' @family ThreadNet_Graphics
+#'
+#' @param e event data frame
+#' @param o occurrence data frame
+#' @param cf  context factor for the graph
+#'
+#' @return visnetwork object
+#' @export
 normalNetwork <- function(e, o, cf){
 
   # First get the node names & remove the spaces just in case
@@ -577,7 +587,12 @@ normalNetwork <- function(e, o, cf){
   return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
 }
 
-
+#' @family ThreadNet_Graphics
+#'
+#' @param n network list of nodeDF and edgeDF
+#' @param  threshold numeric threshold for filtering edges.
+#' @return n network list of nodeDF and edgeDF
+#' @export
 filter_network_edges <- function(n, threshold){
   # print(head(n$edgeDF))
   # print(paste('threshold=',threshold))
@@ -591,6 +606,14 @@ filter_network_edges <- function(n, threshold){
 
 # role map will show "who does what" for any set of events
 # cfs contains a list of two contextual factors.
+#' @family ThreadNet_Graphics
+#'
+#' @param e event data frame
+#' @param o occurrence data frame
+#' @param cf  context factor for the graph
+#'
+#' @return plotly heat map
+#' @export
 role_map <- function(e, o, cfs){
 
   if (!length(cfs)==2)
@@ -618,7 +641,12 @@ role_map <- function(e, o, cfs){
 
 
 # this shows relative time versus sequential time
-# Inspired by Gergen and Daniger-Schroeder
+# Inspired by Gergen and Danner-Schroeder
+#' @family ThreadNet_Graphics
+#'
+#' @param or event data frame
+#' @return plotly scatter plot
+#' @export
 threadTrajectory <- function(or){
 
   # setting color palettes
@@ -639,7 +667,9 @@ threadTrajectory <- function(or){
             ))
 }
 
-
+#' @param trace list of (x,y) coordinates
+#' @return plotly scatter plot
+#' @export
 movingWindowCorrelation <- function( trace ){
   return( plot_ly(trace, x = ~window, y = ~correlation,
                   name = 'Window', type = 'scatter', mode='lines+markers',
@@ -662,6 +692,9 @@ movingWindowCorrelation <- function( trace ){
                    showticklabels = TRUE))
   )
 }
+#' @param trace list of (x,y) coordinates
+#' @return plotly scatter plot
+#' @export
 dualmovingWindowCorrelation <- function( trace ){
   return( plot_ly(trace, x = ~thread, y = ~correlation,
                   name = 'Window', type = 'scatter', mode='lines+markers',

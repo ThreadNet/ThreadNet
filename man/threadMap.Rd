@@ -4,7 +4,7 @@
 \alias{threadMap}
 \title{Shows threads in a horizontal layout}
 \usage{
-threadMap(or, TN, timescale, CF)
+threadMap(or, TN, timescale, CF, shape)
 }
 \arguments{
 \item{or}{Dataframe of threads}
@@ -14,6 +14,8 @@ threadMap(or, TN, timescale, CF)
 \item{timescale}{name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)}
 
 \item{CF}{name of contextual factor that will determine the colors}
+
+\item{shape}{shape code for the markers on the threadmap}
 }
 \value{
 plotly object
@@ -24,7 +26,10 @@ Creates a plotly chart of threads in either clock time or event time, depending 
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
   \code{\link{Comparison_Plots}},
-  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
-  \code{\link{ng_bar_chart}},
-  \code{\link{traminer_threadMap}}
+  \code{\link{circleVisNetwork}},
+  \code{\link{eventNetwork}},
+  \code{\link{filter_network_edges}},
+  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
+  \code{\link{normalNetwork}}, \code{\link{role_map}},
+  \code{\link{threadTrajectory}}
 }
