@@ -219,7 +219,6 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
 #' @param CF name of contextual factor that will determine the colors
-#' @shape shape of plotted points
 #'
 #' @return  plotly object
 #' @export
@@ -273,8 +272,6 @@ threadMap <- function(or, TN, timescale, CF, shape){
 #'
 #' @return plotly object
 #' @export
-#'
-#' @examples
 ng_bar_chart <- function(o,TN, CF, n, mincount){
 
   # get the ngrams
@@ -429,7 +426,6 @@ forceNetworkD3 <- function(n){
 #' @return plotly object, including subplots
 #' @export
 #'
-#' @examples
 Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,role_map_cfs){
 
   # get the first event of each thread, so we can order them consistently by time

@@ -107,8 +107,6 @@ get_CF_levels <- function(o,cf){
 #'
 #' @return data frame with the new column
 #' @export
-#'
-#' @examples
 combineContextFactors <- function(o,CF,newCol){
 
 
@@ -252,7 +250,6 @@ threadSizeTable <- function(o,TN){
 #' @return Dataframe in TraMineR format (state sequeces in horizontal rows)
 #' @export
 #'
-#' @examples
 convert_TN_to_TramineR <- function(df, CF){
   # dataframe must be sorted by time or sequence within each threadNumber
   # TN is the threadnumber

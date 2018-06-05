@@ -360,7 +360,7 @@ print('done converting occurrences...')
 #' @param EVENT_CF - context factors used to define events
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
 #'
-#' @result event data frame, with occurrences aggregated into events.
+#' @return event data frame, with occurrences aggregated into events.
 #'
 #' @export
 
