@@ -7,8 +7,9 @@
 ThreadOccByPOV(o, THREAD_CF, EVENT_CF)
 }
 \arguments{
-\item{o}{is the dataframe of cleaned ocurrences
-#' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)}
+\item{o}{is the dataframe of cleaned ocurrences}
+
+\item{THREAD_CF}{is a list of 1 or more context factors that define the threads (and stay constant during each thread)}
 
 \item{EVENT_CF}{is a list of 1 or more context factors that define events (and change during threads)}
 }
@@ -20,7 +21,7 @@ Take the raw occurrences from the input file and sort them by time stamp within
 a set of contextual factors that remain constant for each thread.
 }
 \seealso{
-Other ThreadNet_Core: \code{\link{OccToEvents}},
+Other ThreadNet_Core: \code{\link{OccToEvents_By_Chunk}},
   \code{\link{count_ngrams}},
   \code{\link{threads_to_network}}
 }

@@ -20,7 +20,6 @@ and also the number of levels when the factors are combined
 }
 \seealso{
 Other ThreadNet_Graphics: \code{\link{Comparison_Plots}},
-  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
-  \code{\link{ng_bar_chart}}, \code{\link{threadMap}},
-  \code{\link{traminer_threadMap}}
+  \code{\link{eventNetwork}}, \code{\link{forceNetworkD3}},
+  \code{\link{ng_bar_chart}}, \code{\link{threadMap}}
 }

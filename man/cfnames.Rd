@@ -16,12 +16,10 @@ list of column names
 cfnames provides names of all the contextual factors (except the time stamp)
 }
 \seealso{
-Other ThreadNet_Misc: \code{\link{cleanOcc}},
-  \code{\link{combineContextFactors}},
+Other ThreadNet_Misc: \code{\link{combineContextFactors}},
   \code{\link{convert_TN_to_TramineR}},
   \code{\link{get_CF_levels}},
   \code{\link{get_moving_window}},
   \code{\link{get_threadList}}, \code{\link{numThreads}},
-  \code{\link{read_occurrences}},
   \code{\link{threadSizeTable}}
 }

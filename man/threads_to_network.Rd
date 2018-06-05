@@ -4,7 +4,7 @@
 \alias{threads_to_network}
 \title{Converts threads to network}
 \usage{
-threads_to_network(et, TN, CF)
+threads_to_network(et, TN, CF, timesplit)
 }
 \arguments{
 \item{et}{dataframe containing threads}
@@ -12,15 +12,17 @@ threads_to_network(et, TN, CF)
 \item{TN}{name of column in dataframe that contains a unique thread number for each thread}
 
 \item{CF}{name of the column in dataframe that contains the events that will form the nodes of the network}
+
+\item{timesplit}{time measure}
 }
 \value{
 a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
 }
 \description{
-Converts a sequentially ordered streams of events (threads) and creates a unimodal, unidimensional network.
+Converts a sequentially ordered streams of ;events (threads) and creates a unimodal, unidimensional network.
 Sequentially adjacent pairs of events become edges in the resulting network.
 }
 \seealso{
-Other ThreadNet_Core: \code{\link{OccToEvents}},
+Other ThreadNet_Core: \code{\link{OccToEvents_By_Chunk}},
   \code{\link{ThreadOccByPOV}}, \code{\link{count_ngrams}}
 }

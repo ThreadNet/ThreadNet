@@ -4,16 +4,21 @@
 \alias{Comparison_Plots}
 \title{Comparison plots}
 \usage{
-Comparison_Plots(e, CF, CF_levels, nTimePeriods = 1, ng_size, zoom_level)
+Comparison_Plots(e, o, CF, CF_levels, nTimePeriods = 1, plot_type,
+  role_map_cfs)
 }
 \arguments{
 \item{e}{dataframe with threads to be plotted}
+
+\item{o}{dataframe with the original data}
 
 \item{CF}{contextul factors}
 
 \item{CF_levels}{list of levels from whicheve contextual factor was chosen for comprisons (e.g., location =1, 2, 3)}
 
 \item{nTimePeriods}{how many time periods to divide the data?}
+
+\item{plot_type}{a type of plotly plot with a function written}
 
 \item{ng_size}{size of ngram}
 
@@ -28,7 +33,6 @@ This is a prototype that could use rather extensive redesign...
 }
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
-  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
-  \code{\link{ng_bar_chart}}, \code{\link{threadMap}},
-  \code{\link{traminer_threadMap}}
+  \code{\link{eventNetwork}}, \code{\link{forceNetworkD3}},
+  \code{\link{ng_bar_chart}}, \code{\link{threadMap}}
 }

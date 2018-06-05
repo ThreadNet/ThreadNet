@@ -4,7 +4,7 @@
 \alias{eventNetwork}
 \title{Circular network layout for event network (USES visnetwork)}
 \usage{
-eventNetwork(et, TN, CF)
+eventNetwork(et, TN, CF, timesplit)
 }
 \arguments{
 \item{et}{dataframe with the threads to be graphed}
@@ -12,9 +12,11 @@ eventNetwork(et, TN, CF)
 \item{TN}{the column with the threadNumber}
 
 \item{CF}{is the contetual factors (column)}
+
+\item{timesplit}{time measure}
 }
 \value{
-visnetwork object
+plotly object
 }
 \description{
 Should be replaced with a more expressive layout in plotly
@@ -22,6 +24,6 @@ Should be replaced with a more expressive layout in plotly
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
   \code{\link{Comparison_Plots}},
-  \code{\link{eventNetworkD3}}, \code{\link{ng_bar_chart}},
-  \code{\link{threadMap}}, \code{\link{traminer_threadMap}}
+  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
+  \code{\link{threadMap}}
 }

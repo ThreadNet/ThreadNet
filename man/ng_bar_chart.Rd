@@ -26,6 +26,6 @@ Shows the n-grams within a set of threads (but not splitting across threads). Th
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
   \code{\link{Comparison_Plots}},
-  \code{\link{eventNetworkD3}}, \code{\link{eventNetwork}},
-  \code{\link{threadMap}}, \code{\link{traminer_threadMap}}
+  \code{\link{eventNetwork}}, \code{\link{forceNetworkD3}},
+  \code{\link{threadMap}}
 }
