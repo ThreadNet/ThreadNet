@@ -21,7 +21,8 @@ Take the raw occurrences from the input file and sort them by time stamp within
 a set of contextual factors that remain constant for each thread.
 }
 \seealso{
-Other ThreadNet_Core: \code{\link{OccToEvents_By_Chunk}},
-  \code{\link{count_ngrams}},
-  \code{\link{threads_to_network}}
+Other ThreadNet_Core: \code{\link{OccToEvents3}},
+  \code{\link{OccToEvents_By_Chunk}},
+  \code{\link{clusterEvents}}, \code{\link{count_ngrams}},
+  \code{\link{threads_to_network_original}}
 }

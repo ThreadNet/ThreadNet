@@ -24,6 +24,9 @@ Should be replaced with a more expressive layout in plotly
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
   \code{\link{Comparison_Plots}},
+  \code{\link{circleVisNetwork}},
+  \code{\link{filter_network_edges}},
   \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
-  \code{\link{threadMap}}
+  \code{\link{normalNetwork}}, \code{\link{role_map}},
+  \code{\link{threadMap}}, \code{\link{threadTrajectory}}
 }

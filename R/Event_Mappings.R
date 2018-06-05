@@ -17,6 +17,7 @@ check_POV_name <- function(mapname){
     }
     return(existingMap)
 }
+
 #' @family Event_mappings
 #' @return List of POV names
 #' @export
@@ -34,7 +35,7 @@ get_POV_name_list <- function(){
 #' @param thread_CF List of CFs to be stored
 #' @param event_CF List of CFs to be stored
 #'
-#' @return (updates global variables)
+#' @return None, updates global variables
 #' @export
 store_POV <- function(EventMapName, e,  thread_CF, event_CF){
 
@@ -124,7 +125,7 @@ get_POV_COMPARISON_CF <- function(mapname, CF_list){
 
 #' @family Event_mappings
 #' @param mapname name of POV map
-#' @return (updates global event map variables)
+#' @return  None, updates global variables
 #' @export
 delete_POV <- function(mapname){
 

@@ -22,7 +22,9 @@ a dataframe with ngram, frequency and proportion in descending order
 This function counts n-grams within threads where the length of the thread is greater than n.
 }
 \seealso{
-Other ThreadNet_Core: \code{\link{OccToEvents_By_Chunk}},
+Other ThreadNet_Core: \code{\link{OccToEvents3}},
+  \code{\link{OccToEvents_By_Chunk}},
   \code{\link{ThreadOccByPOV}},
-  \code{\link{threads_to_network}}
+  \code{\link{clusterEvents}},
+  \code{\link{threads_to_network_original}}
 }

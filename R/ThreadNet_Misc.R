@@ -248,7 +248,6 @@ threadSizeTable <- function(o,TN){
 #'
 #' @return Dataframe in TraMineR format (state sequeces in horizontal rows)
 #' @export
-#'
 convert_TN_to_TramineR <- function(df, CF){
   # dataframe must be sorted by time or sequence within each threadNumber
   # TN is the threadnumber
@@ -305,7 +304,6 @@ get_threadList <- function(e,TN,SN){
 #'
 #' @return data from with just the threads in the window
 #' @export
-#'
 get_moving_window <- function(e, s, l ){
 
   # get the list of threads
@@ -499,6 +497,9 @@ make_nice_event_DT <- function(e){
 
 # find the biggest column with ZM_, and then get the number that goes with that.
 # It will not be the same as the column number.
+#' @param event data frame
+#' @return biggest zoom level
+#' @export
 zoom_upper_limit <- function(e){
   upper_limit = as.integer(str_replace(colnames(e[max(grep("ZM_",colnames(e)))]),"ZM_",""))
   return(upper_limit)

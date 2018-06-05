@@ -31,6 +31,10 @@ This is a prototype that could use rather extensive redesign...
 }
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
-  \code{\link{eventNetwork}}, \code{\link{forceNetworkD3}},
-  \code{\link{ng_bar_chart}}, \code{\link{threadMap}}
+  \code{\link{circleVisNetwork}},
+  \code{\link{eventNetwork}},
+  \code{\link{filter_network_edges}},
+  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
+  \code{\link{normalNetwork}}, \code{\link{role_map}},
+  \code{\link{threadMap}}, \code{\link{threadTrajectory}}
 }

@@ -26,6 +26,10 @@ Creates a plotly chart of threads in either clock time or event time, depending 
 \seealso{
 Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
   \code{\link{Comparison_Plots}},
-  \code{\link{eventNetwork}}, \code{\link{forceNetworkD3}},
-  \code{\link{ng_bar_chart}}
+  \code{\link{circleVisNetwork}},
+  \code{\link{eventNetwork}},
+  \code{\link{filter_network_edges}},
+  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
+  \code{\link{normalNetwork}}, \code{\link{role_map}},
+  \code{\link{threadTrajectory}}
 }
