@@ -4,7 +4,7 @@
 ##############################
 
 # limit what files to accept on input
-fileTypes <- c("text/csv","text/comma-separated-values,text/plain",".csv")
+fileTypes <- c("text/csv","text/comma-separated-values,text/plain",".csv",".xes")
 
 ##########################
 # Tab Output Definitions #
@@ -14,7 +14,7 @@ fileTypes <- c("text/csv","text/comma-separated-values,text/plain",".csv")
 output$fileSelector <- renderUI({
   tags$div(
     align = "center",
-    fileInput("inputFile","Please select a .csv file",accept=fileTypes)
+    fileInput("inputFile","Please select a .csv or .xes file",accept=fileTypes)
   )
 })
 
@@ -46,10 +46,31 @@ output$dataFilter <- DT::renderDataTable(
 # return dataframe of occurences
 parseInputData <- function(inputFile){
 
-  withProgress(message = "Cleaning Data", value = 0,{
+  withProgress(message = "Reading and cleaning Data", value = 0,{
 
-  # read in the table of occurrences
-  fileRows <- read.csv(inputFile$datapath)
+    # Check if this is an xes file
+    fileType= tools::file_ext(inputFile$datapath)
+    print(paste('fileType=',fileType))
+    if (fileType=='xes')
+    {
+      print(paste('in fileType=xes=',fileType))
+      # read in the table of occurrences
+      fileRows=as.data.frame(read_xes(inputFile$datapath))
+      print(head(fileRows))
+      if (any(match(colnames(fileRows),"timestamp"))) {
+
+        # rename column as tStamp
+        colnames(fileRows)[colnames(fileRows)=="timestamp"] <- "tStamp"
+
+        # move tStamp to the first column
+        fileRows=fileRows[c('tStamp', setdiff(names(fileRows), 'tStamp'))]
+        print(head(fileRows))
+        }
+      else {return(NULL)}
+    }
+    else
+    { # read in the table of occurrences
+      fileRows <- read.csv(inputFile$datapath) }
 
   incProgress(1/3)
 
