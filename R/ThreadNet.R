@@ -1,4 +1,4 @@
 #' @family ThreadNet_Core
 #'
-#' @export
+#' @export ThreadNet
  ThreadNet <- function() { shiny::runApp(system.file('ThreadNet', package='ThreadNet')) }

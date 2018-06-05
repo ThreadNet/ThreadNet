@@ -21,7 +21,7 @@
 #'
 #' @return a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
 #'
-#' @export
+#' @export threads_to_network_original
 # here is a version without all the position stuff, which should be separated out, if possible.
 # Added in the "group" for the network graphics - default group is 'threadNum' because it will always be there
 threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
