@@ -26,7 +26,6 @@ library(lubridate)
 library(knitr)
 
 
-
 # visualization types for UI dropdowns
 visualizations <- c(
 	'Threads (event time)',

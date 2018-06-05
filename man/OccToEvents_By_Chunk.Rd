@@ -26,6 +26,9 @@ OccToEvents_By_Chunk(o, m, EventMapName, uniform_chunk_size, tThreshold,
 
 \item{EVENT_CF}{- context factors used to define events}
 }
+\value{
+event data frame, with occurrences aggregated into events.
+}
 \description{
 Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
 occurrences in isolation.  There are many ways to accomplish this mapping.

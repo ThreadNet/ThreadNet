@@ -20,8 +20,6 @@
 #'
 #' @return number
 #' @export
-#'
-#' @examples
 estimate_network_complexity <- function(net){ return(estimate_task_complexity_index( nrow(net$nodeDF), nrow(net$edgeDF)) ) }
 
 # this version takes vertices and edges
