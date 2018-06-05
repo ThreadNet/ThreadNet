@@ -261,12 +261,14 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
       # get the length of the thread
       tlen = sum(occ[[nPOV]]==p)
 
+
       # print(paste('start_row=',start_row))
       # print(paste('thrd =', thrd ))
       # print(paste('p =', p ))
       # print(paste('tlen =', tlen ))
 
       # guard against error
+      if (length(tlen)==0) tlen=0
       if (tlen>0){
 
         #compute the index of the end row
