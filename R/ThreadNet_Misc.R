@@ -407,6 +407,11 @@ window_correlation  <- function(e,w,s=1,n=2){
 # s = step (how far to move the window in each step)
 # n is the ngram size
 # similar as above, except one window on each side of a focal thread.
+#' @param e data fraom for POV
+#' @param w width of moving window
+#' @param s step - how far to move window in each increment (default is 1)
+#' @param n number of windows (default is 2)
+#' @export
 dual_window_correlation  <- function(e,w,s=1,n=2){
 
   # make data frame
