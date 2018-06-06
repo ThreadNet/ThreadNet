@@ -18,7 +18,6 @@
 #' When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
 #' and also the number of levels when the factors are combined
 #'
-#' @family ThreadNet_Graphics
 #' @name CF_multi_pie
 #' @param oc data frame of occurrences
 #' @param CF list of contextual factors (columns) to include in the display
@@ -133,6 +132,15 @@ make_df_for_one_pie <- function(o,e,cf,r,zm){
 # zoom level as an integer (so you can grab it from the slider)
 # r = row number or cluster number.  Should be the number on the event
 # z = integer for zoom column
+#' @name CF_multi_pie_event
+#' @param o data frame of raw occurrences (for the names)
+#' @param e data frame with events
+#' @param CF list of contextual factors (columns) to include in the display
+#' @param r row number of cluster (the number of the event node)
+#' @param zm integer for zoom column
+#' @return  plotyly pie charts (one or more)
+#'
+#' @export
 CF_multi_pie_event <- function(o, e,CF,r, zm){
 
   # avoid unpleasant error messages
@@ -213,8 +221,8 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 #'
 #' Creates a plotly chart of threads in either clock time or event time, depending on the timescale parameter.
 #'
-#' @family ThreadNet_Graphics
 #'
+#' @name threadMap
 #' @param or Dataframe of threads
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
@@ -263,14 +271,12 @@ threadMap <- function(or, TN, timescale, CF, shape){
 #'
 #' Shows the n-grams within a set of threads (but not splitting across threads). This provides a visual indication of how repetitive the threads are.
 #'
-#' @family ThreadNet_Graphics
-#'
+#' @name ng_bar_chart
 #' @param o a dataframe of occurrences or events
 #' @param TN the column that contains the threadNum
 #' @param CF the contextual factor within which to count the n-grams
 #' @param n the length of the ngram
 #' @param mincount the minimum count to display
-#'
 #' @return plotly object
 #' @export
 ng_bar_chart <- function(o,TN, CF, n, mincount){
@@ -315,8 +321,7 @@ ng_bar_chart_freq <- function(ngdf){
 #'
 #' Should be replaced with a more expressive layout in plotly
 #'
-#' @family ThreadNet_Graphics
-#'
+#' @name eventNetwork
 #' @param et dataframe with the threads to be graphed
 #' @param TN the column with the threadNumber
 #' @param CF is the contetual factors (column)
@@ -324,7 +329,6 @@ ng_bar_chart_freq <- function(ngdf){
 #'
 #' @return plotly object
 #' @export
-
 eventNetwork <- function(et, TN, CF, timesplit){
 
   n <- threads_to_network(et, TN, CF, timesplit)
@@ -385,10 +389,8 @@ eventNetwork <- function(et, TN, CF, timesplit){
 
 #' NetworkD3 layout for event network
 #'
-#' @family ThreadNet_Graphics
-#'
+#' @name forceNetworkD3
 #' @param n = list with data frames for nodes and edges
-#'
 #' @return networkD3 object
 #' @export
 forceNetworkD3 <- function(n){
@@ -412,8 +414,7 @@ forceNetworkD3 <- function(n){
 #' Produce a set set of comparison sub-plots in an array.  Ideally, we should be able to use any of the plots. So far it is only bar charts.
 #' This is a prototype that could use rather extensive redesign...
 #'
-#' @family ThreadNet_Graphics
-#'
+#' @name Comparison_Plots
 #' @param e dataframe with threads to be plotted
 #' @param o dataframe with the original data
 #' @param CF contextul factors
@@ -421,7 +422,6 @@ forceNetworkD3 <- function(n){
 #' @param nTimePeriods how many time periods to divide the data?
 #' @param plot_type a type of plotly plot with a function written
 #' @param role_map_cfs context factors for the role map plot
-#'
 #' @return plotly object, including subplots
 #' @export
 Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,role_map_cfs){
@@ -494,12 +494,10 @@ Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,rol
 
 # Basic Network layout
 # accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
-#' @family ThreadNet_Graphics
-#'
+#' @name circleVisNetwork
 #' @param n list with nodeDF and edgeDF dataframes
 #' @param directed type of network = directed or not
 #' @param showTitle  - show the title or not
-#'
 #' @return visnetwork object
 #' @export
 circleVisNetwork <- function( n,directed='directed', showTitle=FALSE ){
@@ -539,12 +537,10 @@ if (directed =='directed')
 # e is any set of events
 # vcf is the context factor to graph as network for that set of events
 # l is the set of labels = factor levels of original data for that VCF
-#' @family ThreadNet_Graphics
-#'
+#' @name normalNetwork
 #' @param e event data frame
 #' @param o occurrence data frame
 #' @param cf  context factor for the graph
-#'
 #' @return visnetwork object
 #' @export
 normalNetwork <- function(e, o, cf){
@@ -587,8 +583,7 @@ normalNetwork <- function(e, o, cf){
   return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
 }
 
-#' @family ThreadNet_Graphics
-#'
+#' @name filter_network_edges
 #' @param n network list of nodeDF and edgeDF
 #' @param  threshold numeric threshold for filtering edges.
 #' @return n network list of nodeDF and edgeDF
@@ -606,12 +601,10 @@ filter_network_edges <- function(n, threshold){
 
 # role map will show "who does what" for any set of events
 # cfs contains a list of two contextual factors.
-#' @family ThreadNet_Graphics
-#'
+#' @name role_map
 #' @param e event data frame
 #' @param o occurrence data frame
 #' @param cf  context factor for the graph
-#'
 #' @return plotly heat map
 #' @export
 role_map <- function(e, o, cfs){
@@ -642,8 +635,7 @@ role_map <- function(e, o, cfs){
 
 # this shows relative time versus sequential time
 # Inspired by Gergen and Danner-Schroeder
-#' @family ThreadNet_Graphics
-#'
+#' @name threadTrajectory
 #' @param or event data frame
 #' @return plotly scatter plot
 #' @export
@@ -667,6 +659,7 @@ threadTrajectory <- function(or){
             ))
 }
 
+#' @name movingWindowCorrelation
 #' @param trace list of (x,y) coordinates
 #' @return plotly scatter plot
 #' @export
@@ -692,6 +685,7 @@ movingWindowCorrelation <- function( trace ){
                    showticklabels = TRUE))
   )
 }
+#' @name dualmovingWindowCorrelation
 #' @param trace list of (x,y) coordinates
 #' @return plotly scatter plot
 #' @export
