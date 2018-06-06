@@ -5,11 +5,11 @@
 #' map names in memory and forces the creation of a new name.
 #'
 #' @family Event_mappings
-#'
+#' @name check_POV_name
 #' @param mapname name of map attempting to be created
 #' @return TRUE or FALSE
 #'
-#' @export check_POV_name
+#' @export
 check_POV_name <- function(mapname){
 
     if (mapname %in% get_POV_name_list()){
@@ -21,6 +21,7 @@ check_POV_name <- function(mapname){
 }
 
 #' @family Event_mappings
+#' @name get_POV_name_list
 #' @return List of POV names
 #'
 #' @export get_POV_name_list
@@ -33,6 +34,7 @@ get_POV_name_list <- function(){
 }
 
 #' @family Event_mappings
+#' @name store_POV
 #' @param EventMapName name of map attempting to be created
 #' @param e data frame with POV to be stored
 #' @param thread_CF List of CFs to be stored
@@ -40,7 +42,7 @@ get_POV_name_list <- function(){
 #'
 #' @return None, updates global variables
 #'
-#' @export store_POV
+#' @export
 store_POV <- function(EventMapName, e,  thread_CF, event_CF){
 
 
@@ -62,10 +64,11 @@ store_POV <- function(EventMapName, e,  thread_CF, event_CF){
 }
 
 #' @family Event_mappings
+#' @name get_POV
 #' @param mapname name of POV map
 #' @return data frame with POV
 #'
-#' @export get_POV
+#' @export
 get_POV <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
@@ -79,10 +82,11 @@ get_POV <- function(mapname){
 }
 
 #' @family Event_mappings
+#' @name get_POV_THREAD_CF
 #' @param mapname name of POV map
 #' @return thread CFs for that POV
 #'
-#' @export get_POV_THREAD_CF
+#' @export
 get_POV_THREAD_CF <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
@@ -96,10 +100,11 @@ get_POV_THREAD_CF <- function(mapname){
 }
 
 #' @family Event_mappings
+#' @name get_POV_EVENT_CF
 #' @param mapname name of POV map
 #' @return event CFs for that POV
 #'
-#' @export get_POV_EVENT_CF
+#' @export
 get_POV_EVENT_CF <- function(mapname){
 
   idx <- which(mapname==get_POV_name_list() )
@@ -114,11 +119,12 @@ get_POV_EVENT_CF <- function(mapname){
 
 # this one compute the list based on the other two
 #' @family Event_mappings
+#' @name get_POV_COMPARISON_CF
 #' @param mapname name of POV map
 #' @param CF_list list of other column names
 #' @return comparison CFs for that POV
 #'
-#' @export get_POV_COMPARISON_CF
+#' @export
 get_POV_COMPARISON_CF <- function(mapname, CF_list){
 
   idx <- which(mapname==get_POV_name_list() )
@@ -132,10 +138,11 @@ get_POV_COMPARISON_CF <- function(mapname, CF_list){
 }
 
 #' @family Event_mappings
+#' @name delete_POV
 #' @param mapname name of POV map
 #' @return  None, updates global variables
 #'
-#' @export delete_POV
+#' @export
 delete_POV <- function(mapname){
 
   # get the index for the mapname
@@ -152,10 +159,11 @@ delete_POV <- function(mapname){
 }
 
 #' @family Event_mappings
+#' @name export_POV
 #' @param mapname name of POV map
 #' @return (writes Rdata file)
 #'
-#' @export export_POV
+#' @export
 export_POV <- function(mapname){
 
   # get the nice variable names
@@ -173,10 +181,11 @@ export_POV <- function(mapname){
 }
 
 #' @family Event_mappings
+#' @name export_POV_csv
 #' @param mapname name of POV map
 #' @return (writes CSV file)
 #'
-#' @export export_POV_csv
+#' @export
 export_POV_csv <- function(mapname){
 
   output = as.data.frame( get_POV(mapname) )
