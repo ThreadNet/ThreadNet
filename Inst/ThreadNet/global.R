@@ -11,19 +11,21 @@
 
 library(shiny)
 library(plotly)
+library(ggplot2)
 library(tidyverse)
 library(ngram)
 library(stringr)
 library(stringdist)
-library(ggplot2)
+library(igraph)
 library(networkD3)
+library(visNetwork)
 library(xesreadR)
 library(colorspace)
-library(igraph)
 library(DT)
 library(RColorBrewer)
 library(lubridate)
 library(knitr)
+library(shinyjs)
 
 
 # visualization types for UI dropdowns

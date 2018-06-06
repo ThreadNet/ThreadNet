@@ -10,10 +10,10 @@
 # May 2, 2018 Separation of tab definitions into files
 
 # pdf(NULL) # prevent plotly errors
-library(shiny)
-library(shinyjs)
-library(networkD3)
-library(visNetwork)
+# library(shiny)
+# library(shinyjs)
+# library(networkD3)
+# library(visNetwork)
 
 ui <- fluidPage(
 
