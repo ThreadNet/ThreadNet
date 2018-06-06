@@ -7,7 +7,8 @@
 ##########################################################################################################
 
 
-##  Make an example data frame for display...
+#' @title make_example_DF
+#' @description Make an example data frame for display...
 #' @name  make_example_DF
 #' @return DF with some data
 #' @export
@@ -22,10 +23,9 @@ make_example_DF = function(){
 
 
 
-#' numThreads counts how many threads in the data set
-#'
-#' Threads must have unique thred numbers for this function to work
-#'
+
+#' @title numThreads counts how many threads in the data set
+#' @description Threads must have unique thred numbers for this function to work
 #' @name numThreads
 #' @param o data frame with occurrences or events
 #' @param TN column with thread number
@@ -49,6 +49,8 @@ timeRangePhrase = function(tr){
 
 
 # this function is used to split up the threads into n ~equal buckets
+#' @title make_subsets
+#' @description this function is used to split up the threads into n ~equal buckets
 #' @name make_subsets
 #' @param d data frame with occurrences or events
 #' @param n number of buckets
@@ -58,8 +60,9 @@ make_subsets <- function(d,n){
   return(split(d, ceiling(seq_along(d)/(length(d)/n))))
 }
 
-# This function takes a slider value and returns a valid column name for zooming
-# if the argument is null, then use ZM_1
+#' @title zoomColumn
+#' @description This function takes a slider value and returns a valid column name for zooming
+#' if the argument is null, then use ZM_1
 #' @name zoomColumn
 #' @param z integer for the zoom level
 #' @return column name for that zoom level ('ZM_n)
@@ -78,11 +81,9 @@ zoomColumn <- function(z){
 }
 
 ######### Functions that return column names #######
-
-# names of the columns for contextual factors
-# grab all of the columns except the first, which has the time stamp
-# tStamp in the first column
-#' cfnames provides names of all the contextual factors (except the time stamp)
+#' @title cfnames provides names of all the contextual factors (except the time stamp)
+#' @description grab all of the columns except the first, which has the time stamp
+#' tStamp in the first colummn
 #' @name cfnames
 #' @param o data frame with threads
 #' @return list of column names
@@ -90,8 +91,8 @@ zoomColumn <- function(z){
 cfnames <- function(o){
   colnames(o)[2:length(colnames(o))]}
 
-## this is used to populate the UI for comparison of categories within a CF
-#' get_CF_levels returns the levels of a contextual factor
+#' @title get_CF_levels returns the levels of a contextual factor
+#' @description this is used to populate the UI for comparison of categories within a CF
 #' @name get_CF_levels
 #' @param o data frame with threads
 #' @param cf  a contextual factors (column)
@@ -102,11 +103,8 @@ get_CF_levels <- function(o,cf){
 }
 
 ##########################################################################################################
-# this function adds a new column to the occurrenes table based on a combination of context factors CF)
-#' Creates a new column that combines some set of other columns
-#'
-#' For example, actor+action
-#'
+#' @titleCreates a new column that combines some set of other columns
+#' @description this function adds a new column to the occurrenes table based on a combination of context factors CF). For example, actor+action
 #' @name combineContextFactors
 #' @param o data frame with threads
 #' @param CF contextual factors to be combined.
@@ -133,7 +131,9 @@ combineContextFactors <- function(o,CF,newCol){
   return(o)
 }
 
-# just keep this simple
+
+#' @title newColName
+#' @description returns new combined column name from a list of CFs
 #' @name newColName
 #' @param CF_list list of context factors to define events
 #' @return column name
@@ -143,6 +143,8 @@ newColName <- function(CF_list){
 
 
 # These were used on the occ-to-event tab to configure the slider
+#' @title threshold_slider_min
+#' @description These were used on the occ-to-event tab to configure the slider
 #' @name threshold_slider_min
 #' @param o dataframe of occurrences
 #' @return slider min
@@ -151,6 +153,8 @@ threshold_slider_min <- function(o){
   return(floor(min(o$timeGap)))
 }
 
+#' @title threshold_slider_max
+#' @description These were used on the occ-to-event tab to configure the slider
 #' @name threshold_slider_max
 #' @param o dataframe of occurrences
 #' @return slider max
@@ -158,6 +162,9 @@ threshold_slider_min <- function(o){
 threshold_slider_max <- function(o){
   return(ceiling(max(o$timeGap)))
 }
+
+#' @title threshold_slider_selected
+#' @description These were used on the occ-to-event tab to configure the slider
 #' @name threshold_slider_selected
 #' @param o dataframe of occurrences
 #' @return selected value = min
@@ -170,6 +177,8 @@ threshold_slider_selected <- function(o){
 
 
 #### count the handoffs, but reverse coded -- zero = all different
+#' @title diff_handoffs
+#' @description count the handoffs, but reverse coded -- zero = all different
 #' @name diff_handoffs
 #' @param o dataframe of occurrences
 #' @return o dataframe of occurrences with handoff count filled in
@@ -196,6 +205,8 @@ row_diff_handoff <- function(this_row){
 
 
 #### Time gaps -- just pass in the column of time stamps
+#' @title diff_tStamp
+#' @description Time gaps -- just pass in the column of time stamps - uses auto units
 #' @name diff_tStamp
 #' @param o dataframe of occurrences
 #' @return o dataframe of occurrences with handoff count filled in
@@ -227,11 +238,9 @@ row_diff_tStamp <- function(this_row){
 
 
 
-#' threadSizeTable provides a distribution of the length of threads
-#'
-#' This function should work on either ocurrences or events.
+#' @title threadSizeTable provides a distribution of the length of threads
+#' @description This function should work on either ocurrences or events.
 #' it returns length and duration of each thread.It requires tStamp field to compute duration.
-#'
 #' @name threadSizeTable
 #' @param o data frame with threads
 #' @param TN column comtaining the threadNumber
@@ -264,10 +273,8 @@ threadSizeTable <- function(o,TN){
 
 
 #########################################################
-#' convert_TN_to_TramineR
-#'
-#' converts the csv format used in ThreadNet to the format used by TraMiner.  Should provide a way to save this, as well.
-#'
+#' @title convert_TN_to_TramineR
+#' @description converts the csv format used in ThreadNet to the format used by TraMiner.  Should provide a way to save this, as well.
 #' @name convert_TN_to_TramineR
 #' @param df  threads (occurrences or events)
 #' @param CF Contextual factor that will be used to define the state sequences in TraMineR
@@ -303,8 +310,8 @@ convert_TN_to_TramineR <- function(df, CF){
 }
 
 # these functions support the moving window
-#' get_threadList returns a list of all thread numbers
-#'
+#' @titleget_threadList
+#' @description get_threadList returns a list of all thread numbers
 #' @name get_threadList
 #' @param e  data frame with threaded events
 #' @param TN Column with threadNumber
@@ -317,8 +324,8 @@ get_threadList <- function(e,TN,SN){
   return(e[e[[SN]]==1,TN])
 }
 
-#' get_moving_window returns a set of threads for a moving window
-#'
+#' @title get_moving_window
+#' @description get_moving_window returns a set of threads for a moving window
 #' @name get_moving_window
 #' @param e data frame with threads (needs to have threadNum and seqNum)
 #' @param s size of window
@@ -339,10 +346,9 @@ get_moving_window <- function(e, s, l ){
 
 }
 
-# e is the data
-# w = window size
-# s = step (how far to move the window in each step)
-# n is the ngram size
+
+#' @title window_correlation
+#' @description Correlation between moving windows
 #' @name window_correlation
 #' @param e data fraom for POV
 #' @param w width of moving window
@@ -421,11 +427,8 @@ window_correlation  <- function(e,w,s=1,n=2){
 
 }
 
-# e is the data
-# w = window size
-# s = step (how far to move the window in each step)
-# n is the ngram size
-# similar as above, except one window on each side of a focal thread.
+#' @title dual_window_correlation
+#' @description similar to moving window, except one window on each side of a focal thread.
 #' @name dual_window_correlation
 #' @param e data fraom for POV
 #' @param w width of moving window
@@ -508,7 +511,8 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
 }
 
 # Make a nice dataframe to display
-# Issue is that DT::renderdatatable cannot display lists correctly.
+#' @title make_nice_event_DT
+#' @description Issue is that DT::renderdatatable cannot display lists correctly, so cut then out.
 #' @name make_nice_event_DT
 #' @description Removes columns that do not need to be displayed
 #' @param e data frame with POV
@@ -532,8 +536,8 @@ make_nice_event_DT <- function(e){
   return(e)
 }
 
-# find the biggest column with ZM_, and then get the number that goes with that.
-# It will not be the same as the column number.
+#' @title zoom_upper_limit
+#' @description find the biggest column with ZM_, and then get the number that goes with that.
 #' @name zoom_upper_limit
 #' @description Used to set upper limit on sliders for zooming
 #' @param event data frame

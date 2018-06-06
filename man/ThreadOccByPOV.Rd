@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Core.R
 \name{ThreadOccByPOV}
 \alias{ThreadOccByPOV}
-\title{Make new threads from a new POV}
+\title{Converts occurrences into events, make threads from a new POV}
 \usage{
 ThreadOccByPOV(o, THREAD_CF, EVENT_CF)
 }

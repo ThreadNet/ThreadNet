@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Core.R
 \name{OccToEvents_By_Chunk}
 \alias{OccToEvents_By_Chunk}
-\title{Maps occurrences into events}
+\title{Maps occurrences into events by chunks.}
 \usage{
 OccToEvents_By_Chunk(o, m, EventMapName, uniform_chunk_size, tThreshold,
   timescale = "mins", chunk_CF, thread_CF, event_CF, compare_CF)
@@ -32,6 +32,6 @@ OccToEvents_By_Chunk(o, m, EventMapName, uniform_chunk_size, tThreshold,
 event data frame, with occurrences aggregated into events.
 }
 \description{
-Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
-occurrences in isolation.  There are many ways to accomplish this mapping.
+Thus function provides a way to map occurrences into events, so is is not necessary to interpret individual
+occurrences in isolation.  Provides three ways to accomplish this mapping.
 }

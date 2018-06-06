@@ -19,5 +19,5 @@ count_ngrams(o, TN, CF, n)
 a dataframe with ngram, frequency and proportion in descending order
 }
 \description{
-This function counts n-grams within threads where the length of the thread is greater than n.
+Counting ngrams is essential to several ThreadNet functions. This function counts n-grams within threads where the length of the thread is greater than n.
 }
