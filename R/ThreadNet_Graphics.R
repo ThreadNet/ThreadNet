@@ -19,7 +19,7 @@
 #' and also the number of levels when the factors are combined
 #'
 #' @family ThreadNet_Graphics
-#'
+#' @name CF_multi_pie
 #' @param oc data frame of occurrences
 #' @param CF list of contextual factors (columns) to include in the display
 #'
