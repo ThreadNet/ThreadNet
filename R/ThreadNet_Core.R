@@ -146,12 +146,9 @@ threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
 #   return(list(nodeDF = nodes, edgeDF = edges))
 # }
 
-# Counting ngrams is essential to several ThreadNet functions
-#' Counts ngrams in a set of threads
-#'
-#' This function counts n-grams within threads where the length of the thread is greater than n.
-#' @title
-#' @description
+
+#' @title Counts ngrams in a set of threads
+#' @description Counting ngrams is essential to several ThreadNet functions. This function counts n-grams within threads where the length of the thread is greater than n.
 #' @name count_ngrams
 #' @param o dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
@@ -179,19 +176,15 @@ count_ngrams <- function(o,TN,CF,n){
 
 
 #################################################################
-#
-#' Make new threads from a new POV
-#'
-#' Take the raw occurrences from the input file and sort them by time stamp within
+#' @title Converts occurrences into events, make threads from a new POV
+#' @description Take the raw occurrences from the input file and sort them by time stamp within
 #' a set of contextual factors that remain constant for each thread.
-#' @title
-#' @description
 #' @name ThreadOccByPOV
 #' @param  o is the dataframe of cleaned ocurrences
 #' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)
 #' @param  EVENT_CF is a list of 1 or more context factors that define events (and change during threads)
 #' @return dataframe containing the same occurrences sorted from a different point of view
-#'@export
+#' @export
 ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
   timescale = get_timeScale()
@@ -339,12 +332,11 @@ print('done converting occurrences...')
 
 
 ##############################################################################################################
-#' Maps occurrences into events
 #'
-#' Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
-#' occurrences in isolation.  There are many ways to accomplish this mapping.
-#' @title
-#' @description
+#'
+#' @title Maps occurrences into events by chunks.
+#' @description Thus function provides a way to map occurrences into events, so is is not necessary to interpret individual
+#' occurrences in isolation.  Provides three ways to accomplish this mapping.
 #' @name  OccToEvents_By_Chunk
 #' @param  o  a dataframe of occurrences
 #' @param m = method parameter = one of c('Variable chunks','Uniform chunks')
@@ -497,9 +489,9 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 }
 
 
-# this one creates events based on frequent ngrams or regular expressions
-#' @title
-#' @description
+#
+#' @title OccToEvents3
+#' @description Creates events based on frequent ngrams or regular expressions
 #' @name OccToEvents3
 #' @param  o  a dataframe of occurrences
 #' @param EventMapName = used to store this mapping for visualization and comparison
@@ -664,12 +656,8 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 
 }
 
-# new function for new tab
-# e is the event list
-# EventMapName is an input selected from the list of available mappings
-# cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
-#' @title
-#' @description
+#' @title Clusters occurrences or eents
+#' @description cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
 #' @name clusterEvents
 #' @param  e  a dataframe of events or occurrences
 #' @param NewMapName = used to store this mapping for visualization and comparison
