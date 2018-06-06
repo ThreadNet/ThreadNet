@@ -5,9 +5,6 @@
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
 # Absolutely no warranty!
 ##########################################################################################################
-#' @importFrom methods new
-#' @importFrom stats as.dist cor cutree dist filter hclust setNames
-#' @importFrom utils read.table write.csv
 
 
 # These are the basic functions that convert threads to networks, etc.
@@ -84,7 +81,8 @@ threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
     label = ngdf$freq,
     Value =ngdf$freq) %>% filter(!from==to)
 
-  # print(paste("Edges:",edges))
+  print(paste("T2N nodes:",nodes))
+   print(paste("T2N edges:",edges))
 
   return(list(nodeDF = nodes, edgeDF = edges))
 }
@@ -771,7 +769,11 @@ dist_matrix_network <- function(e,CF){
   # first get the nodes and edges
   n=threads_to_network_original(e,'threadNum',CF)
 
-  # print(paste('in dist_matrix_network, n=', n))
+   print(paste('in dist_matrix_network, n=', n))
+   print(n$nodeDF[['label']])
+   print(n$edgeDF)
+
+
 
   # now get the shortest paths between all nodes in the graph
   d=distances(graph_from_data_frame(n$edgeDF),
