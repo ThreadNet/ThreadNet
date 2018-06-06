@@ -15,5 +15,5 @@ get_CF_levels(o, cf)
 list of unique factor levels
 }
 \description{
-get_CF_levels returns the levels of a contextual factor
+this is used to populate the UI for comparison of categories within a CF
 }

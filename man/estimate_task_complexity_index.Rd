@@ -15,5 +15,5 @@ estimate_task_complexity_index(v, e)
 number
 }
 \description{
-Same as estimate_network_complexity, but takes different parameters
+Same as estimate_network_complexity, but takes this version takes vertices and edges as parameters
 }

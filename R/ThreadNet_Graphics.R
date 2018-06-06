@@ -590,12 +590,12 @@ filter_network_edges <- function(n, threshold){
   return(n)
 }
 
-#' @name role_map
+#' @title role_map
 #' @description A role map (like a heat map) that will show "who does what" for any set of events
 #' @name role_map
 #' @param e event data frame
 #' @param o occurrence data frame
-#' @param cf  context factor for the graph
+#' @param cfs  context factors for the graph
 #' @return plotly heat map
 #' @export
 role_map <- function(e, o, cfs){
@@ -625,7 +625,7 @@ role_map <- function(e, o, cfs){
 
 
 
-#'@title threadTrajectory
+#' @title threadTrajectory
 #' @description Create a plotly diagram showing relative time versus sequential time.
 #' Inspired by Gergen and Danner-Schroeder
 #' @name threadTrajectory

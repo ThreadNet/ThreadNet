@@ -8,7 +8,10 @@
 
 # 15 October Point of view code has solidified somewhat
 # 20 October Starting on NetworkD3
+# June 6 finishing up Package
 
+
+# add the dependent packages
 library(shiny)
 library(plotly)
 library(ggplot2)

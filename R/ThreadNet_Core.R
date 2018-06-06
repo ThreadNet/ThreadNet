@@ -332,8 +332,6 @@ print('done converting occurrences...')
 
 
 ##############################################################################################################
-#'
-#'
 #' @title Maps occurrences into events by chunks.
 #' @description Thus function provides a way to map occurrences into events, so is is not necessary to interpret individual
 #' occurrences in isolation.  Provides three ways to accomplish this mapping.
@@ -489,16 +487,12 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 }
 
 
-#
+################################################################################
 #' @title OccToEvents3
 #' @description Creates events based on frequent ngrams or regular expressions
 #' @name OccToEvents3
 #' @param  o  a dataframe of occurrences
 #' @param EventMapName = used to store this mapping for visualization and comparison
-#' @param uniform_chunk_size = used to identify breakpoints -- from input slider
-#' @param tThreshold = used to identify breakpoints -- from input slider
-#' @param timescale hours, min or sec
-#' @param chunk_CF - context factors used to delineate chunks
 #' @param THREAD_CF - context factors used to delineate threads
 #' @param EVENT_CF - context factors used to define events
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
@@ -656,6 +650,7 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 
 }
 
+######################################################################################
 #' @title Clusters occurrences or eents
 #' @description cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
 #' @name clusterEvents
@@ -664,8 +659,6 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 #' @param cluster_method = method for clustering
 #' @param thread_CF - context factors used to delineate threads
 #' @param event_CF - context factors used to define events
-#' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
-#' @param TN ThreadNum
 #' @param what_to_return POV or Cluster solution
 #' @return event data frame with occurrences aggregated into events or cluster solution
 #' @export

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{get_moving_window}
 \alias{get_moving_window}
-\title{get_moving_window returns a set of threads for a moving window}
+\title{get_moving_window}
 \usage{
 get_moving_window(e, s, l)
 }

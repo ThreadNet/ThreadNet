@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{get_threadList}
 \alias{get_threadList}
-\title{get_threadList returns a list of all thread numbers}
+\title{get_threadList}
 \usage{
 get_threadList(e, TN, SN)
 }

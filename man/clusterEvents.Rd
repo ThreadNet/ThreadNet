@@ -19,10 +19,6 @@ clusterEvents(e, NewMapName, cluster_method, thread_CF, event_CF,
 \item{event_CF}{- context factors used to define events}
 
 \item{what_to_return}{POV or Cluster solution}
-
-\item{compare_CF}{= context factors used for comparison -- need to be copied over here when the thread is created.}
-
-\item{TN}{ThreadNum}
 }
 \value{
 event data frame with occurrences aggregated into events or cluster solution

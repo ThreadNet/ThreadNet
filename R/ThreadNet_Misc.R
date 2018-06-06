@@ -103,7 +103,7 @@ get_CF_levels <- function(o,cf){
 }
 
 ##########################################################################################################
-#' @titleCreates a new column that combines some set of other columns
+#' @title combineContextFactors creates a new column that combines some set of other columns
 #' @description this function adds a new column to the occurrenes table based on a combination of context factors CF). For example, actor+action
 #' @name combineContextFactors
 #' @param o data frame with threads
@@ -208,8 +208,8 @@ row_diff_handoff <- function(this_row){
 #' @title diff_tStamp
 #' @description Time gaps -- just pass in the column of time stamps - uses auto units
 #' @name diff_tStamp
-#' @param o dataframe of occurrences
-#' @return o dataframe of occurrences with handoff count filled in
+#' @param ts column of time stamps
+#' @return Column of differences between timestamps
 #' @export
 diff_tStamp <- function(ts){
 
@@ -310,7 +310,7 @@ convert_TN_to_TramineR <- function(df, CF){
 }
 
 # these functions support the moving window
-#' @titleget_threadList
+#' @title get_threadList
 #' @description get_threadList returns a list of all thread numbers
 #' @name get_threadList
 #' @param e  data frame with threaded events
@@ -540,7 +540,7 @@ make_nice_event_DT <- function(e){
 #' @description find the biggest column with ZM_, and then get the number that goes with that.
 #' @name zoom_upper_limit
 #' @description Used to set upper limit on sliders for zooming
-#' @param event data frame
+#' @param e data frame
 #' @return biggest zoom level
 #' @export
 zoom_upper_limit <- function(e){

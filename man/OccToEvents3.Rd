@@ -25,14 +25,6 @@ OccToEvents3(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF, TN, CF, rx,
 \item{rx}{list of patterns}
 
 \item{KeepIrregularEvents}{= keep or drop events that don't fit patterns}
-
-\item{uniform_chunk_size}{= used to identify breakpoints -- from input slider}
-
-\item{tThreshold}{= used to identify breakpoints -- from input slider}
-
-\item{timescale}{hours, min or sec}
-
-\item{chunk_CF}{- context factors used to delineate chunks}
 }
 \value{
 event data frame, with occurrences aggregated into events.

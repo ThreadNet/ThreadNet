@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Misc.R
 \name{combineContextFactors}
 \alias{combineContextFactors}
-\title{Creates a new column that combines some set of other columns}
+\title{combineContextFactors creates a new column that combines some set of other columns}
 \usage{
 combineContextFactors(o, CF, newCol)
 }
@@ -17,5 +17,5 @@ combineContextFactors(o, CF, newCol)
 data frame with the new column
 }
 \description{
-For example, actor+action
+this function adds a new column to the occurrenes table based on a combination of context factors CF). For example, actor+action
 }

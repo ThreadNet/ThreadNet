@@ -13,5 +13,6 @@ cfnames(o)
 list of column names
 }
 \description{
-cfnames provides names of all the contextual factors (except the time stamp)
+grab all of the columns except the first, which has the time stamp
+tStamp in the first colummn
 }
