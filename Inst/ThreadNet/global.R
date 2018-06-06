@@ -10,6 +10,12 @@
 # 20 October Starting on NetworkD3
 # June 6 finishing up Package
 
+# explicitly add packages/functions to the NAMESPACE
+#' @importFrom  grDevices colorRampPalette
+#' @importFrom  graphics plot
+#' @importFrom methods new
+#' @importFrom stats as.dist cor cutree dist filter hclust setNames
+#' @importFrom utils read.table write.csv
 
 # add the dependent packages
 library(shiny)

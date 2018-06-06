@@ -5,6 +5,10 @@
 # GNU General Public License (GPL-3.0) https://opensource.org/licenses/GPL-3.0?
 # Absolutely no warranty!
 ##########################################################################################################
+#' @importFrom methods new
+#' @importFrom stats as.dist cor cutree dist filter hclust setNames
+#' @importFrom utils read.table write.csv
+
 
 # These are the basic functions that convert threads to networks, etc.
 
