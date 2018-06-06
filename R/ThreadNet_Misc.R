@@ -325,6 +325,11 @@ get_moving_window <- function(e, s, l ){
 # w = window size
 # s = step (how far to move the window in each step)
 # n is the ngram size
+#' @param e data fraom for POV
+#' @param w width of moving window
+#' @param s step - how far to move window in each increment (default is 1)
+#' @param n number of windows (default is 2)
+#' @export
 window_correlation  <- function(e,w,s=1,n=2){
 
   # make data frame
