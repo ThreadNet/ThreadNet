@@ -50,13 +50,11 @@ parseInputData <- function(inputFile){
 
     # Check if this is an xes file
     fileType= tools::file_ext(inputFile$datapath)
-    print(paste('fileType=',fileType))
     if (fileType=='xes')
     {
-      print(paste('in fileType=xes=',fileType))
       # read in the table of occurrences
       fileRows=as.data.frame(read_xes(inputFile$datapath))
-      print(head(fileRows))
+
       if (any(match(colnames(fileRows),"timestamp"))) {
 
         # rename column as tStamp
@@ -64,7 +62,6 @@ parseInputData <- function(inputFile){
 
         # move tStamp to the first column
         fileRows=fileRows[c('tStamp', setdiff(names(fileRows), 'tStamp'))]
-        print(head(fileRows))
         }
       else {return(NULL)}
     }
