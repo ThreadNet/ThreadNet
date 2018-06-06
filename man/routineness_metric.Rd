@@ -24,9 +24,3 @@ number, index of routineness.
 Computes the fraction of observed behavior that conforms to an observed pattern.
 Current version uses ngrams, but it would be good to use spmf pattern mining to avoid including duplicate patterns  (e.g., a-b-c and b-c-d)
 }
-\seealso{
-Other ThreadNet_Metrics: \code{\link{compression_index}},
-  \code{\link{compute_entropy}},
-  \code{\link{estimate_network_complexity}},
-  \code{\link{estimate_task_complexity_index}}
-}

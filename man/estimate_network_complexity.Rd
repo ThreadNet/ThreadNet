@@ -16,9 +16,3 @@ number
 This function takes a network descripts (nodes and edges, as generaged by the functino threads_to_network, and estimates the number of paths.
 as described in Haerem, Pentland and Miller (2015). The estimate correlates with the McCabe's (1975) cyclometric complexity.
 }
-\seealso{
-Other ThreadNet_Metrics: \code{\link{compression_index}},
-  \code{\link{compute_entropy}},
-  \code{\link{estimate_task_complexity_index}},
-  \code{\link{routineness_metric}}
-}

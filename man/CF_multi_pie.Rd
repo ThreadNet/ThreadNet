@@ -18,12 +18,3 @@ plotyly pie charts (one or more)
 When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
 and also the number of levels when the factors are combined
 }
-\seealso{
-Other ThreadNet_Graphics: \code{\link{Comparison_Plots}},
-  \code{\link{circleVisNetwork}},
-  \code{\link{eventNetwork}},
-  \code{\link{filter_network_edges}},
-  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
-  \code{\link{normalNetwork}}, \code{\link{role_map}},
-  \code{\link{threadMap}}, \code{\link{threadTrajectory}}
-}

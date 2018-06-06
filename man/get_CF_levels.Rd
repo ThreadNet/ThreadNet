@@ -17,11 +17,3 @@ list of unique factor levels
 \description{
 get_CF_levels returns the levels of a contextual factor
 }
-\seealso{
-Other ThreadNet_Misc: \code{\link{cfnames}},
-  \code{\link{combineContextFactors}},
-  \code{\link{convert_TN_to_TramineR}},
-  \code{\link{get_moving_window}},
-  \code{\link{get_threadList}}, \code{\link{numThreads}},
-  \code{\link{threadSizeTable}}
-}

@@ -17,11 +17,3 @@ Dataframe in TraMineR format (state sequeces in horizontal rows)
 \description{
 converts the csv format used in ThreadNet to the format used by TraMiner.  Should provide a way to save this, as well.
 }
-\seealso{
-Other ThreadNet_Misc: \code{\link{cfnames}},
-  \code{\link{combineContextFactors}},
-  \code{\link{get_CF_levels}},
-  \code{\link{get_moving_window}},
-  \code{\link{get_threadList}}, \code{\link{numThreads}},
-  \code{\link{threadSizeTable}}
-}

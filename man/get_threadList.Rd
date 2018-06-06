@@ -19,11 +19,3 @@ list of thread numbers
 \description{
 get_threadList returns a list of all thread numbers
 }
-\seealso{
-Other ThreadNet_Misc: \code{\link{cfnames}},
-  \code{\link{combineContextFactors}},
-  \code{\link{convert_TN_to_TramineR}},
-  \code{\link{get_CF_levels}},
-  \code{\link{get_moving_window}},
-  \code{\link{numThreads}}, \code{\link{threadSizeTable}}
-}

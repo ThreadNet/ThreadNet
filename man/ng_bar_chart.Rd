@@ -23,13 +23,3 @@ plotly object
 \description{
 Shows the n-grams within a set of threads (but not splitting across threads). This provides a visual indication of how repetitive the threads are.
 }
-\seealso{
-Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
-  \code{\link{Comparison_Plots}},
-  \code{\link{circleVisNetwork}},
-  \code{\link{eventNetwork}},
-  \code{\link{filter_network_edges}},
-  \code{\link{forceNetworkD3}},
-  \code{\link{normalNetwork}}, \code{\link{role_map}},
-  \code{\link{threadMap}}, \code{\link{threadTrajectory}}
-}

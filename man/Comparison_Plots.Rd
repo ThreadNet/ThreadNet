@@ -29,12 +29,3 @@ plotly object, including subplots
 Produce a set set of comparison sub-plots in an array.  Ideally, we should be able to use any of the plots. So far it is only bar charts.
 This is a prototype that could use rather extensive redesign...
 }
-\seealso{
-Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
-  \code{\link{circleVisNetwork}},
-  \code{\link{eventNetwork}},
-  \code{\link{filter_network_edges}},
-  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
-  \code{\link{normalNetwork}}, \code{\link{role_map}},
-  \code{\link{threadMap}}, \code{\link{threadTrajectory}}
-}

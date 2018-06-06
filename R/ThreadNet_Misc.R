@@ -8,7 +8,7 @@
 
 
 ##  Make an example data frame for display...
-#' @description presents example data when the input data is bad
+#' @name  make_example_DF
 #' @return DF with some data
 #' @export
 make_example_DF = function(){
@@ -26,10 +26,9 @@ make_example_DF = function(){
 #'
 #' Threads must have unique thred numbers for this function to work
 #'
-#' @family ThreadNet_Misc
+#' @name numThreads
 #' @param o data frame with occurrences or events
 #' @param TN column with thread number
-#'
 #' @return number of threads
 #' @export
 numThreads = function(o,TN) {length(unique(o[[TN]]))}
@@ -50,12 +49,21 @@ timeRangePhrase = function(tr){
 
 
 # this function is used to split up the threads into n ~equal buckets
+#' @name make_subsets
+#' @param d data frame with occurrences or events
+#' @param n number of buckets
+#' @return list of smaller data frames
+#' @export
 make_subsets <- function(d,n){
   return(split(d, ceiling(seq_along(d)/(length(d)/n))))
 }
 
 # This function takes a slider value and returns a valid column name for zooming
 # if the argument is null, then use ZM_1
+#' @name zoomColumn
+#' @param z integer for the zoom level
+#' @return column name for that zoom level ('ZM_n)
+#' @export
 zoomColumn <- function(z){
   # print(paste("In zoomColumn z=",z))
 
@@ -75,25 +83,21 @@ zoomColumn <- function(z){
 # grab all of the columns except the first, which has the time stamp
 # tStamp in the first column
 #' cfnames provides names of all the contextual factors (except the time stamp)
-#' @family ThreadNet_Misc
+#' @name cfnames
 #' @param o data frame with threads
-#'
 #' @return list of column names
 #' @export
-#'
 cfnames <- function(o){
   colnames(o)[2:length(colnames(o))]}
 
 ## this is used to populate the UI for comparison of categories within a CF
 #' get_CF_levels returns the levels of a contextual factor
-#' @family ThreadNet_Misc
+#' @name get_CF_levels
 #' @param o data frame with threads
 #' @param cf  a contextual factors (column)
-#'
 #' @return list of unique factor levels
 #' @export
 get_CF_levels <- function(o,cf){
-
   return(levels(o[,cf]))
 }
 
@@ -103,15 +107,13 @@ get_CF_levels <- function(o,cf){
 #'
 #' For example, actor+action
 #'
-#' @family ThreadNet_Misc
+#' @name combineContextFactors
 #' @param o data frame with threads
 #' @param CF contextual factors to be combined.
 #' @param newCol  name of the new combined conextual factor
-#'
 #' @return data frame with the new column
 #' @export
 combineContextFactors <- function(o,CF,newCol){
-
 
   # Use the old column if there is one
   if (!(newCol %in% names(o))) {
@@ -132,19 +134,34 @@ combineContextFactors <- function(o,CF,newCol){
 }
 
 # just keep this simple
+#' @name newColName
+#' @param CF_list list of context factors to define events
+#' @return column name
+#' @export
 newColName <- function(CF_list){
   return(paste0(CF_list,collapse="_")) }
 
 
 # These were used on the occ-to-event tab to configure the slider
+#' @name threshold_slider_min
+#' @param o dataframe of occurrences
+#' @return slider min
+#' @export
 threshold_slider_min <- function(o){
   return(floor(min(o$timeGap)))
 }
 
+#' @name threshold_slider_max
+#' @param o dataframe of occurrences
+#' @return slider max
+#' @export
 threshold_slider_max <- function(o){
   return(ceiling(max(o$timeGap)))
 }
-
+#' @name threshold_slider_selected
+#' @param o dataframe of occurrences
+#' @return selected value = min
+#' @export
 threshold_slider_selected <- function(o){
   return(min(o$timeGap))
 }
@@ -153,6 +170,10 @@ threshold_slider_selected <- function(o){
 
 
 #### count the handoffs, but reverse coded -- zero = all different
+#' @name diff_handoffs
+#' @param o dataframe of occurrences
+#' @return o dataframe of occurrences with handoff count filled in
+#' @export
 diff_handoffs <- function(o){
 
   # initialize the previous row
@@ -175,6 +196,10 @@ row_diff_handoff <- function(this_row){
 
 
 #### Time gaps -- just pass in the column of time stamps
+#' @name diff_tStamp
+#' @param o dataframe of occurrences
+#' @return o dataframe of occurrences with handoff count filled in
+#' @export
 diff_tStamp <- function(ts){
 
   # initialize the first row
@@ -190,7 +215,7 @@ row_diff_tStamp <- function(this_row){
 
 
   # just add up the differences.
-  d <-max(0,difftime(this_row, previous_row, units="secs"))
+  d <-max(0,difftime(this_row, previous_row, units='auto'))
 
   # store the previous row
   previous_row <<-this_row
@@ -207,11 +232,9 @@ row_diff_tStamp <- function(this_row){
 #' This function should work on either ocurrences or events.
 #' it returns length and duration of each thread.It requires tStamp field to compute duration.
 #'
-#' @family ThreadNet_Misc
-#'
+#' @name threadSizeTable
 #' @param o data frame with threads
 #' @param TN column comtaining the threadNumber
-#'
 #' @return data frame with table of thread lengths
 #' @export
 threadSizeTable <- function(o,TN){
@@ -245,10 +268,9 @@ threadSizeTable <- function(o,TN){
 #'
 #' converts the csv format used in ThreadNet to the format used by TraMiner.  Should provide a way to save this, as well.
 #'
-#' @family ThreadNet_Misc
+#' @name convert_TN_to_TramineR
 #' @param df  threads (occurrences or events)
 #' @param CF Contextual factor that will be used to define the state sequences in TraMineR
-#'
 #' @return Dataframe in TraMineR format (state sequeces in horizontal rows)
 #' @export
 convert_TN_to_TramineR <- function(df, CF){
@@ -283,12 +305,10 @@ convert_TN_to_TramineR <- function(df, CF){
 # these functions support the moving window
 #' get_threadList returns a list of all thread numbers
 #'
-#' @family ThreadNet_Misc
-#'
+#' @name get_threadList
 #' @param e  data frame with threaded events
 #' @param TN Column with threadNumber
 #' @param SN Column with sequence numbers
-#'
 #' @return list of thread numbers
 #' @export
 get_threadList <- function(e,TN,SN){
@@ -299,12 +319,10 @@ get_threadList <- function(e,TN,SN){
 
 #' get_moving_window returns a set of threads for a moving window
 #'
-#' @family ThreadNet_Misc
-#'
+#' @name get_moving_window
 #' @param e data frame with threads (needs to have threadNum and seqNum)
 #' @param s size of window
 #' @param l location of window
-#'
 #' @return data from with just the threads in the window
 #' @export
 get_moving_window <- function(e, s, l ){
@@ -325,6 +343,7 @@ get_moving_window <- function(e, s, l ){
 # w = window size
 # s = step (how far to move the window in each step)
 # n is the ngram size
+#' @name window_correlation
 #' @param e data fraom for POV
 #' @param w width of moving window
 #' @param s step - how far to move window in each increment (default is 1)
@@ -407,6 +426,7 @@ window_correlation  <- function(e,w,s=1,n=2){
 # s = step (how far to move the window in each step)
 # n is the ngram size
 # similar as above, except one window on each side of a focal thread.
+#' @name dual_window_correlation
 #' @param e data fraom for POV
 #' @param w width of moving window
 #' @param s step - how far to move window in each increment (default is 1)
@@ -489,6 +509,7 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
 
 # Make a nice dataframe to display
 # Issue is that DT::renderdatatable cannot display lists correctly.
+#' @name make_nice_event_DT
 #' @description Removes columns that do not need to be displayed
 #' @param e data frame with POV
 #' @export
@@ -513,6 +534,7 @@ make_nice_event_DT <- function(e){
 
 # find the biggest column with ZM_, and then get the number that goes with that.
 # It will not be the same as the column number.
+#' @name zoom_upper_limit
 #' @description Used to set upper limit on sliders for zooming
 #' @param event data frame
 #' @return biggest zoom level
@@ -531,25 +553,22 @@ zoom_upper_limit <- function(e){
 ######################################################
 # Just putting this code here to play with for now.
 # this function finds the common events in two subsets of thread data
-common_events <- function(ss1, ss2, TN, CF, n){
-
-  # get the list of ngrams for each subset of threads
-  e1 = count_ngrams(ss1, TN, CF, n)[1]
-  e2 = count_ngrams(ss2, TN, CF, n)[1]
-
-  # return the intersection
-  return(intersect(as.matrix(e1), as.matrix(e2)))
-
-}
-
-rr_grams <- function(o,TN, CF, N, R) {
-  # N - max length of ngram
-  # R = threshold for repetition
-
-
-
-
-}
+# common_events <- function(ss1, ss2, TN, CF, n){
+#
+#   # get the list of ngrams for each subset of threads
+#   e1 = count_ngrams(ss1, TN, CF, n)[1]
+#   e2 = count_ngrams(ss2, TN, CF, n)[1]
+#
+#   # return the intersection
+#   return(intersect(as.matrix(e1), as.matrix(e2)))
+#
+# }
+#
+# rr_grams <- function(o,TN, CF, N, R) {
+#   # N - max length of ngram
+#   # R = threshold for repetition
+#
+# }
 
 # Ideas for regex work
 # https://stackoverflow.com/questions/35704369/identify-repetitive-pattern-in-numeric-vector-in-r-with-fuzzy-search

@@ -18,11 +18,3 @@ data frame with table of thread lengths
 This function should work on either ocurrences or events.
 it returns length and duration of each thread.It requires tStamp field to compute duration.
 }
-\seealso{
-Other ThreadNet_Misc: \code{\link{cfnames}},
-  \code{\link{combineContextFactors}},
-  \code{\link{convert_TN_to_TramineR}},
-  \code{\link{get_CF_levels}},
-  \code{\link{get_moving_window}},
-  \code{\link{get_threadList}}, \code{\link{numThreads}}
-}

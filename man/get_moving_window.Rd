@@ -19,11 +19,3 @@ data from with just the threads in the window
 \description{
 get_moving_window returns a set of threads for a moving window
 }
-\seealso{
-Other ThreadNet_Misc: \code{\link{cfnames}},
-  \code{\link{combineContextFactors}},
-  \code{\link{convert_TN_to_TramineR}},
-  \code{\link{get_CF_levels}},
-  \code{\link{get_threadList}}, \code{\link{numThreads}},
-  \code{\link{threadSizeTable}}
-}

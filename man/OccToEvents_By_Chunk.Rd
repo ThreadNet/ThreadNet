@@ -35,9 +35,3 @@ event data frame, with occurrences aggregated into events.
 Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
 occurrences in isolation.  There are many ways to accomplish this mapping.
 }
-\seealso{
-Other ThreadNet_Core: \code{\link{OccToEvents3}},
-  \code{\link{ThreadOccByPOV}},
-  \code{\link{clusterEvents}}, \code{\link{count_ngrams}},
-  \code{\link{threads_to_network_original}}
-}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{threadMap}
 \alias{threadMap}
-\title{Shows threads in a horizontal layout}
+\title{threadMap shows threads in a horizontal layout}
 \usage{
 threadMap(or, TN, timescale, CF, shape)
 }
@@ -22,14 +22,4 @@ plotly object
 }
 \description{
 Creates a plotly chart of threads in either clock time or event time, depending on the timescale parameter.
-}
-\seealso{
-Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
-  \code{\link{Comparison_Plots}},
-  \code{\link{circleVisNetwork}},
-  \code{\link{eventNetwork}},
-  \code{\link{filter_network_edges}},
-  \code{\link{forceNetworkD3}}, \code{\link{ng_bar_chart}},
-  \code{\link{normalNetwork}}, \code{\link{role_map}},
-  \code{\link{threadTrajectory}}
 }

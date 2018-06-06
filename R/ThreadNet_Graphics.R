@@ -13,17 +13,13 @@
 ###### Pie charts for context factors  ####
 # It would be nice to display some other helpful information, perhaps (like the % of possible combinations that occur)
 
-#' Creates pie charts for one or more contextual factors
-#'
-#' When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
+#' @title Creates pie charts for one or more contextual factors
+#' @description When selecting contextual factors that define threads, events and comparisons, this function provide visual feedback about the number of factors levels
 #' and also the number of levels when the factors are combined
-#'
 #' @name CF_multi_pie
 #' @param oc data frame of occurrences
 #' @param CF list of contextual factors (columns) to include in the display
-#'
 #' @return  plotyly pie charts (one or more)
-#'
 #' @export
 CF_multi_pie <- function(oc,CF){
 
@@ -132,6 +128,8 @@ make_df_for_one_pie <- function(o,e,cf,r,zm){
 # zoom level as an integer (so you can grab it from the slider)
 # r = row number or cluster number.  Should be the number on the event
 # z = integer for zoom column
+#' @title CF_multi_pie_event
+#' @description Make multi-pie for click event from force network layout.  Generate a small plot of context factor pie charts when you click on a node in the graph
 #' @name CF_multi_pie_event
 #' @param o data frame of raw occurrences (for the names)
 #' @param e data frame with events
@@ -139,7 +137,6 @@ make_df_for_one_pie <- function(o,e,cf,r,zm){
 #' @param r row number of cluster (the number of the event node)
 #' @param zm integer for zoom column
 #' @return  plotyly pie charts (one or more)
-#'
 #' @export
 CF_multi_pie_event <- function(o, e,CF,r, zm){
 
@@ -217,21 +214,16 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
 
 ######################################################################
 # ThreadMap shows the threads in a horizongal layout
-#' Shows threads in a horizontal layout
-#'
-#' Creates a plotly chart of threads in either clock time or event time, depending on the timescale parameter.
-#'
-#'
+#' @title threadMap shows threads in a horizontal layout
+#' @description Creates a plotly chart of threads in either clock time or event time, depending on the timescale parameter.
 #' @name threadMap
 #' @param or Dataframe of threads
 #' @param TN name of column with thread number
 #' @param timescale name of column that will be used to plot x-axis of events. It can be the can be the time stamp (for clock time) or the sequence number (for event time)
 #' @param CF name of contextual factor that will determine the colors
 #' @param shape shape code for the markers on the threadmap
-#'
 #' @return  plotly object
 #' @export
-#'
 threadMap <- function(or, TN, timescale, CF, shape){
 
 
@@ -267,10 +259,8 @@ threadMap <- function(or, TN, timescale, CF, shape){
 
 
 ################################################
-#' Create an ngram bar chart
-#'
-#' Shows the n-grams within a set of threads (but not splitting across threads). This provides a visual indication of how repetitive the threads are.
-#'
+#' @title Create an ngram bar chart
+#' @description Shows the n-grams within a set of threads (but not splitting across threads). This provides a visual indication of how repetitive the threads are.
 #' @name ng_bar_chart
 #' @param o a dataframe of occurrences or events
 #' @param TN the column that contains the threadNum
@@ -317,78 +307,78 @@ ng_bar_chart_freq <- function(ngdf){
 
 
 #############################################################################
-#' Circular network layout for event network (USES visnetwork)
-#'
-#' Should be replaced with a more expressive layout in plotly
-#'
-#' @name eventNetwork
-#' @param et dataframe with the threads to be graphed
-#' @param TN the column with the threadNumber
-#' @param CF is the contetual factors (column)
-#' @param timesplit time measure
-#'
-#' @return plotly object
-#' @export
-eventNetwork <- function(et, TN, CF, timesplit){
+# @title Circular network layout for event network (USES visnetwork)
+#
+# Should be replaced with a more expressive layout in plotly
+#
+# @name eventNetwork
+# @param et dataframe with the threads to be graphed
+# @param TN the column with the threadNumber
+# @param CF is the contetual factors (column)
+# @param timesplit time measure
+# @return plotly object
+# @export
+# eventNetwork <- function(et, TN, CF, timesplit){
+#
+#   n <- threads_to_network(et, TN, CF, timesplit)
+#
+#
+#   title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
+#
+#   edge_shapes <- list()
+#   for(i in 1:length(n$edgeDF$from)) {
+#     E <- n$edgeDF[i,]
+#
+#     edge_shape = list(
+#       type = "line",
+#       line = list(color = "#030303", width = 0),
+#       x0 = E[['from_x']],
+#       x1 = E[['to_x']],
+#       y0 = E[['from_y']],
+#       y1 = E[['to_y']],
+#       xref = "x",
+#       yref = "y"
+#     )
+#
+#     edge_shapes[[i]] <- edge_shape
+#   }
+#
+#   x <- list(
+#     title = 'Average Time'
+#   )
+#
+#   y <- list(
+#     title = 'Frequency'
+#   )
+#   color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
+#   size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
+#   network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
+#                      width = 0,
+#                      mode = "markers",
+#                      marker = list(size= size_pal,
+#                                    color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
+#
+#                      ),
+#                      text = n$nodeDF$label, key = n$nodeDF$label, hoverinfo = "text", source = 'A')
+#
+#   p <- plotly::layout(
+#     network,
+#     title = title_phrase,
+#     shapes = edge_shapes,
+#     xaxis = x,
+#     yaxis = y
+#   )
+#   return(p)
+#
+# }
 
-  n <- threads_to_network(et, TN, CF, timesplit)
-
-
-  title_phrase = paste("Estimated complexity index =",estimate_network_complexity(n))
-
-  edge_shapes <- list()
-  for(i in 1:length(n$edgeDF$from)) {
-    E <- n$edgeDF[i,]
-
-    edge_shape = list(
-      type = "line",
-      line = list(color = "#030303", width = 0),
-      x0 = E[['from_x']],
-      x1 = E[['to_x']],
-      y0 = E[['from_y']],
-      y1 = E[['to_y']],
-      xref = "x",
-      yref = "y"
-    )
-
-    edge_shapes[[i]] <- edge_shape
-  }
-
-  x <- list(
-    title = 'Average Time'
-  )
-
-  y <- list(
-    title = 'Frequency'
-  )
-  color_pal = colorRampPalette(brewer.pal(11,'Spectral'))
-  size_pal = (n$nodeDF$y_pos-min(n$nodeDF$y_pos))/(max(n$nodeDF$y_pos)-min(n$nodeDF$y_pos))*15+10
-  network <- plot_ly(x = ~n$nodeDF$x_pos, y = ~n$nodeDF$y_pos,
-                     width = 0,
-                     mode = "markers",
-                     marker = list(size= size_pal,
-                                   color=color_pal(100)[as.numeric(cut(n$nodeDF$x_pos, breaks=100))]
-
-                     ),
-                     text = n$nodeDF$label, key = n$nodeDF$label, hoverinfo = "text", source = 'A')
-
-  p <- plotly::layout(
-    network,
-    title = title_phrase,
-    shapes = edge_shapes,
-    xaxis = x,
-    yaxis = y
-  )
-  return(p)
-
-}
 ################################################################
 ##  Here is the networkD3 version of the same thing.
 # it has a bunch of extra code because of the groups...
 # needs to be re-written to separate computation of the network from the layout...
 
-#' NetworkD3 layout for event network
-#'
+#' @title forceNetworkD3 is an Interactive layout for event network
+#' @description This produces a force layout network using networkD3
 #' @name forceNetworkD3
 #' @param n = list with data frames for nodes and edges
 #' @return networkD3 object
@@ -400,7 +390,6 @@ forceNetworkD3 <- function(n){
   n$edgeDF['from'] =  n$edgeDF['from']-1
   n$edgeDF['to'] =  n$edgeDF['to']-1
 
-
   return( forceNetwork(Links = n$edgeDF, Nodes = n$nodeDF, Source = "from",
                        Target = "to", Value = "Value", NodeID = "label",
                        Group = "Group", opacity = 1, zoom = T,arrows=TRUE, bounded = FALSE,
@@ -409,11 +398,9 @@ forceNetworkD3 <- function(n){
 
 
 ######################################################################################
-#' Comparison plots
-#'
-#' Produce a set set of comparison sub-plots in an array.  Ideally, we should be able to use any of the plots. So far it is only bar charts.
+#' @title Comparison plots
+#' @description Produce a set set of comparison sub-plots in an array.  Ideally, we should be able to use any of the plots. So far it is only bar charts.
 #' This is a prototype that could use rather extensive redesign...
-#'
 #' @name Comparison_Plots
 #' @param e dataframe with threads to be plotted
 #' @param o dataframe with the original data
@@ -494,6 +481,8 @@ Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,rol
 
 # Basic Network layout
 # accepts the data stucture with nodeDF and edgeDF created by threads_to_network and normalNetwork
+#' @title circleVisNetwork
+#' @description Produces a circle network layout using visNetwork
 #' @name circleVisNetwork
 #' @param n list with nodeDF and edgeDF dataframes
 #' @param directed type of network = directed or not
@@ -537,6 +526,8 @@ if (directed =='directed')
 # e is any set of events
 # vcf is the context factor to graph as network for that set of events
 # l is the set of labels = factor levels of original data for that VCF
+#' @title normalNetwork
+#' @description Produced a network of co-occurrences for any given CF and displays it in a visNetwork circle layout
 #' @name normalNetwork
 #' @param e event data frame
 #' @param o occurrence data frame
@@ -569,8 +560,6 @@ normalNetwork <- function(e, o, cf){
   diag(a) = 0
   a=a/max(a)
 
-
-
   # print(a)
   g=graph_from_adjacency_matrix(a, mode='undirected', weighted=TRUE)
 
@@ -583,6 +572,8 @@ normalNetwork <- function(e, o, cf){
   return(list(nodeDF = nodes, edgeDF = as.data.frame(edges) ))
 }
 
+#' @title filter_network_edges
+#' @description Filters out network edges with weight below the threshold
 #' @name filter_network_edges
 #' @param n network list of nodeDF and edgeDF
 #' @param  threshold numeric threshold for filtering edges.
@@ -599,8 +590,8 @@ filter_network_edges <- function(n, threshold){
   return(n)
 }
 
-# role map will show "who does what" for any set of events
-# cfs contains a list of two contextual factors.
+#' @name role_map
+#' @description A role map (like a heat map) that will show "who does what" for any set of events
 #' @name role_map
 #' @param e event data frame
 #' @param o occurrence data frame
@@ -633,8 +624,10 @@ role_map <- function(e, o, cfs){
 }
 
 
-# this shows relative time versus sequential time
-# Inspired by Gergen and Danner-Schroeder
+
+#'@title threadTrajectory
+#' @description Create a plotly diagram showing relative time versus sequential time.
+#' Inspired by Gergen and Danner-Schroeder
 #' @name threadTrajectory
 #' @param or event data frame
 #' @return plotly scatter plot
@@ -659,6 +652,9 @@ threadTrajectory <- function(or){
             ))
 }
 
+#' @title movingWindowCorrelation
+#' @description Creates plotly diagram showing correlation of moving windows across time
+#' In this version, the moving window can overlap with itself as it slides
 #' @name movingWindowCorrelation
 #' @param trace list of (x,y) coordinates
 #' @return plotly scatter plot
@@ -685,6 +681,10 @@ movingWindowCorrelation <- function( trace ){
                    showticklabels = TRUE))
   )
 }
+
+#' @title dualmovingWindowCorrelation
+#' @description Creates plotly diagram showing correlation of moving windows across time
+#' This version computes the correlation of TWO adjacent windows that never overlap
 #' @name dualmovingWindowCorrelation
 #' @param trace list of (x,y) coordinates
 #' @return plotly scatter plot

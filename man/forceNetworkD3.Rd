@@ -2,7 +2,7 @@
 % Please edit documentation in R/ThreadNet_Graphics.R
 \name{forceNetworkD3}
 \alias{forceNetworkD3}
-\title{NetworkD3 layout for event network}
+\title{forceNetworkD3 is an Interactive layout for event network}
 \usage{
 forceNetworkD3(n)
 }
@@ -13,15 +13,5 @@ forceNetworkD3(n)
 networkD3 object
 }
 \description{
-NetworkD3 layout for event network
-}
-\seealso{
-Other ThreadNet_Graphics: \code{\link{CF_multi_pie}},
-  \code{\link{Comparison_Plots}},
-  \code{\link{circleVisNetwork}},
-  \code{\link{eventNetwork}},
-  \code{\link{filter_network_edges}},
-  \code{\link{ng_bar_chart}}, \code{\link{normalNetwork}},
-  \code{\link{role_map}}, \code{\link{threadMap}},
-  \code{\link{threadTrajectory}}
+This produces a force layout network using networkD3
 }

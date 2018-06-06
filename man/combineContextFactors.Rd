@@ -19,11 +19,3 @@ data frame with the new column
 \description{
 For example, actor+action
 }
-\seealso{
-Other ThreadNet_Misc: \code{\link{cfnames}},
-  \code{\link{convert_TN_to_TramineR}},
-  \code{\link{get_CF_levels}},
-  \code{\link{get_moving_window}},
-  \code{\link{get_threadList}}, \code{\link{numThreads}},
-  \code{\link{threadSizeTable}}
-}

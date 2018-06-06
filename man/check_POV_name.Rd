@@ -2,8 +2,7 @@
 % Please edit documentation in R/Event_Mappings.R
 \name{check_POV_name}
 \alias{check_POV_name}
-\title{Checks the name attempting to be create against the list of
-map names in memory and forces the creation of a new name.}
+\title{check_POV_name}
 \usage{
 check_POV_name(mapname)
 }
@@ -16,13 +15,4 @@ TRUE or FALSE
 \description{
 Checks the name attempting to be create against the list of
 map names in memory and forces the creation of a new name.
-}
-\seealso{
-Other Event_mappings: \code{\link{delete_POV}},
-  \code{\link{export_POV_csv}}, \code{\link{export_POV}},
-  \code{\link{get_POV_COMPARISON_CF}},
-  \code{\link{get_POV_EVENT_CF}},
-  \code{\link{get_POV_THREAD_CF}},
-  \code{\link{get_POV_name_list}}, \code{\link{get_POV}},
-  \code{\link{store_POV}}
 }

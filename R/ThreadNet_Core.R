@@ -8,19 +8,15 @@
 
 # These are the basic functions that convert threads to networks, etc.
 
-#' Converts threads to network
-#'
-#' Converts a sequentially ordered streams of ;events (threads) and creates a unimodal, unidimensional network.
+#' @title Converts threads to network
+#' @description  Converts a sequentially ordered streams of ;events (threads) and creates a unimodal, unidimensional network.
 #' Sequentially adjacent pairs of events become edges in the resulting network.
-#' @family ThreadNet_Core
-#'
+#' @name threads_to_network_original
 #' @param et dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
 #' @param CF name of the column in dataframe that contains the events that will form the nodes of the network
 #' @param grp grouping variable for coloring the nodes
-#'
 #' @return a list containing two dataframes, one for the nodes (nodeDF) and one for the edges (edgeDF)
-#'
 #' @export threads_to_network_original
 # here is a version without all the position stuff, which should be separated out, if possible.
 # Added in the "group" for the network graphics - default group is 'threadNum' because it will always be there
@@ -154,15 +150,14 @@ threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
 #' Counts ngrams in a set of threads
 #'
 #' This function counts n-grams within threads where the length of the thread is greater than n.
-#' @family ThreadNet_Core
-#'
+#' @title
+#' @description
+#' @name count_ngrams
 #' @param o dataframe containing threads
 #' @param TN name of column in dataframe that contains a unique thread number for each thread
 #' @param CF name of the column in dataframe that contains the events that will form the nodes of the network
 #' @param n length of ngrams to count
-#'
 #' @return a dataframe with ngram, frequency and proportion in descending order
-#'
 #' @export
 count_ngrams <- function(o,TN,CF,n){
 
@@ -189,14 +184,13 @@ count_ngrams <- function(o,TN,CF,n){
 #'
 #' Take the raw occurrences from the input file and sort them by time stamp within
 #' a set of contextual factors that remain constant for each thread.
-#' @family ThreadNet_Core
-#'
+#' @title
+#' @description
+#' @name ThreadOccByPOV
 #' @param  o is the dataframe of cleaned ocurrences
 #' @param  THREAD_CF is a list of 1 or more context factors that define the threads (and stay constant during each thread)
 #' @param  EVENT_CF is a list of 1 or more context factors that define events (and change during threads)
-#'
 #' @return dataframe containing the same occurrences sorted from a different point of view
-#'
 #'@export
 ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
 
@@ -349,8 +343,9 @@ print('done converting occurrences...')
 #'
 #' Thus function provides a place to map occurrences into events, so is is not necessary to interpret individual
 #' occurrences in isolation.  There are many ways to accomplish this mapping.
-#' @family ThreadNet_Core
-#'
+#' @title
+#' @description
+#' @name  OccToEvents_By_Chunk
 #' @param  o  a dataframe of occurrences
 #' @param m = method parameter = one of c('Variable chunks','Uniform chunks')
 #' @param EventMapName = used to store this mapping for visualization and comparison
@@ -361,9 +356,7 @@ print('done converting occurrences...')
 #' @param thread_CF - context factors used to delineate threads
 #' @param event_CF - context factors used to define events
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
-#'
 #' @return event data frame, with occurrences aggregated into events.
-#'
 #' @export
 OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThreshold, timescale='mins', chunk_CF, thread_CF, event_CF, compare_CF){
 
@@ -505,7 +498,9 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 
 
 # this one creates events based on frequent ngrams or regular expressions
-#' @family ThreadNet_Core
+#' @title
+#' @description
+#' @name OccToEvents3
 #' @param  o  a dataframe of occurrences
 #' @param EventMapName = used to store this mapping for visualization and comparison
 #' @param uniform_chunk_size = used to identify breakpoints -- from input slider
@@ -519,9 +514,7 @@ OccToEvents_By_Chunk <- function(o, m, EventMapName, uniform_chunk_size, tThresh
 #' @param CF context factor
 #' @param rx list of patterns
 #' @param KeepIrregularEvents = keep or drop events that don't fit patterns
-#'
 #' @return event data frame, with occurrences aggregated into events.
-#'
 #' @export
 OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF, rx, KeepIrregularEvents){
 
@@ -675,7 +668,9 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 # e is the event list
 # EventMapName is an input selected from the list of available mappings
 # cluster_method is either "Sequential similarity" or "Contextual Similarity" or "Network Structure"
-#' @family ThreadNet_Core
+#' @title
+#' @description
+#' @name clusterEvents
 #' @param  e  a dataframe of events or occurrences
 #' @param NewMapName = used to store this mapping for visualization and comparison
 #' @param cluster_method = method for clustering
@@ -684,9 +679,7 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 #' @param compare_CF = context factors used for comparison -- need to be copied over here when the thread is created.
 #' @param TN ThreadNum
 #' @param what_to_return POV or Cluster solution
-
 #' @return event data frame with occurrences aggregated into events or cluster solution
-#'
 #' @export
 clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,what_to_return='POV'){
 
@@ -755,6 +748,12 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
   else
    {return(newmap)}
 }
+
+#############################################################################
+#############################################################################
+##  LOCAL FUNCTIONS from here on down
+#############################################################################
+#############################################################################
 
 # this function pulls computes their similarity of chunks based on sequence
 # these functions are only used locally

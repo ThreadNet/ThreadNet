@@ -16,9 +16,3 @@ number
 Each column in the raw data represents a contextual factor.  This function computes the entropy of each factor that is selected for use in the
 analysis.
 }
-\seealso{
-Other ThreadNet_Metrics: \code{\link{compression_index}},
-  \code{\link{estimate_network_complexity}},
-  \code{\link{estimate_task_complexity_index}},
-  \code{\link{routineness_metric}}
-}
