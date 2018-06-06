@@ -91,7 +91,7 @@ CF_multi_pie <- function(oc,CF){
   }
 
   pies = pies %>%
-    layout(showlegend=FALSE,
+    plotly::layout(showlegend=FALSE,
            xaxis = list(showgrid = FALSE,zeroline = FALSE, showticklabels = FALSE),
            yaxis = list(showgrid = FALSE, zeroline = FALSE,showticklabels = FALSE)
            # ,
@@ -197,7 +197,7 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
   }
 
   pies = pies %>%
-    layout(showlegend=FALSE,
+    plotly::layout(showlegend=FALSE,
            xaxis = list(showgrid = FALSE,zeroline = FALSE, showticklabels = FALSE),
            yaxis = list(showgrid = FALSE, zeroline = FALSE,showticklabels = FALSE)
            # ,
@@ -250,7 +250,7 @@ threadMap <- function(or, TN, timescale, CF, shape){
              hoverinfo = "text+x+y",
              symbol= "line-ew", symbols=shape, showlegend=FALSE)
              %>%
-               layout(
+            plotly::layout(
                  xaxis = list(title = xaxis),
                  yaxis = list(title = knitr::combine_words(get_THREAD_CF(), sep = ", "))
                )
@@ -291,7 +291,7 @@ ng_bar_chart <- function(o,TN, CF, n, mincount){
   ngBars = ngdf[ngdf$freq>=mincount,]
 
   ngp <- plot_ly( ngBars, x = ~ngrams, y = ~freq, type = "bar",showlegend=FALSE) %>%
-    layout(xaxis= list(showticklabels = FALSE, title=paste0(n,"-grams of ",CF, " that occur > ",mincount," times")))
+    plotly::layout(xaxis= list(showticklabels = FALSE, title=paste0(n,"-grams of ",CF, " that occur > ",mincount," times")))
 
   return(ngp)
 }
@@ -303,8 +303,8 @@ ng_bar_chart_freq <- function(ngdf){
   ngdf$ngrams = factor(ngdf$ngrams, levels =unique(ngdf$ngrams)[order(ngdf$freq, decreasing = FALSE)])
 
   ngp <- plot_ly( ngdf, y = ~ngrams, x = ~freq, type = "bar",showlegend=FALSE) %>%
-    layout(xaxis= list(showticklabels = TRUE, title='Frequency'))  %>%
-    layout(yaxis= list(showticklabels = FALSE, title=''))
+    plotly::layout(xaxis= list(showticklabels = TRUE, title='Frequency'))  %>%
+    plotly::layout(yaxis= list(showticklabels = FALSE, title=''))
 
   return(ngp)
 }
@@ -368,7 +368,7 @@ eventNetwork <- function(et, TN, CF, timesplit){
                      ),
                      text = n$nodeDF$label, key = n$nodeDF$label, hoverinfo = "text", source = 'A')
 
-  p <- layout(
+  p <- plotly::layout(
     network,
     title = title_phrase,
     shapes = edge_shapes,
@@ -661,7 +661,7 @@ threadTrajectory <- function(or){
                   hoverinfo = "text",
                   showlegend=FALSE)
           %>%
-            layout(
+            plotly::layout(
               xaxis = list(title='Relative time'),
               yaxis = list(title='Sequence')
             ))
@@ -679,7 +679,7 @@ movingWindowCorrelation <- function( trace ){
                   symbol= "line-ew", symbols=15, showlegend=FALSE
   )
   %>%
-    layout(
+    plotly::layout(
       xaxis = list(title='Window number'),
       yaxis = list(title='Correlation',
                    range = c(0, 1),
@@ -704,7 +704,7 @@ dualmovingWindowCorrelation <- function( trace ){
                   symbol= "line-ew", symbols=15, showlegend=FALSE  #,height = 200
   )
   %>%
-    layout(
+    plotly::layout(
       xaxis = list(title='Window number'),
       yaxis = list(title='Correlation',
                    range = c(0, 1),
