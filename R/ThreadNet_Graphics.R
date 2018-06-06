@@ -11,7 +11,6 @@
 # explicitly add packages/functions to the NAMESPACE
 #' @importFrom  grDevices colorRampPalette
 #' @importFrom  graphics plot
-#' @importFrom methods new
 
 
 ###### Pie charts for context factors  ####

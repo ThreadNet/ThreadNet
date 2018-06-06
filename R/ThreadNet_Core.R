@@ -81,8 +81,8 @@ threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
     label = ngdf$freq,
     Value =ngdf$freq) %>% filter(!from==to)
 
-  print(paste("T2N nodes:",nodes))
-   print(paste("T2N edges:",edges))
+  # print(paste("T2N nodes:",nodes))
+  #  print(paste("T2N edges:",edges))
 
   return(list(nodeDF = nodes, edgeDF = edges))
 }
@@ -732,6 +732,36 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
    {return(newmap)}
 }
 
+
+# this is used for the regex pages to show the threads.
+# similar code is used in count_ngrams and to make networks, but with different delimiters
+# and with a minimum sequence length (ngram size), but this can be filtered after this function3
+#' @title thread_text_vector
+#' @description Create a vector of threads
+#' @name thread_text_vector
+#' @param  o  a dataframe of events or occurrences
+#' @param TN = threadNum
+#' @param CF = CF or columm to include
+#' @param delimiter usually comma or blank
+#' @return vector of threads as delimited character strings
+#' @export
+ thread_text_vector <- function(o, TN, CF, delimiter){
+
+  # Initialize text vector
+  tv = vector(mode="character")
+
+  # Loop through the unique thread numbers
+  j=0
+  for (i in unique(o[[TN]])){
+    txt =o[o[[TN]]==i,CF]
+
+    j=j+1
+    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF] ),' ',delimiter)
+  }
+  return(tv)
+
+}
+
 #############################################################################
 #############################################################################
 ##  LOCAL FUNCTIONS from here on down
@@ -769,10 +799,9 @@ dist_matrix_network <- function(e,CF){
   # first get the nodes and edges
   n=threads_to_network_original(e,'threadNum',CF)
 
-   print(paste('in dist_matrix_network, n=', n))
-   print(n$nodeDF[['label']])
-   print(n$edgeDF)
-
+   # print(paste('in dist_matrix_network, n=', n))
+   # print(n$nodeDF[['label']])
+   # print(n$edgeDF)
 
 
   # now get the shortest paths between all nodes in the graph
@@ -932,25 +961,7 @@ one_vcf_matrix <- function(e, vcf){
 }
 
 
-# this is used for the regex pages to show the threads.
-# similar code is used in count_ngrams and to make networks, but with different delimiters
-# and with a minimum sequence length (ngram size), but this can be filtered after this function3
-thread_text_vector <- function(o, TN, CF, delimiter){
 
-  # Initialize text vector
-  tv = vector(mode="character")
-
-  # Loop through the unique thread numbers
-  j=0
-  for (i in unique(o[[TN]])){
-    txt =o[o[[TN]]==i,CF]
-
-    j=j+1
-    tv[j] = str_replace_all(concatenate(o[o[[TN]]==i,CF] ),' ',delimiter)
-  }
-  return(tv)
-
-}
 
 # use this to replace patterns for regex and ngrams
 # tv is the text vector for the set of threads
@@ -983,6 +994,17 @@ replace_regex_list <- function(tv, rx ){
 
 # combined set of frequent ngrams
 # add parameter to make maximal a choice
+#' @title frequent_ngrams
+#' @description combined set of frequent ngrams within a range o lengths
+#' @name frequent_ngrams
+#' @param  e  event data
+#' @param TN threadNum
+#' @param CF context factor (column) to look at
+#' @param minN  miniumum ngram length
+#' @param maxN  maximum ngram length
+#' @param onlyMaximal Filters out ngrams that are included in longer ngrams.  Default is true.
+#' @return dataframe of ngrams
+#' @export
 frequent_ngrams <- function(e, TN, CF, minN, maxN, onlyMaximal=TRUE){
 
   # initialize the output
@@ -1024,6 +1046,13 @@ maximal_ngrams <- function(ng){
 # tv = text vectors for the threads
 # ng = frequent ngrams data frame
 # returns ng data frame with support level added
+#' @title support_level
+#' @description Counts what fraction of the threads a particular ngram appears in
+#' @name support_level
+#' @param  tv  text vector of threads
+#' @param ng ngram to be located in the threads
+#' @return percentage of threads containing the ngram
+#' @export
 support_level <- function(tv, ng) {
 
   # change the commas back to spaces
@@ -1045,7 +1074,7 @@ support_level <- function(tv, ng) {
   return(ng)
 }
 
-# compute the generativity = in-degree and out-degree
+
 generativity_level<- function(tv, ng){
 
   # for each ngram, look at the next longer size
