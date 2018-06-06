@@ -8,6 +8,9 @@
 
 
 ##  Make an example data frame for display...
+#' @description presents example data when the input data is bad
+#' @return DF with some data
+#' @export
 make_example_DF = function(){
   correct_occ = read.table(text="tStamp actor action object location
                             '2017-4-7 17:52:04' jimmy tosses ball playground
@@ -476,6 +479,9 @@ dual_window_correlation  <- function(e,w,s=1,n=2){
 
 # Make a nice dataframe to display
 # Issue is that DT::renderdatatable cannot display lists correctly.
+#' @description Removes columns that do not need to be displayed
+#' @param e data frame with POV
+#' @export
 make_nice_event_DT <- function(e){
 
   # Add new column for the occurrences as a character string for display
@@ -497,6 +503,7 @@ make_nice_event_DT <- function(e){
 
 # find the biggest column with ZM_, and then get the number that goes with that.
 # It will not be the same as the column number.
+#' @description Used to set upper limit on sliders for zooming
 #' @param event data frame
 #' @return biggest zoom level
 #' @export

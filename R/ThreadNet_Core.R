@@ -320,9 +320,10 @@ ThreadOccByPOV <- function(o,THREAD_CF,EVENT_CF){
     incProgress(4/n)
 
 
-    # this will store the event map in the GlobalEventMappings and return events with network cluster added for zooming...
- #   e=clusterEvents(occ, 'OneToOne', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
-    e=clusterEvents(occ, '', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
+    #  return events with network cluster added for zooming...
+    # print('assign label to ZM_1')
+    # e$ZM_1 = e$label
+     e=clusterEvents(occ, '', 'Network Proximity', THREAD_CF, EVENT_CF,'threads')
 
     # sort them by threadnum and seqnum
     e = e[order(e[['threadNum']],e[['seqNum']]),]
@@ -689,7 +690,6 @@ OccToEvents3 <- function(o, EventMapName, THREAD_CF, EVENT_CF, compare_CF,TN, CF
 #' @export
 clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,what_to_return='POV'){
 
-  # make sure to cluster on the correct column (one that exists...)
 
   if (cluster_method=="Sequential similarity")
   { dd = dist_matrix_seq(e) }
@@ -707,6 +707,10 @@ clusterEvents <- function(e, NewMapName, cluster_method, thread_CF, event_CF,wha
     {focalCol = paste0('ZM_',zoom_upper_limit(e))}
     # print(paste('in cluster_events, then, focalCol=',focalCol))
     dd = dist_matrix_network(e,focalCol) }
+
+  # if there are NA or NaN values, replace then with numbers 10x as big as the largest
+  dd[is.na(dd)] = max(dd[!is.na(dd)])*10
+  dd[is.infinite(dd)] = max(dd[!is.infinite(dd)])*10
 
   ### cluster the elements
   clust = hclust( dd,  method="ward.D2" )
