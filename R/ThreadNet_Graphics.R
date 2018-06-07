@@ -30,10 +30,10 @@ CF_multi_pie <- function(oc,CF){
   # print(paste('in CF_multiPie, CF=',CF))
 
   # avoid unpleasant error messages
-  if (length(CF)==0) {return(plotly_empty())}
+  if (length(CF)==0) {return(plotly_empty(type='scatter',mode='markers'))}
 
   # make sure the necessary columns are present
-  if (!all(CF %in% colnames(oc))) {return(plotly_empty())}
+  if (!all(CF %in% colnames(oc))) {return(plotly_empty(type='scatter',mode='markers'))}
 
   # first add the combined column if there is more than one
   if (length(CF) >1){
@@ -57,7 +57,7 @@ CF_multi_pie <- function(oc,CF){
 
 
   # Now loop for each CF, computing entropy and adding on the next "trace" to the plot
-  # start with blank plot object
+  # start with blank plot object.  Assign type=scatter to suppress warnings.
   pies = plot_ly()
   max_combos = 1
   for (i in 1:nPlots) {
@@ -105,11 +105,6 @@ CF_multi_pie <- function(oc,CF){
 # CF = list of context factor names used to define events
 # r is the row name for the event being examined
 #
-# KNOWN ISSUES:
-#  * Need to pass in the factor levels as labels for the pie slices
-#  * Need to compute the values differently for a node in the dendrogram or in a zoomed graph
-#  * Probably need to pass in the vector of values
-#
 #  Call this for one CF at a time
 # o is the raw occurrences.  This is where we get the labels.
 # e is the events.  This is where we get the frequencies
@@ -144,9 +139,9 @@ make_df_for_one_pie <- function(o,e,cf,r,zm){
 CF_multi_pie_event <- function(o, e,CF,r, zm){
 
   # avoid unpleasant error messages
-  if (length(CF)==0) {return(plotly_empty())}
+  if (length(CF)==0) {return(plotly_empty(type='scatter',mode='markers'))}
   # print(paste('in CF_multi_pie_event, r=',r))
-  if (is.na(as.numeric(r))) {return(plotly_empty())}
+  if (is.na(as.numeric(r))) {return(plotly_empty(type='scatter',mode='markers'))}
 
   # get number of plots
   nPlots = length(CF)
@@ -169,8 +164,10 @@ CF_multi_pie_event <- function(o, e,CF,r, zm){
   n=length
 
   # Now loop for each CF, computing entropy and adding on the next "trace" to the plot
-  # start with blank plot object
+  # start with blank plot object.  Assign type = scatter to suppress warnings.
+#  pies = plot_ly(type='scatter')
   pies = plot_ly()
+
   max_combos = 1
   for (i in 1:nPlots) {
 
@@ -604,7 +601,7 @@ filter_network_edges <- function(n, threshold){
 role_map <- function(e, o, cfs){
 
   if (!length(cfs)==2)
-    return(plot_ly())
+    return(plot_ly(type='scatter'))
 
   # Get the context factors
   vcf_1 = paste0('V_',cfs[1])
