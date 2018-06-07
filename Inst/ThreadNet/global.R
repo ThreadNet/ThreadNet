@@ -12,26 +12,26 @@
 
 
 # add the dependent packages
-library(shiny)
-library(shinyjs)
-library(plotly)
-library(ggplot2)
-library(tidyverse)
-library(ngram)
-library(stringr)
-library(stringdist)
-library(igraph)
-library(networkD3)
-library(visNetwork)
-library(xesreadR)
-library(colorspace)
-library(DT)
-library(RColorBrewer)
-library(lubridate)
-library(knitr)
-library(ThreadNet)
-
-
+suppressPackageStartupMessages({
+	library(shiny)
+	library(shinyjs)
+	library(plotly)
+	library(ggplot2)
+	library(tidyverse)
+	library(ngram)
+	library(stringr)
+	library(stringdist)
+	library(igraph)
+	library(networkD3)
+	library(visNetwork)
+	library(xesreadR)
+	library(colorspace)
+	library(DT)
+	library(RColorBrewer)
+	library(lubridate)
+	library(knitr)
+	library(ThreadNet)
+})
 
 # visualization types for UI dropdowns
 visualizations <- c(
