@@ -455,7 +455,7 @@ Comparison_Plots <- function(e, o, CF, CF_levels, nTimePeriods=1,  plot_type,rol
          else if (plot_type=='Threads (event time)')
          {plot_list[[plotName]] = threadMap(dfp, "threadNum", "seqNum", 1, 15 ) }
        else
-        {plot_list[[plotName]] =  plotly_empty()}
+        {plot_list[[plotName]] =  plotly_empty(type='scatter',mode='marker')}
     }
   }}
 

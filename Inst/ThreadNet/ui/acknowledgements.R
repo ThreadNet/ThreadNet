@@ -4,7 +4,7 @@ tabPanel(
     tags$p("Brian Pentland, Michigan State University"),
 
     tags$h4("Contact"),
-    tags$mailto("ThreadNetHelp@gmail.com"),
+    tags$a(href="mailto:ThreadNetHelp@gmail.com","ThreadNetHelp@gmail.com"),
 
     tags$h4("Financial Support"),
     tags$a(href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1734237","NSF SES-1734237",target="_blank"),
@@ -23,5 +23,5 @@ tabPanel(
     tags$a(href="http://routines.broad.msu.edu/ThreadNet/","http://routines.broad.msu.edu/ThreadNet/",target="_blank" ),
 
     tags$h4("Official Song"),
-    tags$a(href="Doctor Decade: Tell Us a Story","https://www.youtube.com/watch?v=tSnoHWBYA8U",target="_blank" )
+    tags$a(href="https://www.youtube.com/watch?v=tSnoHWBYA8U", "Doctor Decade: Tell Us a Story", target="_blank" )
 )
