@@ -8,6 +8,14 @@
 
 server <- shinyServer(function(input, output, session) {
 
+  # try just moving these here and see if it works...
+  Global_POV <<- list()
+  Global_POV_Name <<- list()
+  Global_POV_Event_CF <<- list()
+  Global_POV_Thread_CF <<- list()
+
+
+
   observe({
     hide(selector = "#navbar li a[data-value=choosePOV]")
     hide(selector = "#navbar li a[data-value=visualize]")

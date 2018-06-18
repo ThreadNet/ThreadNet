@@ -57,8 +57,8 @@ visualizations <- c(
 Sys.setenv(TZ='GMT')
 
 # This is where we store the list of event mappings.
-Global_POV <<- list()
-Global_POV_Name <<- list()
-Global_POV_Event_CF <<- list()
-Global_POV_Thread_CF <<- list()
+# Global_POV <<- list()
+# Global_POV_Name <<- list()
+# Global_POV_Event_CF <<- list()
+# Global_POV_Thread_CF <<- list()
 
