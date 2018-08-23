@@ -3,6 +3,7 @@
 #### Main Tab Output Functions ####
 
 # Controls for the whole set of tabs
+
 output$Visualize_Tab_Controls_1 <- renderUI({
 	selectizeInput(
 		"VisualizeEventMapInputID",
@@ -81,6 +82,7 @@ output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({ threadMap(threadedE
 # use this to select how to color the nodes in force layout
 output$Circle_Network_Tab_Controls <- renderUI({
   tags$div(
+    actionButton("save_edge_list_button","Save this network view"),
   sliderInput("circleEdgeTheshold","Display edges above", 0,1,0,step = 0.01,ticks = FALSE ),
   radioButtons(
     "Label_or_Zoom_1",
@@ -88,23 +90,44 @@ output$Circle_Network_Tab_Controls <- renderUI({
     choices = c('Labels','Zooming'),
     selected = 'Labels',
     inline = TRUE)
+
   )
 })
 
-
-output$circleVisNetwork <- renderVisNetwork({
+# Create the network to be exported and also displayed
+viz_net  <<-  reactive({
   req(input$circleEdgeTheshold)
 
-	# first convert the threads to the network
+  # first convert the threads to the network
   if (input$Label_or_Zoom_1 == 'Labels')
   { n <- threads_to_network_original(threadedEventsViz(), "threadNum", 'label') }
   else
   { n <- threads_to_network_original(threadedEventsViz(), "threadNum", get_Zoom_VIZ()) }
 
   # filter out the edges if desired
-	n <- filter_network_edges(n,input$circleEdgeTheshold)
-	circleVisNetwork(n, 'directed', TRUE)
+  n <- filter_network_edges(n,input$circleEdgeTheshold)
+  n
 })
+
+output$circleVisNetwork <- renderVisNetwork({
+  req(input$circleEdgeTheshold)
+
+	circleVisNetwork(viz_net(), 'directed', TRUE)
+})
+
+# output$circleVisNetwork <- renderVisNetwork({
+#   req(input$circleEdgeTheshold)
+#
+# 	# first convert the threads to the network
+#   if (input$Label_or_Zoom_1 == 'Labels')
+#   { n <- threads_to_network_original(threadedEventsViz(), "threadNum", 'label') }
+#   else
+#   { n <- threads_to_network_original(threadedEventsViz(), "threadNum", get_Zoom_VIZ()) }
+#
+#   # filter out the edges if desired
+# 	n <- filter_network_edges(n,input$circleEdgeTheshold)
+# 	circleVisNetwork(n, 'directed', TRUE)
+# })
 
 #### Other Networks sub-tab ####
 

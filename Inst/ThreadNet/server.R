@@ -320,6 +320,12 @@ server <- shinyServer(function(input, output, session) {
 	  showNotification(paste(input$ManageEventMapInputID, " exported as .csv file"), type='message', duration=10)
 	})
 
+	# This is on  visualize tab, but logically it fits better here
+	observeEvent(input$save_edge_list_button,{
+	  export_network(input$ManageEventMapInputID, viz_net() )
+	  showNotification("Graph exported as edge list", type='message', duration=10)
+	})
+
 	# Another opportunity to make subsets...
 	observeEvent(input$SelectSubsetButton,
                  if (check_POV_name(input$SelectSubsetMapName)){

@@ -191,3 +191,24 @@ export_POV_csv <- function(mapname){
   write.csv(output, file=file.choose(), quote = TRUE, row.names = FALSE)
 
 }
+
+#' @title export_network
+#' @description Exports the edge list for the graph that is displayed
+#' @name export_network
+#' @param mapname name of POV map to use as name of the file
+#' @param n
+#' @return (saves network into file)
+#' @export
+export_network <- function(mapname, CurrentNetwork ){
+
+  # get the nice variable names
+  nicename = paste0("CurrentNetwork_from_",mapname)
+
+  # get the edge list for the network
+  # edge_list <- n.edgeDF
+
+  # save the data
+  save( CurrentNetwork , file = paste0(nicename,".Rdata"))
+
+}
+
