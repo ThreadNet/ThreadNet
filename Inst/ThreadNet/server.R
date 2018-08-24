@@ -320,10 +320,24 @@ server <- shinyServer(function(input, output, session) {
 	  showNotification(paste(input$ManageEventMapInputID, " exported as .csv file"), type='message', duration=10)
 	})
 
+	CurrentNetwork <- reactiveValues()
+	observe({
+	  if(!is.null(viz_net()))
+	    isolate(
+	      CurrentNetwork <<- viz_net()
+	    )
+	})
+
+	output$downloadNetwork <- downloadHandler(
+	  filename =  paste("CurrentNetwork_POV.Rdata"),
+	  # content = function(file) { save( eval(assign('CurrentNetwork',viz_net())) , file = file) }
+	  content = function(file) { save( CurrentNetwork , file = file) }
+	)
+
 	# This is on  visualize tab, but logically it fits better here
 	observeEvent(input$save_edge_list_button,{
-	  export_network(input$ManageEventMapInputID, viz_net() )
-	  showNotification("Graph exported as edge list", type='message', duration=10)
+	  export_network(input$VisualizeEventMapInputID, viz_net() )
+	  showNotification("Exported to CurrentNetwork_POV.Rdata", type='message', duration=10)
 	})
 
 	# Another opportunity to make subsets...

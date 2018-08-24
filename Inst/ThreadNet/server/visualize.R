@@ -82,7 +82,7 @@ output$WholeSequenceThreadMap_RelativeTime <- renderPlotly({ threadMap(threadedE
 # use this to select how to color the nodes in force layout
 output$Circle_Network_Tab_Controls <- renderUI({
   tags$div(
-    actionButton("save_edge_list_button","Save this network view"),
+    downloadButton('downloadNetwork', 'Export this Network', class="dlButton"),
   sliderInput("circleEdgeTheshold","Display edges above", 0,1,0,step = 0.01,ticks = FALSE ),
   radioButtons(
     "Label_or_Zoom_1",
@@ -108,6 +108,7 @@ viz_net  <<-  reactive({
   n <- filter_network_edges(n,input$circleEdgeTheshold)
   n
 })
+
 
 output$circleVisNetwork <- renderVisNetwork({
   req(input$circleEdgeTheshold)

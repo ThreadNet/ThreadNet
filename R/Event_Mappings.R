@@ -203,12 +203,15 @@ export_network <- function(mapname, CurrentNetwork ){
 
   # get the nice variable names
   nicename = paste0("CurrentNetwork_from_",mapname)
+  nicename = "CurrentNetwork_POV"
 
   # get the edge list for the network
   # edge_list <- n.edgeDF
 
+  print('saving network: CurrentNetwork_POV.Rdata')
   # save the data
   save( CurrentNetwork , file = paste0(nicename,".Rdata"))
+  print(' network saved')
 
 }
 
