@@ -1,4 +1,4 @@
-##########################################################################################################
+ ##########################################################################################################
 # THREADNET:  Metrics
 
 # This software may be used according to the terms provided in the
@@ -17,6 +17,9 @@
 #' @export
 estimate_network_complexity <- function(net){ return(estimate_task_complexity_index( nrow(net$nodeDF), nrow(net$edgeDF)) ) }
 
+# returns a string with the number of nodes and edges in  the  network
+print_network_nodes_edges <- function(net){ return(paste0('Number of nodes = ', nrow(net$nodeDF),'  Number of edges = ', nrow(net$edgeDF) ) ) }
+
 
 #' @title Estimates the number of paths in a directed graph
 #' @description Same as estimate_network_complexity, but takes this version takes vertices and edges as parameters
@@ -32,17 +35,17 @@ estimate_task_complexity_index <- function(v,e){
   # v = number of vertices
   # tested for range of 10 < v < 100
   # e = number of edges
-  print("edges")
-  print(e)
-  print("vertices")
-  print(v)
+  # print("edges")
+  # print(e)
+  # print("vertices")
+  # print(v)
   #
   # OUTPUT ARG:
   # cidx correlates with Log10(simple paths) with r>= 0.8
 
   # from ORM paper analysis, constant is 0.12.
   # For boundary condition of 2 nodes and 1 edge, complexity index=0, constant = 0.08
-  return(  0.08 + 0.08*e - 0.08*v )
+  return( 10^( 0.08 + 0.08*e - 0.08*v) )
 }
 
 
@@ -84,7 +87,7 @@ compression_index <- function(df,CF){ return(
     length(paste0(as.character(df[[CF]]))) ) }
 
 
-#######################################################################
+#######################################################################es
 #compute entropy for a set of observations in a column from a data frame
 #' @title Compute the entropy of a contextual factor
 #' @description Each column in the raw data represents a contextual factor.  This function computes the entropy of each factor that is selected for use in the

@@ -94,6 +94,15 @@ output$Circle_Network_Tab_Controls <- renderUI({
   )
 })
 
+output$Circle_Network_Path_Estimate <- renderText({
+  paste0('Estimated paths = ',
+         estimate_network_complexity(viz_net())  )
+})
+
+output$Network_Nodes_Edges <- renderText({
+  paste0( print_network_nodes_edges(viz_net())  )
+})
+
 # Create the network to be exported and also displayed
 viz_net  <<-  reactive({
   req(input$circleEdgeTheshold)

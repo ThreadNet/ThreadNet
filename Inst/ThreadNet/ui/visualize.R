@@ -40,6 +40,8 @@ tabPanel(value = "visualize",
         tabPanel(
             "Event network (circle)",
             uiOutput("Circle_Network_Tab_Controls"),
+            textOutput("Circle_Network_Path_Estimate"),
+            textOutput("Network_Nodes_Edges"),
             visNetworkOutput("circleVisNetwork", width = "100%", height = "1200px")
         ),
         tabPanel(
