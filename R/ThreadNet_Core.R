@@ -75,14 +75,16 @@ threads_to_network_original <- function(et,TN,CF,grp='threadNum'){
     to[i] = match(to_labels[i], nodes$label)
   }
 
+  # Stopped filtering out selfies July 20, 2019 for  Kerstin Sailer bug  report
   edges = data.frame(
     from,
     to,
     label = ngdf$freq,
-    Value =ngdf$freq) %>% filter(!from==to)
+    Value =ngdf$freq) # %>% filter(!from==to)
 
   # print(paste("T2N nodes:",nodes))
-  #  print(paste("T2N edges:",edges))
+  # print(paste("ngdf = :",ngdf))
+  # print(paste("edges= :",edges))
 
   return(list(nodeDF = nodes, edgeDF = edges))
 }
@@ -163,10 +165,13 @@ count_ngrams <- function(o,TN,CF,n){
   # Need a vector of strings, one for each thread, delimited by spaces
   # the function long_enough filters out the threads that are shorter than n
   # use space for the delimiter here
-  text_vector = long_enough( thread_text_vector(o,TN,CF,' '), n, ' ')
+   text_vector = long_enough( thread_text_vector(o,TN,CF,' '), n, ' ')
+  # text_vector =   thread_text_vector(o,TN,CF,' ')
 
-  # print("text_vector")
-  # print(text_vector)
+
+   # print(paste0("thread=", o[1,TN] ,", text_vector"))
+   # print(text_vector)
+
 
   ng = get.phrasetable(ngram(text_vector,n))
 

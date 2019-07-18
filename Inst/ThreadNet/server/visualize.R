@@ -96,7 +96,7 @@ output$Circle_Network_Tab_Controls <- renderUI({
 
 output$Circle_Network_Path_Estimate <- renderText({
   paste0('Estimated paths = ',
-         estimate_network_complexity(viz_net())  )
+        round(estimate_network_complexity(viz_net())  ),1)
 })
 
 output$Network_Nodes_Edges <- renderText({
