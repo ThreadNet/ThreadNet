@@ -18,6 +18,12 @@
 estimate_network_complexity <- function(net){ return(estimate_task_complexity_index( nrow(net$nodeDF), nrow(net$edgeDF)) ) }
 
 # returns a string with the number of nodes and edges in  the  network
+#' @title returns a string with the number of nodes and edges in  the  network
+#' @description returns a string with the number of nodes and edges
+#' @name print_network_nodes_edges
+#' @param net Object with dataframe for nodes and edges
+#' @return string
+#' @export
 print_network_nodes_edges <- function(net){ return(paste0('Number of nodes = ', nrow(net$nodeDF),'  Number of edges = ', nrow(net$edgeDF) ) ) }
 
 
