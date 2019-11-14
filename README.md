@@ -1,12 +1,30 @@
 # ThreadNet
 
-##ThreadNet weaves threads into networks
+ThreadNet weaves threads into networks
 
 ## Overview
+
 ThreadNet is a tool for visualization of repetitive sequences, such as organizational routines. It emphasizes the role of sequential and temporal context.  It is being created for NSF (SES-1734237) Antecedents of Complexity in Healthcare Routine, a collaborative project between Michigan State University and the University of Rochester Medical Center.  Co-PIs: Brian Pentland and Kenneth Frank (MSU), Julie Ryan Wolf and Alice Pentland (URMC).  The original version of ThreadNet was implemented in MatLab. 
 
-## Documentation and sample data
-You can access installation instructions, documentation and sample data here: http://routines.broad.msu.edu/ThreadNet 
+## Installation
+ThreadNet is currently not available through CRAN. You can install the package directly rom the source, using `devtools`:
+
+```r
+if (!"devtools" %in% installed.packages()[, "Package"]) {
+  install.packages("devtools")
+}
+devtools::install_github('ThreadNet/ThreadNet')
+```
+
+## Usage 
+In order to start the app:
+
+```r
+library(ThreadNet)
+ThreadNet()
+```
+
+ThreadNet uses an intuitive `R Shiny` graphical user interface that you can explore on your own. For further documentation and sample data see [ThreadNet's institutional homepage](http://routines.broad.msu.edu/ThreadNet).
 
 ## File format
 ThreadNet reads data in simple .CSV format and .XES format (IEEE standard for process event log data). 
